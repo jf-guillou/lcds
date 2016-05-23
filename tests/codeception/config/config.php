@@ -1,6 +1,6 @@
 <?php
 /**
- * Application configuration shared by all test types
+ * Application configuration shared by all test types.
  */
 return [
     'language' => 'en-US',

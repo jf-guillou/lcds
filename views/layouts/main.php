@@ -43,14 +43,14 @@ AppAsset::register($this);
                 ['label' => 'Login', 'url' => ['/site/login']]
             ) : (
                 '<li>'
-                . Html::beginForm(['/site/logout'], 'post', ['class' => 'navbar-form'])
-                . Html::submitButton(
-                    'Logout (' . Yii::$app->user->identity->username . ')',
+                .Html::beginForm(['/site/logout'], 'post', ['class' => 'navbar-form'])
+                .Html::submitButton(
+                    'Logout ('.Yii::$app->user->identity->username.')',
                     ['class' => 'btn btn-link']
                 )
-                . Html::endForm()
-                . '</li>'
-            )
+                .Html::endForm()
+                .'</li>'
+            ),
         ],
     ]);
     NavBar::end();

@@ -57,5 +57,4 @@ class LoginFormTest extends TestCase
             expect('user should be logged in', Yii::$app->user->isGuest)->false();
         });
     }
-
 }
