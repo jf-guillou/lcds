@@ -7,12 +7,11 @@ use Yii;
 /**
  * This is the model class for table "flow".
  *
- * @property integer $id
+ * @property int $id
  * @property string $name
  * @property string $description
- * @property integer $owner_id
- * @property integer $parent_id
- *
+ * @property int $owner_id
+ * @property int $parent_id
  * @property Flow $parent
  * @property Flow[] $flows
  * @property FlowHasContent[] $flowHasContents
@@ -23,7 +22,7 @@ use Yii;
 class Flow extends \yii\db\ActiveRecord
 {
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public static function tableName()
     {
@@ -31,7 +30,7 @@ class Flow extends \yii\db\ActiveRecord
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function rules()
     {
@@ -40,12 +39,12 @@ class Flow extends \yii\db\ActiveRecord
             [['owner_id', 'parent_id'], 'integer'],
             [['name'], 'string', 'max' => 64],
             [['description'], 'string', 'max' => 1024],
-            [['parent_id'], 'exist', 'skipOnError' => true, 'targetClass' => Flow::className(), 'targetAttribute' => ['parent_id' => 'id']],
+            [['parent_id'], 'exist', 'skipOnError' => true, 'targetClass' => self::className(), 'targetAttribute' => ['parent_id' => 'id']],
         ];
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function attributeLabels()
     {
@@ -63,7 +62,7 @@ class Flow extends \yii\db\ActiveRecord
      */
     public function getParent()
     {
-        return $this->hasOne(Flow::className(), ['id' => 'parent_id']);
+        return $this->hasOne(self::className(), ['id' => 'parent_id']);
     }
 
     /**
@@ -71,7 +70,7 @@ class Flow extends \yii\db\ActiveRecord
      */
     public function getFlows()
     {
-        return $this->hasMany(Flow::className(), ['parent_id' => 'id']);
+        return $this->hasMany(self::className(), ['parent_id' => 'id']);
     }
 
     /**

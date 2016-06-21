@@ -7,18 +7,18 @@ use Yii;
 /**
  * This is the model class for table "content".
  *
- * @property integer $id
+ * @property int $id
  * @property string $name
  * @property string $description
- * @property integer $type_id
+ * @property int $type_id
  * @property string $data
- * @property integer $duration
+ * @property int $duration
  * @property string $start_ts
  * @property string $end_ts
  * @property string $add_ts
- * @property boolean $enabled
- * @property integer $owner_id
- *
+ * @property bool $enabled
+ * @property int $owner_id
+ * @property bool $editable
  * @property ContentType $type
  * @property FlowHasContent[] $flowHasContents
  * @property Flow[] $flows
@@ -26,7 +26,7 @@ use Yii;
 class Content extends \yii\db\ActiveRecord
 {
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public static function tableName()
     {
@@ -34,7 +34,7 @@ class Content extends \yii\db\ActiveRecord
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function rules()
     {
@@ -43,7 +43,7 @@ class Content extends \yii\db\ActiveRecord
             [['type_id', 'duration', 'owner_id'], 'integer'],
             [['data'], 'string'],
             [['start_ts', 'end_ts', 'add_ts'], 'safe'],
-            [['enabled'], 'boolean'],
+            [['enabled', 'editable'], 'boolean'],
             [['name'], 'string', 'max' => 64],
             [['description'], 'string', 'max' => 1024],
             [['type_id'], 'exist', 'skipOnError' => true, 'targetClass' => ContentType::className(), 'targetAttribute' => ['type_id' => 'id']],
@@ -51,7 +51,7 @@ class Content extends \yii\db\ActiveRecord
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function attributeLabels()
     {
@@ -67,7 +67,18 @@ class Content extends \yii\db\ActiveRecord
             'add_ts' => Yii::t('app', 'Add Ts'),
             'enabled' => Yii::t('app', 'Enabled'),
             'owner_id' => Yii::t('app', 'Owner ID'),
+            'editable' => Yii::t('app', 'Editable'),
         ];
+    }
+
+    public static function fromFlows($flows, $type)
+    {
+        $contents = [];
+        foreach ($flows as $flow) {
+            $contents = array_merge($contents, $flow->contents);
+        }
+
+        return $contents;
     }
 
     /**

@@ -7,11 +7,10 @@ use Yii;
 /**
  * This is the model class for table "screen".
  *
- * @property integer $id
+ * @property int $id
  * @property string $name
  * @property string $description
- * @property integer $template_id
- *
+ * @property int $template_id
  * @property ScreenTemplate $template
  * @property ScreenHasFlow[] $screenHasFlows
  * @property Flow[] $flows
@@ -19,7 +18,7 @@ use Yii;
 class Screen extends \yii\db\ActiveRecord
 {
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public static function tableName()
     {
@@ -27,7 +26,7 @@ class Screen extends \yii\db\ActiveRecord
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function rules()
     {
@@ -41,7 +40,7 @@ class Screen extends \yii\db\ActiveRecord
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function attributeLabels()
     {
@@ -51,6 +50,32 @@ class Screen extends \yii\db\ActiveRecord
             'description' => Yii::t('app', 'Description'),
             'template_id' => Yii::t('app', 'Template ID'),
         ];
+    }
+
+    public function allFlows()
+    {
+        $ret = [];
+
+        // Initialize main loop
+        $newFlows = $this->flows;
+        while (count($newFlows)) {
+            // Append latest loop parents
+            $ret = array_merge($ret, $newFlows);
+
+            $parents = [];
+            foreach ($newFlows as $flow) {
+                if ($flow->parent_id != null) {
+                    $f = $flow->parent;
+                    if ($f) {
+                        $parents[] = $f;
+                    }
+                }
+            }
+            // Prepare next loop, will merge if necessary later
+            $newFlows = $parents;
+        }
+
+        return $ret;
     }
 
     /**
