@@ -12,10 +12,10 @@ use Yii;
  * @property string $html
  * @property string $css
  * @property string $js
- * @property bool $can_update
- * @property bool $is_string
- * @property string $attribute
+ * @property bool $self_update
+ * @property string $append_params
  * @property Content[] $contents
+ * @property FieldHasContentType[] $fieldHasContentTypes
  * @property Field[] $fields
  */
 class ContentType extends \yii\db\ActiveRecord
@@ -36,8 +36,9 @@ class ContentType extends \yii\db\ActiveRecord
         return [
             [['name'], 'required'],
             [['html', 'css', 'js'], 'string'],
-            [['can_update', 'is_string'], 'boolean'],
-            [['name', 'attribute'], 'string', 'max' => 45],
+            [['self_update'], 'boolean'],
+            [['name'], 'string', 'max' => 45],
+            [['append_params'], 'string', 'max' => 1024],
         ];
     }
 
@@ -52,9 +53,8 @@ class ContentType extends \yii\db\ActiveRecord
             'html' => Yii::t('app', 'Html'),
             'css' => Yii::t('app', 'Css'),
             'js' => Yii::t('app', 'Js'),
-            'can_update' => Yii::t('app', 'Can Update'),
-            'is_string' => Yii::t('app', 'Is String'),
-            'attribute' => Yii::t('app', 'Attribute'),
+            'self_update' => Yii::t('app', 'Can Update'),
+            'append_params' => Yii::t('app', 'Append Params'),
         ];
     }
 
@@ -69,8 +69,16 @@ class ContentType extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
+    public function getFieldHasContentTypes()
+    {
+        return $this->hasMany(FieldHasContentType::className(), ['content_type_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
     public function getFields()
     {
-        return $this->hasMany(Field::className(), ['type_id' => 'id']);
+        return $this->hasMany(Field::className(), ['id' => 'field_id'])->viaTable('field_has_content_type', ['content_type_id' => 'id']);
     }
 }

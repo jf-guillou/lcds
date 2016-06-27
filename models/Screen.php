@@ -11,6 +11,7 @@ use Yii;
  * @property string $name
  * @property string $description
  * @property int $template_id
+ * @property string $last_changes
  * @property ScreenTemplate $template
  * @property ScreenHasFlow[] $screenHasFlows
  * @property Flow[] $flows
@@ -33,6 +34,7 @@ class Screen extends \yii\db\ActiveRecord
         return [
             [['name', 'template_id'], 'required'],
             [['template_id'], 'integer'],
+            [['last_changes'], 'safe'],
             [['name'], 'string', 'max' => 64],
             [['description'], 'string', 'max' => 1024],
             [['template_id'], 'exist', 'skipOnError' => true, 'targetClass' => ScreenTemplate::className(), 'targetAttribute' => ['template_id' => 'id']],
@@ -49,6 +51,7 @@ class Screen extends \yii\db\ActiveRecord
             'name' => Yii::t('app', 'Name'),
             'description' => Yii::t('app', 'Description'),
             'template_id' => Yii::t('app', 'Template ID'),
+            'last_changes' => Yii::t('app', 'Last Changes'),
         ];
     }
 
