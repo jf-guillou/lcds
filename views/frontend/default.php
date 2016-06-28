@@ -9,7 +9,7 @@ use yii\helpers\Url;
 
 $this->title = $name;
 $css = [];
-$css[] = 'body { background-image: url('.Url::to('@web/images/'.$background).') }';
+$css[] = 'body { background-image: url('.Url::to('@web/'.$background).') }';
 $js = [];
 ?>
 
@@ -68,6 +68,8 @@ foreach ($fields as $field) :
         echo $type->html;
     } ?>
 </div>
-<?php endforeach;
+<?php endforeach; ?>
+<script type="text/javascript">var updateScreenUrl = "<?= $updateUrl ?>"</script>
+<?php
 $this->registerCSS(implode("\n", $css));
 $this->registerJS(implode("\n", $js));

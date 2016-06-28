@@ -17,10 +17,10 @@ var lastChanges = null;
 function updateScreen() {
   $.get(updateScreenUrl, function(j) {
     if (j.success) {
-      console.log(j.last_changes);
+      console.log(j.data);
       if (lastChanges == null) {
-        lastChanges = j.last_changes;
-      } else if (lastChanges != j.last_changes) {
+        lastChanges = j.data;
+      } else if (lastChanges != j.data) {
         window.location.reload();
       }
     }

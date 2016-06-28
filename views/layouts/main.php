@@ -27,7 +27,7 @@ AppAsset::register($this);
 <div class="wrap">
     <?php
     NavBar::begin([
-        'brandLabel' => 'My Company',
+        'brandLabel' => Yii::t('app', 'LCDS'),
         'brandUrl' => Yii::$app->homeUrl,
         'options' => [
             'class' => 'navbar-inverse navbar-fixed-top',
@@ -36,14 +36,16 @@ AppAsset::register($this);
     echo Nav::widget([
         'options' => ['class' => 'navbar-nav navbar-right'],
         'items' => [
-            ['label' => 'Home', 'url' => ['/site/index']],
-            ['label' => 'About', 'url' => ['/site/about']],
-            ['label' => 'Contact', 'url' => ['/site/contact']],
+            ['label' => Yii::t('app', 'Templates'), 'url' => ['/screen-template']],
+            ['label' => Yii::t('app', 'Screens'), 'url' => ['/screen']],
+            ['label' => Yii::t('app', 'Flows'), 'url' => ['/flow']],
+            ['label' => Yii::t('app', 'Content'), 'url' => ['/content']],
+            ['label' => Yii::t('app', 'Content types'), 'url' => ['/content-type']],
             Yii::$app->user->isGuest ? (
-                ['label' => 'Login', 'url' => ['/site/login']]
+                ['label' => 'Login', 'url' => ['/auth/login']]
             ) : (
                 '<li>'
-                .Html::beginForm(['/site/logout'], 'post', ['class' => 'navbar-form'])
+                .Html::beginForm(['/auth/logout'], 'post', ['class' => 'navbar-form'])
                 .Html::submitButton(
                     'Logout ('.Yii::$app->user->identity->username.')',
                     ['class' => 'btn btn-link']
