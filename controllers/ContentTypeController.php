@@ -3,16 +3,16 @@
 namespace app\controllers;
 
 use Yii;
-use app\models\ScreenTemplate;
+use app\models\ContentType;
 use yii\data\ActiveDataProvider;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 
 /**
- * ScreentemplateController implements the CRUD actions for ScreenTemplate model.
+ * ContentTypeController implements the CRUD actions for ContentType model.
  */
-class ScreenTemplateController extends Controller
+class ContentTypeController extends Controller
 {
     /**
      * @inheritdoc
@@ -30,13 +30,13 @@ class ScreenTemplateController extends Controller
     }
 
     /**
-     * Lists all ScreenTemplate models.
+     * Lists all ContentType models.
      * @return mixed
      */
     public function actionIndex()
     {
         $dataProvider = new ActiveDataProvider([
-            'query' => ScreenTemplate::find(),
+            'query' => ContentType::find(),
         ]);
 
         return $this->render('index', [
@@ -45,7 +45,7 @@ class ScreenTemplateController extends Controller
     }
 
     /**
-     * Displays a single ScreenTemplate model.
+     * Displays a single ContentType model.
      * @param integer $id
      * @return mixed
      */
@@ -57,13 +57,13 @@ class ScreenTemplateController extends Controller
     }
 
     /**
-     * Creates a new ScreenTemplate model.
+     * Creates a new ContentType model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
     public function actionCreate()
     {
-        $model = new ScreenTemplate();
+        $model = new ContentType();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);
@@ -75,7 +75,7 @@ class ScreenTemplateController extends Controller
     }
 
     /**
-     * Updates an existing ScreenTemplate model.
+     * Updates an existing ContentType model.
      * If update is successful, the browser will be redirected to the 'view' page.
      * @param integer $id
      * @return mixed
@@ -94,7 +94,7 @@ class ScreenTemplateController extends Controller
     }
 
     /**
-     * Deletes an existing ScreenTemplate model.
+     * Deletes an existing ContentType model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
      * @param integer $id
      * @return mixed
@@ -107,15 +107,15 @@ class ScreenTemplateController extends Controller
     }
 
     /**
-     * Finds the ScreenTemplate model based on its primary key value.
+     * Finds the ContentType model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param integer $id
-     * @return ScreenTemplate the loaded model
+     * @return ContentType the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($id)
     {
-        if (($model = ScreenTemplate::findOne($id)) !== null) {
+        if (($model = ContentType::findOne($id)) !== null) {
             return $model;
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');
