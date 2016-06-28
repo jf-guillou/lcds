@@ -3,6 +3,7 @@
 namespace app\models;
 
 use yii\web\UploadedFile;
+use yii\helpers\FileHelper;
 
 /**
  * This is the model class for image uploads.
@@ -16,25 +17,64 @@ class ImageUpload extends \yii\base\Model
      */
     public $image;
 
+    const BASE_PATH = 'uploads/';
+    const TYPES = ['background'];
+
     /**
      * {@inheritdoc}
      */
     public function rules()
     {
         return [
-            [['image'], 'image', 'skipOnEmpty' => false, 'extensions' => 'png, jpg'],
+            [['image'], 'image', 'skipOnEmpty' => true, 'extensions' => 'png, jpg'],
         ];
     }
 
-    public function upload()
+    public function upload($type)
     {
-        if ($this->validate()) {
-            $path = 'uploads/'.$this->image->baseName.'.'.$this->image->extension;
+        if ($this->validate() && isset($this->image)) {
+            $img = $this->image->baseName.'.'.$this->image->extension;
+            $path = self::BASE_PATH.self::typePath($type).$img;
             if ($this->image->saveAs($path)) {
-                return $path;
+                return $img;
             }
         }
 
         return false;
+    }
+
+    public static function getImages($type)
+    {
+        $files = FileHelper::findFiles('uploads/'.self::typePath($type));
+
+        $images = [];
+        foreach ($files as $f) {
+            $images[] = substr($f, strrpos($f, '/') + 1);
+        }
+
+        return $images;
+    }
+
+    public static function getImagesWithPath($type)
+    {
+        $files = FileHelper::findFiles('uploads/'.self::typePath($type));
+
+        $images = [];
+        foreach ($files as $f) {
+            $images[substr($f, strrpos($f, '/') + 1)] = $f;
+        }
+
+        return $images;
+    }
+
+    public static function typePath($type)
+    {
+        if (in_array($type, self::TYPES)) {
+            $type .= '/';
+        } else {
+            $type = '';
+        }
+
+        return $type;
     }
 }

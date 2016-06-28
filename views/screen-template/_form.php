@@ -16,7 +16,7 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'background')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'background')->radioList($backgrounds, ['encode' => false]) ?>
 
     <?= $form->field($image, 'image')->fileInput() ?>
 

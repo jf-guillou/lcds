@@ -6,6 +6,7 @@ use Yii;
 use app\models\ScreenTemplate;
 use app\models\ImageUpload;
 use yii\data\ActiveDataProvider;
+use yii\helpers\Url;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\web\UploadedFile;
@@ -74,7 +75,7 @@ class ScreenTemplateController extends Controller
 
         if ($model->load(Yii::$app->request->post())) {
             $image->image = UploadedFile::getInstance($image, 'image');
-            $imagePath = $image->upload();
+            $imagePath = $image->upload('background');
             if ($imagePath) {
                 $model->background = $imagePath;
             }
@@ -84,9 +85,12 @@ class ScreenTemplateController extends Controller
             }
         }
 
+        $backgrounds = self::getBackgroundRadios();
+
         return $this->render('create', [
             'model' => $model,
             'image' => $image,
+            'backgrounds' => $backgrounds,
         ]);
     }
 
@@ -105,7 +109,7 @@ class ScreenTemplateController extends Controller
 
         if ($model->load(Yii::$app->request->post())) {
             $image->image = UploadedFile::getInstance($image, 'image');
-            $imagePath = $image->upload();
+            $imagePath = $image->upload('background');
             if ($imagePath) {
                 $model->background = $imagePath;
             }
@@ -115,10 +119,25 @@ class ScreenTemplateController extends Controller
             }
         }
 
+        $backgrounds = self::getBackgroundRadios();
+
         return $this->render('update', [
             'model' => $model,
             'image' => $image,
+            'backgrounds' => $backgrounds,
         ]);
+    }
+
+    public static function getBackgroundRadios()
+    {
+        $backgrounds = ImageUpload::getImagesWithPath('background');
+
+        $radio = [];
+        foreach ($backgrounds as $name => $path) {
+            $radio[$name] = '<img src="'.Url::to('@web/'.$path).'" alt="'.$name.'" class="img-preview"/><br />'.$name;
+        }
+
+        return $radio;
     }
 
     /**
