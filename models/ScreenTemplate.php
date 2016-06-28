@@ -10,6 +10,7 @@ use Yii;
  * @property int $id
  * @property string $name
  * @property string $background
+ * @property string $css
  * @property Field[] $fields
  * @property Screen[] $screens
  */
@@ -30,6 +31,7 @@ class ScreenTemplate extends \yii\db\ActiveRecord
     {
         return [
             [['name'], 'required'],
+            [['css'], 'string'],
             [['name'], 'string', 'max' => 64],
             [['background'], 'string', 'max' => 256],
         ];
@@ -44,6 +46,7 @@ class ScreenTemplate extends \yii\db\ActiveRecord
             'id' => Yii::t('app', 'ID'),
             'name' => Yii::t('app', 'Name'),
             'background' => Yii::t('app', 'Background'),
+            'css' => Yii::t('app', 'CSS'),
         ];
     }
 

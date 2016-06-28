@@ -31,6 +31,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'id',
             'name',
             'background',
+            'css:ntext',
         ],
     ]) ?>
 
