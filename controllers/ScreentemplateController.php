@@ -4,9 +4,11 @@ namespace app\controllers;
 
 use Yii;
 use app\models\ScreenTemplate;
+use app\models\ImageUpload;
 use yii\data\ActiveDataProvider;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
+use yii\web\UploadedFile;
 use yii\filters\VerbFilter;
 
 /**
@@ -15,7 +17,7 @@ use yii\filters\VerbFilter;
 class ScreenTemplateController extends Controller
 {
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function behaviors()
     {
@@ -31,6 +33,7 @@ class ScreenTemplateController extends Controller
 
     /**
      * Lists all ScreenTemplate models.
+     *
      * @return mixed
      */
     public function actionIndex()
@@ -46,7 +49,9 @@ class ScreenTemplateController extends Controller
 
     /**
      * Displays a single ScreenTemplate model.
-     * @param integer $id
+     *
+     * @param int $id
+     *
      * @return mixed
      */
     public function actionView($id)
@@ -59,44 +64,69 @@ class ScreenTemplateController extends Controller
     /**
      * Creates a new ScreenTemplate model.
      * If creation is successful, the browser will be redirected to the 'view' page.
+     *
      * @return mixed
      */
     public function actionCreate()
     {
         $model = new ScreenTemplate();
+        $image = new ImageUpload();
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
-        } else {
-            return $this->render('create', [
-                'model' => $model,
-            ]);
+        if ($model->load(Yii::$app->request->post())) {
+            $image->image = UploadedFile::getInstance($image, 'image');
+            $imagePath = $image->upload();
+            if ($imagePath) {
+                $model->background = $imagePath;
+            }
+
+            if ($model->save()) {
+                return $this->redirect(['view', 'id' => $model->id]);
+            }
         }
+
+        return $this->render('create', [
+            'model' => $model,
+            'image' => $image,
+        ]);
     }
 
     /**
      * Updates an existing ScreenTemplate model.
      * If update is successful, the browser will be redirected to the 'view' page.
-     * @param integer $id
+     *
+     * @param int $id
+     *
      * @return mixed
      */
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
+        $image = new ImageUpload();
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
-        } else {
-            return $this->render('update', [
-                'model' => $model,
-            ]);
+        if ($model->load(Yii::$app->request->post())) {
+            $image->image = UploadedFile::getInstance($image, 'image');
+            $imagePath = $image->upload();
+            if ($imagePath) {
+                $model->background = $imagePath;
+            }
+
+            if ($model->save()) {
+                return $this->redirect(['view', 'id' => $model->id]);
+            }
         }
+
+        return $this->render('update', [
+            'model' => $model,
+            'image' => $image,
+        ]);
     }
 
     /**
      * Deletes an existing ScreenTemplate model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
-     * @param integer $id
+     *
+     * @param int $id
+     *
      * @return mixed
      */
     public function actionDelete($id)
@@ -109,8 +139,11 @@ class ScreenTemplateController extends Controller
     /**
      * Finds the ScreenTemplate model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
-     * @param integer $id
+     *
+     * @param int $id
+     *
      * @return ScreenTemplate the loaded model
+     *
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($id)
