@@ -2,7 +2,7 @@ function updateContents(f) {
   if (!f.canUpdate) {
     return;
   }
-  console.log('Fetch updated contents', f);
+  //console.log('Fetch updated contents', f);
   $.get(f.url, function(j) {
     if (j.success) {
       setContents(f, j.next);
@@ -14,22 +14,38 @@ function updateContents(f) {
 
 var updateScreenUrl;
 var lastChanges = null;
+var pleaseDie = false;
 function updateScreen() {
   $.get(updateScreenUrl, function(j) {
     if (j.success) {
-      console.log(j.data);
+      //console.log(j.data);
       if (lastChanges == null) {
         lastChanges = j.data;
       } else if (lastChanges != j.data) {
-        window.location.reload();
+        end();
+        //window.location.reload();
       }
     }
   });
 }
 
+var remaining = 0;
+function end() {
+  if (pleaseDie) {
+    return;
+  }
+  pleaseDie = true;
+  for (var f in fields) {
+    if (fields[f].timeout) {
+      remaining++;
+    }
+  }
+  //console.log('STOP : wait ' + remaining);
+}
+
 function onLoad() {
   // Init
-  console.log('onLoad');
+  //console.log('onLoad');
   $('.field').each(function() {
     var $f = $(this);
     var f = {
@@ -56,18 +72,26 @@ function onLoad() {
     }
     updateScreen();
   }, 60000);
+  updateScreen();
 }
 
 function setContents(f, contents) {
   f.contents = contents;
-  console.log('Set updated contents for', f);
+  //console.log('Set updated contents for', f);
   if (!f.timeout && contents.length) {
     next(f);
   }
 }
 
 function next(f) {
-  console.log('Find what to display for', f);
+  if (pleaseDie) {
+    if (--remaining <= 0) {
+      return window.location.reload();
+    }
+    //console.log('Going to die in ' + remaining);
+    return;
+  }
+  //console.log('Find what to display for', f);
   f.previous = f.current;
   f.current = null;
   var pData = f.previous && f.previous.data;
@@ -76,9 +100,9 @@ function next(f) {
     var c = f.contents[content];
     if (c.data == pData) {
       // repeat : skip if possible
-      console.log('Repeat, skip if possible');
+      //console.log('Repeat, skip if possible');
       if (f.contents.length < 2) {
-        console.log('Cannot dodge repeat, not enough content');
+        //console.log('Cannot dodge repeat, not enough content');
         f.next = c;
         break;
       }
@@ -86,9 +110,9 @@ function next(f) {
         return field.current && field.current.data == c.data;
       }).length) {
       // same content : skip if possible
-      console.log('Same content in other field, skip if possible');
+      //console.log('Same content in other field, skip if possible');
       if (f.contents.length < 3) {
-        console.log('Cannot dodge duplicate, not enough content');
+        //console.log('Cannot dodge duplicate, not enough content');
         f.next = c;
         break;
       }
@@ -106,7 +130,7 @@ function next(f) {
 
 function updateFieldContent(f) {
   if (f.next && f.next.duration > 0) {
-    console.log('Display new stuff', f);
+    //console.log('Display new stuff', f);
     f.current = f.next
     f.next = null;
     f.$field.html(f.current.data);
