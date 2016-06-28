@@ -7,17 +7,16 @@ use Yii;
 /**
  * This is the model class for table "screen_template".
  *
- * @property integer $id
+ * @property int $id
  * @property string $name
  * @property string $background
- *
  * @property Field[] $fields
  * @property Screen[] $screens
  */
 class ScreenTemplate extends \yii\db\ActiveRecord
 {
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public static function tableName()
     {
@@ -25,7 +24,7 @@ class ScreenTemplate extends \yii\db\ActiveRecord
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function rules()
     {
@@ -37,7 +36,7 @@ class ScreenTemplate extends \yii\db\ActiveRecord
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function attributeLabels()
     {
@@ -46,6 +45,14 @@ class ScreenTemplate extends \yii\db\ActiveRecord
             'name' => Yii::t('app', 'Name'),
             'background' => Yii::t('app', 'Background'),
         ];
+    }
+
+    public function afterSave($insert, $changedAttributes)
+    {
+        parent::afterSave($insert, $changedAttributes);
+        foreach ($this->screens as $screen) {
+            $screen->setModified();
+        }
     }
 
     /**

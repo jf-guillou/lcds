@@ -3,6 +3,7 @@
 namespace app\models;
 
 use Yii;
+use yii\db\Expression;
 
 /**
  * This is the model class for table "screen".
@@ -79,6 +80,12 @@ class Screen extends \yii\db\ActiveRecord
         }
 
         return $ret;
+    }
+
+    public function setModified()
+    {
+        $this->last_changes = new Expression('NOW()');
+        $this->save();
     }
 
     /**
