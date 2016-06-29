@@ -2,9 +2,12 @@
 
 use yii\helpers\Html;
 use yii\widgets\DetailView;
+use app\assets\DesignerAsset;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\ScreenTemplate */
+
+DesignerAsset::register($this);
 
 $this->title = $model->name;
 $this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Screen Templates'), 'url' => ['index']];
@@ -35,4 +38,16 @@ $this->params['breadcrumbs'][] = $this->title;
         ],
     ]) ?>
 
+    <div class="design-wrapper">
+        <img src="<?= $background; ?>" alt="Background" class="img-full background-edit" />
+        <div id="design" class="design"></div>
+    </div>
+
 </div>
+
+<script type="text/javascript">
+var fields = <?= json_encode(array_map(function ($f) {
+    return $f->toArray();
+}, $fields)) ?>;
+var fieldUrl = '<?= $fieldUrl ?>';
+</script>

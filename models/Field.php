@@ -63,6 +63,14 @@ class Field extends \yii\db\ActiveRecord
         ];
     }
 
+    public function afterSave($insert, $changedAttributes)
+    {
+        parent::afterSave($insert, $changedAttributes);
+        foreach ($this->template->screens as $screen) {
+            $screen->setModified();
+        }
+    }
+
     /**
      * @return \yii\db\ActiveQuery
      */

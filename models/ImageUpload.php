@@ -43,6 +43,11 @@ class ImageUpload extends \yii\base\Model
         return false;
     }
 
+    public static function getImage($type, $name)
+    {
+        return 'uploads/'.self::typePath($type).$name;
+    }
+
     public static function getImages($type)
     {
         $files = FileHelper::findFiles('uploads/'.self::typePath($type));

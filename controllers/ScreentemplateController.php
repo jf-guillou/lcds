@@ -5,6 +5,7 @@ namespace app\controllers;
 use Yii;
 use app\models\ScreenTemplate;
 use app\models\ImageUpload;
+use app\models\Field;
 use yii\data\ActiveDataProvider;
 use yii\helpers\Url;
 use yii\web\Controller;
@@ -57,9 +58,36 @@ class ScreenTemplateController extends Controller
      */
     public function actionView($id)
     {
+        $screenTemplate = $this->findModel($id);
+
         return $this->render('view', [
-            'model' => $this->findModel($id),
+            'model' => $screenTemplate,
+            'background' => Url::to('@web/'.ImageUpload::getImage('background', $screenTemplate->background)),
+            'fields' => $screenTemplate->fields,
+            'fieldUrl' => Url::to([Yii::$app->controller->id.'/set-field', 'id' => '']),
         ]);
+    }
+
+    public function actionSetField($id = null)
+    {
+        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+
+        if ($id !== null) {
+            $field = Field::find()->where(['id' => $id])->one();
+            if ($field === null) {
+                return ['success' => false, 'message' => 'No such field'];
+            }
+        } else {
+            $field = new Field();
+        }
+
+        if ($field->load(Yii::$app->request->post())) {
+            if ($field->save()) {
+                return ['success' => true, 'id' => $field->id];
+            }
+        }
+
+        return ['success' => false, 'message' => $field->errors];
     }
 
     /**

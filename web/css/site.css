@@ -93,3 +93,8 @@ a.desc:after {
 .img-preview {
     width: 100px;
 }
+
+.img-full {
+    width: 100%;
+    max-height: 100%;
+}

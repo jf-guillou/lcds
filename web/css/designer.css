@@ -1,0 +1,14 @@
+.design-wrapper {
+    position: relative;
+}
+
+.design-wrapper img {
+    top: 0;
+    left: 0;
+}
+
+.design-wrapper .design {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
