@@ -63,7 +63,7 @@ class ScreenTemplateController extends Controller
         return $this->render('view', [
             'model' => $screenTemplate,
             'background' => Url::to('@web/'.ImageUpload::getImage('background', $screenTemplate->background)),
-            'fields' => $screenTemplate->fields,
+            'fields' => $screenTemplate->fieldsArray,
             'fieldUrl' => Url::to([Yii::$app->controller->id.'/set-field', 'id' => '']),
         ]);
     }

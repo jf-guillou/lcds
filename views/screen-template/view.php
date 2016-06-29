@@ -46,8 +46,6 @@ $this->params['breadcrumbs'][] = $this->title;
 </div>
 
 <script type="text/javascript">
-var fields = <?= json_encode(array_map(function ($f) {
-    return $f->toArray();
-}, $fields)) ?>;
+var fields = <?= json_encode($fields) ?>;
 var fieldUrl = '<?= $fieldUrl ?>';
 </script>

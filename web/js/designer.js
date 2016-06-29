@@ -16,11 +16,11 @@ function preDraw() {
     r.field = field;
 
     var t = this.text(
-        Math.round(pW * field.x1 + 8),
+        Math.round(pW * field.x1 + 6),
         Math.round(pH * field.y1 + 8),
-        field.id
+        field.contentTypes.map(function(c) { return c.name; }).join(' - ')
       );
-    r.text = t;
+    r.text = t.attr('text-anchor', 'start');
     r.drag(handleMove, handleMoveStart, handleMoveEnd)
       .click(function(a, b, c) {
         console.log(a, b, c);
@@ -87,12 +87,13 @@ function handleMove(dx, dy, x, y, e) {
     width: oW,
     height: oH,
   };
-  this.attr(pos).text.attr({x: oX + 8, y: oY + 8});
+  this.attr(pos).text.attr({x: oX + 6, y: oY + 8});
 }
 
 var resizeTreshold = 6;
 function handleMoveStart(x, y, e) {
-  //this.toFront();
+  this.toFront();
+  this.text.toFront();
   this.resizing = null;
   this.moved = false;
 
