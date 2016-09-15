@@ -3,6 +3,7 @@
 namespace app\controllers;
 
 use Yii;
+use app\models\ContentType;
 use app\models\ScreenTemplate;
 use app\models\ImageUpload;
 use app\models\Field;
@@ -64,11 +65,46 @@ class ScreenTemplateController extends Controller
             'model' => $screenTemplate,
             'background' => Url::to('@web/'.ImageUpload::getImage('background', $screenTemplate->background)),
             'fields' => $screenTemplate->fieldsArray,
-            'fieldUrl' => Url::to([Yii::$app->controller->id.'/set-field', 'id' => '']),
+            'setFieldPosUrl' => Url::to([Yii::$app->controller->id.'/set-field-pos', 'id' => '']),
+            'editFieldUrl' => Url::to([Yii::$app->controller->id.'/edit-field', 'id' => '']),
         ]);
     }
 
-    public function actionSetField($id = null)
+    public function actionEditField($id)
+    {
+        $field = Field::find()->where(['id' => $id])->with('contentTypes')->one();
+        if ($field === null) {
+            return;
+        }
+
+        if ($field->load(Yii::$app->request->post())) {
+            if ($field->save()) {
+                return 'ok';
+            }
+        }
+
+        $contentTypes = ContentType::find()->all();
+
+        return $this->renderPartial('editfield', [
+            'field' => $field,
+            'contentTypes' => array_reduce($contentTypes, function ($a, $c) {
+                if (!$c->self_update) {
+                    $a[$c->id] = $c->name;
+                }
+
+                return $a;
+            }, []),
+            'selfContentTypes' => array_reduce($contentTypes, function ($a, $c) {
+                if ($c->self_update) {
+                    $a[$c->id] = $c->name;
+                }
+
+                return $a;
+            }, []),
+        ]);
+    }
+
+    public function actionSetFieldPos($id = null)
     {
         Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
 

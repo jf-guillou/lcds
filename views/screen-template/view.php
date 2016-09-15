@@ -1,5 +1,6 @@
 <?php
 
+use yii\bootstrap\Modal;
 use yii\helpers\Html;
 use yii\widgets\DetailView;
 use app\assets\DesignerAsset;
@@ -44,8 +45,18 @@ $this->params['breadcrumbs'][] = $this->title;
     </div>
 
 </div>
+<div id="field-modal">
+<?php
+Modal::begin([
+    'header' => 'HEADER',
+]);
+echo 'Placeholder';
+Modal::end();
+?>
+</div>
 
 <script type="text/javascript">
 var fields = <?= json_encode($fields) ?>;
-var fieldUrl = '<?= $fieldUrl ?>';
+var setFieldPosUrl = '<?= $setFieldPosUrl ?>';
+var editFieldUrl = '<?= $editFieldUrl ?>';
 </script>

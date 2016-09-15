@@ -22,10 +22,16 @@ function preDraw() {
       );
     r.text = t.attr('text-anchor', 'start');
     r.drag(handleMove, handleMoveStart, handleMoveEnd)
-      .click(function(a, b, c) {
-        console.log(a, b, c);
-      });
+      .click(editField);
   }
+}
+
+function editField() {
+  $('.modal-content').html('');
+  $.get(editFieldUrl + this.field.id, function(html) {
+    $('.modal-content').html($(html).find('.modal-content > *'));
+    $('.modal').modal('show');
+  });
 }
 
 var resizeMin = 20;
@@ -126,8 +132,8 @@ function handleMoveEnd(e) {
   o.y1 = this.attr('y') / pH;
   o.x2 = (this.attr('x') + this.attr('width')) / pW;
   o.y2 = (this.attr('y') + this.attr('height')) / pH;
-  console.log(o);
-  $.post(fieldUrl + o.id, {Field: o});
+  //console.log(o);
+  $.post(setFieldPosUrl + o.id, {Field: o});
 }
 
 var pW;
