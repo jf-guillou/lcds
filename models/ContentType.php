@@ -14,12 +14,18 @@ use Yii;
  * @property string $js
  * @property bool $self_update
  * @property string $append_params
+ * @property string $kind
  * @property Content[] $contents
  * @property FieldHasContentType[] $fieldHasContentTypes
  * @property Field[] $fields
  */
 class ContentType extends \yii\db\ActiveRecord
 {
+    const KINDS = [
+        'RAW' => 'raw',
+        'URL' => 'url',
+    ];
+
     /**
      * {@inheritdoc}
      */
@@ -39,6 +45,7 @@ class ContentType extends \yii\db\ActiveRecord
             [['self_update'], 'boolean'],
             [['name'], 'string', 'max' => 45],
             [['append_params'], 'string', 'max' => 1024],
+            [['kind'], 'in', 'range' => self::KINDS],
         ];
     }
 
@@ -55,6 +62,7 @@ class ContentType extends \yii\db\ActiveRecord
             'js' => Yii::t('app', 'Js'),
             'self_update' => Yii::t('app', 'Can Update'),
             'append_params' => Yii::t('app', 'Append Params'),
+            'kind' => Yii::t('app', 'Kind'),
         ];
     }
 

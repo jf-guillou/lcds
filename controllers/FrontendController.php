@@ -79,6 +79,7 @@ class FrontendController extends Controller
             return $e->id;
         }, $flows);
 
+        // Get all content type ids
         $contentTypes = array_map(function ($e) {
             return $e->id;
         }, $field->contentTypes);
@@ -102,9 +103,15 @@ class FrontendController extends Controller
                 $data .= (strpos($data, '?') === false ? '?' : '&').str_replace(['%x1%', '%x2%', '%y1%', '%y2%'], [$field->x1, $field->x2, $field->y1, $field->y2], $field->append_params);
             }
 
+            if ($c->type->kind == ContentType::KINDS['URL']) {
+                $data = str_replace('%data%', Url::to($data), $c->type->html);
+            } else {
+                $data = str_replace('%data%', $data, $c->type->html);
+            }
+
             return [
                 'id' => $c->id,
-                'data' => str_replace('%data%', $data, $c->type->html),
+                'data' => $data,
                 'duration' => $c->duration,
                 'type' => $c->type_id,
             ];
