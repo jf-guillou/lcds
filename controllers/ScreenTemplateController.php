@@ -5,7 +5,7 @@ namespace app\controllers;
 use Yii;
 use app\models\ContentType;
 use app\models\ScreenTemplate;
-use app\models\ImageUpload;
+use app\models\upload\BackgroundUpload;
 use app\models\Field;
 use yii\data\ActiveDataProvider;
 use yii\helpers\Url;
@@ -63,7 +63,7 @@ class ScreenTemplateController extends Controller
 
         return $this->render('view', [
             'model' => $screenTemplate,
-            'background' => Url::to('@web/'.ImageUpload::getImage('background', $screenTemplate->background)),
+            'background' => Url::to($screenTemplate->background),
             'fields' => $screenTemplate->fieldsArray,
             'setFieldPosUrl' => Url::to([Yii::$app->controller->id.'/set-field-pos', 'id' => '']),
             'editFieldUrl' => Url::to([Yii::$app->controller->id.'/edit-field', 'id' => '']),
@@ -135,13 +135,13 @@ class ScreenTemplateController extends Controller
     public function actionCreate()
     {
         $model = new ScreenTemplate();
-        $image = new ImageUpload();
+        $image = new BackgroundUpload();
 
         if ($model->load(Yii::$app->request->post())) {
-            $image->image = UploadedFile::getInstance($image, 'image');
-            $imagePath = $image->upload('background');
+            $image->content = UploadedFile::getInstance($image, 'content');
+            $imagePath = $image->upload();
             if ($imagePath) {
-                $model->background = $imagePath;
+                $model->background = Url::to($imagePath);
             }
 
             if ($model->save()) {
@@ -169,13 +169,13 @@ class ScreenTemplateController extends Controller
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
-        $image = new ImageUpload();
+        $image = new BackgroundUpload();
 
         if ($model->load(Yii::$app->request->post())) {
-            $image->image = UploadedFile::getInstance($image, 'image');
-            $imagePath = $image->upload('background');
+            $image->content = UploadedFile::getInstance($image, 'content');
+            $imagePath = $image->upload();
             if ($imagePath) {
-                $model->background = $imagePath;
+                $model->background = Url::to($imagePath);
             }
 
             if ($model->save()) {
@@ -194,11 +194,11 @@ class ScreenTemplateController extends Controller
 
     public static function getBackgroundRadios()
     {
-        $backgrounds = ImageUpload::getImagesWithPath('background');
+        $backgrounds = BackgroundUpload::getAllWithPath();
 
         $radio = [];
         foreach ($backgrounds as $name => $path) {
-            $radio[$name] = '<img src="'.Url::to('@web/'.$path).'" alt="'.$name.'" class="img-preview"/><br />'.$name;
+            $radio[$path] = '<img src="'.Url::to($path).'" alt="'.$name.'" class="img-preview"/><br />'.$name;
         }
 
         return $radio;

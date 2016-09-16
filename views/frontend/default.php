@@ -9,7 +9,7 @@ use yii\helpers\Url;
 
 $this->title = $name;
 $css = $screenCss ? [$screenCss] : [];
-$css[] = 'body { background-image: url('.Url::to('@web/uploads/background/'.$background).'); }';
+$css[] = 'body { background-image: url('.$background.'); }';
 $js = [];
 ?>
 

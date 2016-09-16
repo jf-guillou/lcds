@@ -33,7 +33,7 @@ class FrontendController extends Controller
         $content = [
             'name' => $screen->name,
             'screenCss' => $screen->template->css,
-            'background' => $screen->template->background,
+            'background' => Url::to($screen->template->background),
             'fields' => $screen->template->fields,
             'updateUrl' => Url::to(['frontend/update', 'id' => $id]),
             'nextUrl' => Url::to(['frontend/next', 'id' => $id, 'fieldid' => '']),
