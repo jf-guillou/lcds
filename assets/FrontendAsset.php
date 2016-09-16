@@ -24,7 +24,7 @@ class FrontendAsset extends AssetBundle
     ];
     public $js = [
         'js/frontend.js',
-        'js/bigtext.js',
+        'js/jquery.textfill.min.js',
         'js/moment.min.js',
     ];
     public $depends = [

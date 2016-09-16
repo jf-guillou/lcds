@@ -136,7 +136,9 @@ function updateFieldContent(f) {
     f.$field.html(f.current.data);
     f.$field.show();
     if (f.$field.text() != '') {
-      f.$field.bigtext();
+      f.$field.textfill({
+        maxFontPixels: 0,
+      });
     }
     if (f.timeout) {
       clearTimeout(f.timeout);
