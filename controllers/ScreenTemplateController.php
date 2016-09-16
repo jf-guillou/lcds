@@ -79,13 +79,13 @@ class ScreenTemplateController extends Controller
 
         if ($field->load(Yii::$app->request->post())) {
             if ($field->save()) {
-                return 'ok';
+                return '';
             }
         }
 
         $contentTypes = ContentType::find()->all();
 
-        return $this->renderPartial('editfield', [
+        return $this->renderAjax('editfield', [
             'field' => $field,
             'contentTypes' => array_reduce($contentTypes, function ($a, $c) {
                 if (!$c->self_update) {

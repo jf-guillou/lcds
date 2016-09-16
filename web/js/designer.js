@@ -28,9 +28,9 @@ function preDraw() {
 
 function editField() {
   if (!this.moved) {
-    $('.modal-content').html('');
+    $("#field-modal").html();
     $.get(editFieldUrl + this.field.id, function(html) {
-      $('.modal-content').html($(html).find('.modal-content > *'));
+      $("#field-modal").html($(html));
       $('.modal').modal('show');
     });
   }

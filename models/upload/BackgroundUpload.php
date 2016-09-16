@@ -30,7 +30,7 @@ class BackgroundUpload extends ContentUpload
     public function attributeLabels()
     {
         return [
-            'content' => Yii::t('app', 'Background'),
+            'content' => Yii::t('app', 'Upload background'),
         ];
     }
 

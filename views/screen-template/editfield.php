@@ -10,7 +10,9 @@ Modal::begin([
     'header' => '<h2>'.Yii::t('app', 'Edit field').'</h2>',
 ]);
 
-$form = ActiveForm::begin();
+$form = ActiveForm::begin([
+        'id' => 'screen-template-field-form',
+    ]);
 
 //return var_dump($contentTypes);
 ?>
@@ -55,10 +57,33 @@ $form = ActiveForm::begin();
 
 <?= $form->field($field, 'append_params')->textInput(['maxlength' => true]) ?>
 
-<?= Html::submitButton(Yii::t('app', 'Update'), ['class' => 'btn btn-primary']) ?>
+<div class="form-group">
+    <?= Html::submitButton(Yii::t('app', 'Update'), ['class' => 'btn btn-primary']) ?>
+</div>
 
 <script type="text/javascript">
     var cTypes = $('.field-field-contenttypes');
+    $(document).on('beforeSubmit', '#screen-template-field-form', function() {
+        var $form = $(this);
+        if ($form.find('.has-error').length) {
+            return false;
+        }
+
+        $.ajax({
+            url: $form.attr('action'),
+            type: $form.attr('method'),
+            data: $form.serialize(),
+            success: function(resp) {
+                if (resp == '') {
+                    $('.modal').modal('hide');
+                } else {
+                    $("#field-modal").html($(resp));
+                    $('.modal').modal('show');
+                }
+            }
+        })
+        return false;
+    });
 </script>
 
 <?php

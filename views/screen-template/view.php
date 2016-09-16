@@ -2,7 +2,6 @@
 
 use yii\bootstrap\Modal;
 use yii\helpers\Html;
-use yii\widgets\DetailView;
 use app\assets\DesignerAsset;
 
 /* @var $this yii\web\View */
@@ -29,16 +28,6 @@ $this->params['breadcrumbs'][] = $this->title;
         ]) ?>
     </p>
 
-    <?= DetailView::widget([
-        'model' => $model,
-        'attributes' => [
-            'id',
-            'name',
-            'background',
-            'css:ntext',
-        ],
-    ]) ?>
-
     <div class="design-wrapper">
         <img src="<?= $background; ?>" alt="Background" class="img-full background-edit" />
         <div id="design" class="design"></div>
@@ -50,7 +39,6 @@ $this->params['breadcrumbs'][] = $this->title;
 Modal::begin([
     'header' => 'HEADER',
 ]);
-echo 'Placeholder';
 Modal::end();
 ?>
 </div>
