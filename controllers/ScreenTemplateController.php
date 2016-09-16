@@ -70,6 +70,10 @@ class ScreenTemplateController extends Controller
         ]);
     }
 
+    public function actionAddField()
+    {
+    }
+
     public function actionEditField($id)
     {
         $field = Field::find()->where(['id' => $id])->with('contentTypes')->one();

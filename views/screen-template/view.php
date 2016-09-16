@@ -26,6 +26,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'method' => 'post',
             ],
         ]) ?>
+        <?= Html::a(Yii::t('app', 'Add field'), ['add-field'], ['class' => 'btn btn-success field-add']) ?>
     </p>
 
     <div class="design-wrapper">
@@ -47,4 +48,7 @@ Modal::end();
 var fields = <?= json_encode($fields) ?>;
 var setFieldPosUrl = '<?= $setFieldPosUrl ?>';
 var editFieldUrl = '<?= $editFieldUrl ?>';
+$(document).on('click', '.field-add', function() {
+    addField(); // TODO ME
+});
 </script>

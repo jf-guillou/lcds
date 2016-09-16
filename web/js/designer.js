@@ -26,6 +26,10 @@ function preDraw() {
   paper = this;
 }
 
+function addField() {
+  // TODO
+}
+
 function editField() {
   if (!this.moved) {
     $("#field-modal").html();
