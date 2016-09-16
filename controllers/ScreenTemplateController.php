@@ -126,6 +126,18 @@ class ScreenTemplateController extends Controller
         return ['success' => false, 'message' => $field->errors];
     }
 
+    public function actionDeleteField($id)
+    {
+        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+
+        $field = Field::find()->where(['id' => $id])->with('contentTypes')->one();
+        if ($field === null || $field->delete() === false) {
+            return ['success' => false, 'message' => Yii::t('app', 'Deletion failed')];
+        }
+
+        return ['success' => true];
+    }
+
     /**
      * Creates a new ScreenTemplate model.
      * If creation is successful, the browser will be redirected to the 'view' page.

@@ -59,6 +59,7 @@ $form = ActiveForm::begin([
 
 <div class="form-group">
     <?= Html::submitButton(Yii::t('app', 'Update'), ['class' => 'btn btn-primary']) ?>
+    <?= Html::a(Yii::t('app', 'Delete'), ['delete-field', 'id' => $field->id], ['class' => 'btn btn-danger field-delete']) ?>
 </div>
 
 <script type="text/javascript">
@@ -82,6 +83,26 @@ $form = ActiveForm::begin([
                 }
             }
         })
+        return false;
+    });
+    $(document).on('click', '.field-delete', function() {
+        if (!confirm('<?= Yii::t('app', 'Are you sure you want to delete this item?') ?>')) {
+            return false;
+        }
+        var $btn = $(this);
+        console.log($btn);
+        $.ajax({
+            url: $btn.attr('href'),
+            type: 'GET',
+            success: function(resp) {
+                $('.modal').modal('hide');
+                if (resp.success) {
+                    removeField(<?= $field->id ?>);
+                } else {
+                    alert(resp.message);
+                }
+            }
+        });
         return false;
     });
 </script>

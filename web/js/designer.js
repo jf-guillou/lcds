@@ -1,7 +1,6 @@
 function preDraw() {
   for (var f in fields) {
     var field = fields[f];
-    console.log(field);
 
     var r = this.rect(
         Math.round(pW * field.x1),
@@ -24,6 +23,7 @@ function preDraw() {
     r.drag(handleMove, handleMoveStart, handleMoveEnd)
       .click(editField);
   }
+  paper = this;
 }
 
 function editField() {
@@ -34,6 +34,16 @@ function editField() {
       $('.modal').modal('show');
     });
   }
+}
+
+function removeField(id) {
+  paper.forEach(function(e) {
+    if (e.type == 'rect' && e.field.id*1 === id) {
+      e.text.remove();
+      e.remove();
+      return false;
+    }
+  });
 }
 
 var resizeMin = 20;
@@ -142,6 +152,7 @@ var pW;
 var pH;
 var pX;
 var pY;
+var paper = null;
 
 function load() {
   var $b = $('.background-edit');
