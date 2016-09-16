@@ -4,6 +4,7 @@ namespace app\controllers;
 
 use Yii;
 use yii\helpers\Url;
+use yii\helpers\Html;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\db\Expression;
@@ -103,15 +104,18 @@ class FrontendController extends Controller
                 $data .= (strpos($data, '?') === false ? '?' : '&').str_replace(['%x1%', '%x2%', '%y1%', '%y2%'], [$field->x1, $field->x2, $field->y1, $field->y2], $field->append_params);
             }
 
-            if ($c->type->kind == ContentType::KINDS['URL']) {
-                $data = str_replace('%data%', Url::to($data), $c->type->html);
-            } else {
-                $data = str_replace('%data%', $data, $c->type->html);
+            switch ($c->type->kind) {
+                case ContentType::KINDS['URL']:
+                    $data = Url::to($data);
+                    break;
+                case ContentType::KINDS['TEXT']:
+                    $data = nl2br(Html::encode($data));
+                    break;
             }
 
             return [
                 'id' => $c->id,
-                'data' => $data,
+                'data' => str_replace('%data%', $data, $c->type->html),
                 'duration' => $c->duration,
                 'type' => $c->type_id,
             ];

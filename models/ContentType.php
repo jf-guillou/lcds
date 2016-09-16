@@ -24,6 +24,7 @@ class ContentType extends \yii\db\ActiveRecord
     const KINDS = [
         'RAW' => 'raw',
         'URL' => 'url',
+        'TEXT' => 'text',
     ];
 
     /**
