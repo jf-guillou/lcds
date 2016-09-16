@@ -27,11 +27,13 @@ function preDraw() {
 }
 
 function editField() {
-  $('.modal-content').html('');
-  $.get(editFieldUrl + this.field.id, function(html) {
-    $('.modal-content').html($(html).find('.modal-content > *'));
-    $('.modal').modal('show');
-  });
+  if (!this.moved) {
+    $('.modal-content').html('');
+    $.get(editFieldUrl + this.field.id, function(html) {
+      $('.modal-content').html($(html).find('.modal-content > *'));
+      $('.modal').modal('show');
+    });
+  }
 }
 
 var resizeMin = 20;
