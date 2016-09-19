@@ -213,3 +213,53 @@ function load() {
 }
 
 $(load);
+
+$(document).on('beforeSubmit', '#screen-template-field-form', function() {
+  var $form = $(this);
+  if ($form.find('.has-error').length) {
+    return false;
+  }
+
+  $.ajax({
+    url: $form.attr('action'),
+    type: $form.attr('method'),
+    data: $form.serialize(),
+    success: function(resp) {
+      if (resp == '') {
+        $('.modal').modal('hide');
+        window.location.reload();
+      } else {
+        $("#field-modal").html($(resp));
+        $('.modal').modal('show');
+      }
+    }
+  })
+  return false;
+});
+$(document).on('click', '.field-delete', function() {
+  var $btn = $(this);
+  console.log($btn);
+  $.ajax({
+    url: $btn.attr('href'),
+    type: 'GET',
+    success: function(resp) {
+      $('.modal').modal('hide');
+      if (resp.success) {
+        removeField(currentField);
+      } else {
+        alert(resp.message);
+      }
+    }
+  });
+  return false;
+});
+
+
+$(document).on('change', '#field-contenttypes input', function() {
+  var $chk = $(this);
+  if (selfContentIds.indexOf($chk.val()*1) != -1) {
+      $('#field-contenttypes input').not($chk).prop('checked', false);
+  } else {
+      $('#field-contenttypes input').filter(function() { return selfContentIds.indexOf($(this).val()*1) != -1 }).prop('checked', false);
+  }
+});
