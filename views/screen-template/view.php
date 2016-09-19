@@ -45,10 +45,8 @@ Modal::end();
 </div>
 
 <script type="text/javascript">
+var templateId = <?= $model->id ?>;
 var fields = <?= json_encode($fields) ?>;
 var setFieldPosUrl = '<?= $setFieldPosUrl ?>';
 var editFieldUrl = '<?= $editFieldUrl ?>';
-$(document).on('click', '.field-add', function() {
-    addField(); // TODO ME
-});
 </script>

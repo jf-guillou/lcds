@@ -14,7 +14,6 @@ $form = ActiveForm::begin([
         'id' => 'screen-template-field-form',
     ]);
 
-//return var_dump($contentTypes);
 ?>
 
 <div class="row">
@@ -42,12 +41,8 @@ $form = ActiveForm::begin([
 </div>
 
 <div class="row">
-    <div class="col-lg-6">
-        <?= $form->field($field, 'contentTypes')->checkboxList($selfContentTypes, []) ?>
-    </div>
-
-    <div class="col-lg-6">
-        <?= $form->field($field, 'contentTypes')->checkboxList($contentTypes, []) ?>
+    <div class="col-lg-12">
+        <?= $form->field($field, 'contentTypes')->checkboxList($contentTypesArray, []) ?>
     </div>
 </div>
 
@@ -77,6 +72,7 @@ $form = ActiveForm::begin([
             success: function(resp) {
                 if (resp == '') {
                     $('.modal').modal('hide');
+                    window.location.reload();
                 } else {
                     $("#field-modal").html($(resp));
                     $('.modal').modal('show');
@@ -104,6 +100,16 @@ $form = ActiveForm::begin([
             }
         });
         return false;
+    });
+
+    var selfContentIds = <?= json_encode($selfContentIds); ?>;
+    $(document).on('change', '#field-contenttypes input', function() {
+        var $chk = $(this);
+        if (selfContentIds.indexOf($chk.val()*1) != -1) {
+            $('#field-contenttypes input').not($chk).prop('checked', false);
+        } else {
+            $('#field-contenttypes input').filter(function() { return selfContentIds.indexOf($(this).val()*1) != -1 }).prop('checked', false);
+        }
     });
 </script>
 

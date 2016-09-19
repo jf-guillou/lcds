@@ -1,33 +1,46 @@
 function preDraw() {
-  for (var f in fields) {
-    var field = fields[f];
-
-    var r = this.rect(
-        Math.round(pW * field.x1),
-        Math.round(pH * field.y1),
-        Math.round(pW * (field.x2 - field.x1)),
-        Math.round(pH * (field.y2 - field.y1))
-      )
-      .attr('fill', '#F00')
-      .attr('opacity', 0.7)
-      .attr('stroke', '#FFF')
-      .attr('stroke-width', 6);
-    r.field = field;
-
-    var t = this.text(
-        Math.round(pW * field.x1 + 6),
-        Math.round(pH * field.y1 + 8),
-        field.contentTypes.map(function(c) { return c.name; }).join(' - ')
-      );
-    r.text = t.attr('text-anchor', 'start');
-    r.drag(handleMove, handleMoveStart, handleMoveEnd)
-      .click(editField);
-  }
   paper = this;
+  for (var f in fields) {
+    createField(fields[f]);
+  }
 }
 
-function addField() {
-  // TODO
+function createField(field) {
+  var r = paper.rect(
+      Math.round(pW * field.x1),
+      Math.round(pH * field.y1),
+      Math.round(pW * (field.x2 - field.x1)),
+      Math.round(pH * (field.y2 - field.y1))
+    )
+    .attr('fill', '#F00')
+    .attr('opacity', 0.7)
+    .attr('stroke', '#FFF')
+    .attr('stroke-width', 6);
+  r.field = field;
+
+  var t = paper.text(
+      Math.round(pW * field.x1 + 6),
+      Math.round(pH * field.y1 + 8),
+      field.contentTypes ? field.contentTypes.map(function(c) { return c.name; }).join(' - ') : ''
+    );
+  r.text = t.attr('text-anchor', 'start');
+  r.drag(handleMove, handleMoveStart, handleMoveEnd)
+    .click(editField);
+}
+
+function addField($btn) {
+  $.ajax({
+    url: $btn.attr('href'),
+    type: 'GET',
+    data: { templateId: templateId },
+    success: function(res) {
+      if (res.success) {
+        createField(res.field);
+      } else {
+        alert(res.message);
+      }
+    }
+  });
 }
 
 function editField() {
@@ -40,13 +53,39 @@ function editField() {
   }
 }
 
-function removeField(id) {
+function updateField(id) {
+  $.ajax({
+    url: 'get-field',
+    type: 'GET',
+    data: { id: id },
+    success: function(res) {
+      if (res.success) {
+        var field = res.field;
+        getField(field.id, function(e) {
+          e.attr('x', Math.round(pW * field.x1));
+          e.attr('y', Math.round(pH * field.y1));
+          e.attr('width', Math.round(pW * (field.x2 - field.x1)));
+          e.attr('height', Math.round(pH * (field.y2 - field.y1)));
+          e.text.attr('text', field.contentTypes ? field.contentTypes.map(function(c) { return c.name; }).join(' - ') : '');
+        });
+      }
+    }
+  })
+}
+
+function getField(id, cb) {
   paper.forEach(function(e) {
-    if (e.type == 'rect' && e.field.id*1 === id) {
-      e.text.remove();
-      e.remove();
+    if (e.type == 'rect' && e.field.id * 1 === id) {
+      cb(e);
       return false;
     }
+  });
+}
+
+function removeField(id) {
+  getField(id, function(e) {
+    e.text.remove();
+    e.remove();
   });
 }
 
@@ -151,6 +190,11 @@ function handleMoveEnd(e) {
   //console.log(o);
   $.post(setFieldPosUrl + o.id, {Field: o});
 }
+
+$(document).on('click', '.field-add', function() {
+    addField($(this));
+    return false;
+});
 
 var pW;
 var pH;

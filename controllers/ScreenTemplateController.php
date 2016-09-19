@@ -70,8 +70,41 @@ class ScreenTemplateController extends Controller
         ]);
     }
 
-    public function actionAddField()
+    public function actionAddField($templateId)
     {
+        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+
+        $field = new Field();
+        $field->template_id = $templateId;
+        $max = mt_getrandmax();
+        $field->x1 = self::randf(0.1, 0.4);
+        $field->y1 = self::randf(0.1, 0.4);
+        $field->x2 = self::randf($field->x1, 0.8);
+        $field->y2 = self::randf($field->y1, 0.8);
+
+        if ($field->save()) {
+            return ['success' => true, 'field' => $field];
+        } else {
+            return ['success' => false, 'message' => Yii::t('app', 'Failed to insert new field')];
+        }
+    }
+
+    public static function randf($min = 0.0, $max = 1.0)
+    {
+        return mt_rand($min * mt_getrandmax(), $max * mt_getrandmax()) / mt_getrandmax();
+    }
+
+    public function actionGetField($id)
+    {
+        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+
+        $field = Field::find()->where(['id' => $id])->with('contentTypes')->one();
+
+        if ($field === null) {
+            return ['success' => false, 'message' => Yii::t('app', 'Field not found')];
+        } else {
+            return ['success' => true, 'field' => $field, 'contentTypes' => $field->contentTypes];
+        }
     }
 
     public function actionEditField($id)
@@ -82,29 +115,48 @@ class ScreenTemplateController extends Controller
         }
 
         if ($field->load(Yii::$app->request->post())) {
+            $newTypeIds = Yii::$app->request->post($field->formName())['contentTypes'];
+            if (!is_array($newTypeIds)) {
+                $newTypeIds = [];
+            }
+            $oldTypeIds = array_map(function ($c) {
+                return $c->id;
+            }, $field->contentTypes);
+
+            $unlink = array_diff($oldTypeIds, $newTypeIds);
+            $unlinkModels = ContentType::find()->where(['id' => $unlink])->all();
+            foreach ($unlinkModels as $u) {
+                $field->unlink('contentTypes', $u, true);
+            }
+            $link = array_diff($newTypeIds, $oldTypeIds);
+            $linkModels = ContentType::find()->where(['id' => $link])->all();
+            foreach ($linkModels as $l) {
+                $field->link('contentTypes', $l);
+            }
+
             if ($field->save()) {
                 return '';
             }
         }
 
-        $contentTypes = ContentType::find()->all();
+        $allContentTypes = ContentType::find()->all();
+        $contentTypesArray = array_reduce($allContentTypes, function ($a, $c) {
+            $a[$c->id] = Yii::t('app', $c->name);
+
+            return $a;
+        }, []);
+        $selfCTypes = array_reduce($allContentTypes, function ($a, $c) {
+            if ($c->self_update) {
+                $a[] = $c->id;
+            }
+
+            return $a;
+        }, []);
 
         return $this->renderAjax('editfield', [
             'field' => $field,
-            'contentTypes' => array_reduce($contentTypes, function ($a, $c) {
-                if (!$c->self_update) {
-                    $a[$c->id] = $c->name;
-                }
-
-                return $a;
-            }, []),
-            'selfContentTypes' => array_reduce($contentTypes, function ($a, $c) {
-                if ($c->self_update) {
-                    $a[$c->id] = $c->name;
-                }
-
-                return $a;
-            }, []),
+            'contentTypesArray' => $contentTypesArray,
+            'selfContentIds' => $selfCTypes,
         ]);
     }
 
@@ -115,7 +167,7 @@ class ScreenTemplateController extends Controller
         if ($id !== null) {
             $field = Field::find()->where(['id' => $id])->one();
             if ($field === null) {
-                return ['success' => false, 'message' => 'No such field'];
+                return ['success' => false, 'message' => Yii::t('app', 'No such field')];
             }
         } else {
             $field = new Field();
