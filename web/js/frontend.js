@@ -96,8 +96,9 @@ function next(f) {
   f.current = null;
   var pData = f.previous && f.previous.data;
   // Avoid repeat & other field same content
-  for (content in f.contents) {
-    var c = f.contents[content];
+  //for (content in f.contents) {
+  while (true) {
+    var c = f.contents[Math.floor(Math.random() * f.contents.length)];
     if (c.data == pData) {
       // repeat : skip if possible
       //console.log('Repeat, skip if possible');
