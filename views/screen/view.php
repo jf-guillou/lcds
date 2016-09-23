@@ -23,15 +23,18 @@ $this->params['breadcrumbs'][] = $this->title;
                 'method' => 'post',
             ],
         ]) ?>
+        <?= Html::a(Yii::t('app', 'Preview'), ['/frontend/screen', 'id' => $model->id], ['class' => 'btn btn-success']) ?>
     </p>
 
     <?= DetailView::widget([
         'model' => $model,
         'attributes' => [
-            'id',
             'name',
             'description',
-            'template_id',
+            [
+                'label' => \Yii::t('app', 'Template'),
+                'value' => $model->template->name,
+            ],
         ],
     ]) ?>
 
