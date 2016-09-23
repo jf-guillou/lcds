@@ -16,7 +16,7 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'description')->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'owner_id')->textInput() ?>
+    <?= $form->field($model, 'owner_group')->textInput() ?>
 
     <?= $form->field($model, 'parent_id')->textInput() ?>
 
