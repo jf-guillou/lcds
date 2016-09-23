@@ -7,9 +7,10 @@ $config = [
     'basePath' => dirname(__DIR__),
     'bootstrap' => ['log'],
     'defaultRoute' => 'main/index',
+    'sourceLanguage' => 'en-US',
+    'language' => 'en-US',
     'components' => [
         'request' => [
-            // !!! insert a secret key in the following (if it is empty) - this is required by cookie validation
             'cookieValidationKey' => $params['cookieValidationKey'],
         ],
         'cache' => [
