@@ -2,7 +2,6 @@
 
 use yii\helpers\Html;
 
-
 /* @var $this yii\web\View */
 /* @var $model app\models\Content */
 
@@ -16,6 +15,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <?= $this->render('_form', [
         'model' => $model,
+        'contentTypes' => $contentTypes,
     ]) ?>
 
 </div>

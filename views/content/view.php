@@ -38,7 +38,6 @@ $this->params['breadcrumbs'][] = $this->title;
             'end_ts',
             'add_ts',
             'enabled:boolean',
-            'owner_id',
         ],
     ]) ?>
 

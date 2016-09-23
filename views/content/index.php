@@ -13,27 +13,37 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <h1><?= Html::encode($this->title) ?></h1>
 
-    <p>
-        <?= Html::a(Yii::t('app', 'Create Content'), ['create'], ['class' => 'btn btn-success']) ?>
-    </p>
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
         'columns' => [
-            ['class' => 'yii\grid\SerialColumn'],
+            //['class' => 'yii\grid\SerialColumn'],
 
-            'id',
+            //'id',
             'name',
             'description',
-            'type_id',
-            'data:ntext',
+            [
+                'attribute' => 'type.name',
+                'label' => \Yii::t('app', 'Type'),
+                'value' => function ($model, $key, $index, $column) {
+                    return \Yii::t('app', $model->type->name);
+                },
+            ],
+            //'data:ntext',
             // 'duration',
             // 'start_ts',
             // 'end_ts',
             // 'add_ts',
             // 'enabled:boolean',
-            // 'owner_id',
 
-            ['class' => 'yii\grid\ActionColumn'],
+            [
+                'class' => 'yii\grid\ActionColumn',
+                'template' => '{view} {update} {delete} {toggle}',
+                'buttons' => [
+                    'toggle' => function ($url, $model, $key) {
+                        return Html::a('<span class="glyphicon glyphicon-'.($model->enabled ? 'pause' : 'play').'"></span>', $url);
+                    },
+                ],
+            ],
         ],
     ]); ?>
 </div>
