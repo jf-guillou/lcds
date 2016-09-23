@@ -207,9 +207,8 @@ class ScreenTemplateController extends Controller
 
         if ($model->load(Yii::$app->request->post())) {
             $image->content = UploadedFile::getInstance($image, 'content');
-            $imagePath = $image->upload();
-            if ($imagePath) {
-                $model->background = Url::to($imagePath);
+            if ($image->upload()) {
+                $model->background = Url::to($upload->path);
             }
 
             if ($model->save()) {

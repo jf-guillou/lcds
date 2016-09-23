@@ -3,6 +3,7 @@
 namespace app\models;
 
 use Yii;
+use app\models\upload\ContentUpload;
 
 /**
  * This is the model class for table "content".
@@ -17,7 +18,6 @@ use Yii;
  * @property string $end_ts
  * @property string $add_ts
  * @property bool $enabled
- * @property bool $editable
  * @property Flow $flow
  * @property ContentType $type
  */
@@ -41,7 +41,7 @@ class Content extends \yii\db\ActiveRecord
             [['flow_id', 'type_id', 'duration'], 'integer'],
             [['data'], 'string'],
             [['start_ts', 'end_ts', 'add_ts'], 'safe'],
-            [['enabled', 'editable'], 'boolean'],
+            [['enabled'], 'boolean'],
             [['name'], 'string', 'max' => 64],
             [['description'], 'string', 'max' => 1024],
             [['flow_id'], 'exist', 'skipOnError' => true, 'targetClass' => Flow::className(), 'targetAttribute' => ['flow_id' => 'id']],
@@ -58,24 +58,37 @@ class Content extends \yii\db\ActiveRecord
             'id' => Yii::t('app', 'ID'),
             'name' => Yii::t('app', 'Name'),
             'description' => Yii::t('app', 'Description'),
-            'type_id' => Yii::t('app', 'Type ID'),
-            'data' => Yii::t('app', 'Data'),
-            'duration' => Yii::t('app', 'Duration'),
-            'start_ts' => Yii::t('app', 'Start Ts'),
-            'end_ts' => Yii::t('app', 'End Ts'),
-            'add_ts' => Yii::t('app', 'Add Ts'),
             'flow_id' => Yii::t('app', 'Flow'),
+            'type_id' => Yii::t('app', 'Type'),
+            'data' => Yii::t('app', 'Content'),
+            'duration' => Yii::t('app', 'Duration in seconds'),
+            'start_ts' => Yii::t('app', 'Start at'),
+            'end_ts' => Yii::t('app', 'End on'),
+            'add_ts' => Yii::t('app', 'Added at'),
             'enabled' => Yii::t('app', 'Enabled'),
-            'editable' => Yii::t('app', 'Editable'),
         ];
     }
 
+    public function shouldDeleteFile()
     {
+        if ($this->type->kind == ContentType::KINDS['FILE']) {
+            return self::find()
+                ->joinWith(['type'])
+                ->where(['kind' => ContentType::KINDS['FILE']])
+                ->andWhere(['data' => $this->data])
+                ->count() == 1;
         }
 
+        return false;
     }
 
+    public function getRealFilepath()
     {
+        if ($this->type->kind == ContentType::KINDS['FILE']) {
+            return ContentUpload::toRealPath($this->data);
+        }
+
+        return;
     }
 
     /**

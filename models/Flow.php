@@ -10,7 +10,7 @@ use Yii;
  * @property int $id
  * @property string $name
  * @property string $description
- * @property int $owner_id
+ * @property string $owner_group
  * @property int $parent_id
  * @property Content[] $contents
  * @property Flow $parent
@@ -34,9 +34,9 @@ class Flow extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['name', 'owner_id'], 'required'],
-            [['owner_id', 'parent_id'], 'integer'],
-            [['name'], 'string', 'max' => 64],
+            [['name', 'owner_group'], 'required'],
+            [['parent_id'], 'integer'],
+            [['name', 'owner_group'], 'string', 'max' => 64],
             [['description'], 'string', 'max' => 1024],
             [['parent_id'], 'exist', 'skipOnError' => true, 'targetClass' => self::className(), 'targetAttribute' => ['parent_id' => 'id']],
         ];
@@ -51,8 +51,8 @@ class Flow extends \yii\db\ActiveRecord
             'id' => Yii::t('app', 'ID'),
             'name' => Yii::t('app', 'Name'),
             'description' => Yii::t('app', 'Description'),
-            'owner_id' => Yii::t('app', 'Owner ID'),
-            'parent_id' => Yii::t('app', 'Parent ID'),
+            'owner_group' => Yii::t('app', 'Owner'),
+            'parent_id' => Yii::t('app', 'Parent'),
         ];
     }
 

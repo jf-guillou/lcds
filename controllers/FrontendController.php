@@ -87,7 +87,7 @@ class FrontendController extends Controller
 
         // Get content for flows and field type
         $contents = Content::find()
-            ->joinWith(['flows', 'type'])
+            ->joinWith(['flow', 'type'])
             ->where(['type_id' => $contentTypes])
             ->andWhere([Flow::tableName().'.id' => $flowIds])
             ->andWhere(['enabled' => true])
@@ -105,7 +105,7 @@ class FrontendController extends Controller
             }
 
             switch ($c->type->kind) {
-                case ContentType::KINDS['URL']:
+                case ContentType::KINDS['FILE']:
                     $data = Url::to($data);
                     break;
                 case ContentType::KINDS['TEXT']:

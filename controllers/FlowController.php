@@ -4,6 +4,8 @@ namespace app\controllers;
 
 use Yii;
 use app\models\Flow;
+use app\models\Content;
+use app\models\ContentType;
 use yii\data\ActiveDataProvider;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -15,7 +17,7 @@ use yii\filters\VerbFilter;
 class FlowController extends Controller
 {
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function behaviors()
     {
@@ -31,6 +33,7 @@ class FlowController extends Controller
 
     /**
      * Lists all Flow models.
+     *
      * @return mixed
      */
     public function actionIndex()
@@ -46,19 +49,32 @@ class FlowController extends Controller
 
     /**
      * Displays a single Flow model.
-     * @param integer $id
+     *
+     * @param int $id
+     *
      * @return mixed
      */
     public function actionView($id)
     {
+        $dataProvider = new ActiveDataProvider([
+            'query' => Content::find()->joinWith(['type', 'flow'])->where([Flow::tableName().'.id' => $id]),
+        ]);
+
+        $dataProvider->sort->attributes['type.name'] = [
+            'asc' => [ContentType::tableName().'.name' => SORT_ASC],
+            'desc' => [ContentType::tableName().'.name' => SORT_DESC],
+        ];
+
         return $this->render('view', [
             'model' => $this->findModel($id),
+            'dataProvider' => $dataProvider,
         ]);
     }
 
     /**
      * Creates a new Flow model.
      * If creation is successful, the browser will be redirected to the 'view' page.
+     *
      * @return mixed
      */
     public function actionCreate()
@@ -77,7 +93,9 @@ class FlowController extends Controller
     /**
      * Updates an existing Flow model.
      * If update is successful, the browser will be redirected to the 'view' page.
-     * @param integer $id
+     *
+     * @param int $id
+     *
      * @return mixed
      */
     public function actionUpdate($id)
@@ -96,7 +114,9 @@ class FlowController extends Controller
     /**
      * Deletes an existing Flow model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
-     * @param integer $id
+     *
+     * @param int $id
+     *
      * @return mixed
      */
     public function actionDelete($id)
@@ -109,8 +129,11 @@ class FlowController extends Controller
     /**
      * Finds the Flow model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
-     * @param integer $id
+     *
+     * @param int $id
+     *
      * @return Flow the loaded model
+     *
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($id)
