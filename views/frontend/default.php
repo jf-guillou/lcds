@@ -53,7 +53,8 @@ foreach ($fields as $field) :
         return 'field_'.$ct;
     }, $contentTypes);
 
-    $type = $field->contentTypes[0];
+    $isSelfUpdate = count($field->contentTypes) > 0 && $field->contentTypes[0]->self_update;
+    $selfHtml = $isSelfUpdate ? $field->contentTypes[0]->html : ''
 ?>
 <div
     id="field_<?= $field->id ?>"
@@ -61,11 +62,11 @@ foreach ($fields as $field) :
     data-id="<?= $field->id ?>"
     data-types="<?= implode(' ', $contentTypes) ?>"
     style="display: none;"
-    <?= $type->self_update ? '' : 'data-url="'.$nextUrl.$field->id.'"' ?>
+    <?= $isSelfUpdate ? '' : 'data-url="'.$nextUrl.$field->id.'"' ?>
 >
     <?php
-    if ($type->self_update && $type->html) {
-        echo $type->html;
+    if ($selfHtml) {
+        echo $selfHtml;
     } ?>
 </div>
 <?php endforeach; ?>
