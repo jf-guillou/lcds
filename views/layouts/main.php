@@ -23,7 +23,7 @@ AppAsset::register($this);
 </head>
 <body>
 <?php $this->beginBody() ?>
-
+<script type="text/javascript">window.jqReady = [];</script>
 <div class="wrap">
     <?php
     NavBar::begin([
@@ -42,12 +42,12 @@ AppAsset::register($this);
             ['label' => Yii::t('app', 'Content'), 'url' => ['/content']],
             ['label' => Yii::t('app', 'Content types'), 'url' => ['/content-type']],
             Yii::$app->user->isGuest ? (
-                ['label' => 'Login', 'url' => ['/auth/login']]
+                ['label' => Yii::t('app', 'Login'), 'url' => ['/auth/login']]
             ) : (
                 '<li>'
                 .Html::beginForm(['/auth/logout'], 'post', ['class' => 'navbar-form'])
                 .Html::submitButton(
-                    'Logout ('.Yii::$app->user->identity->username.')',
+                    Yii::t('app', 'Logout ({username})', ['username' => Yii::$app->user->identity->username]),
                     ['class' => 'btn btn-link']
                 )
                 .Html::endForm()
@@ -75,6 +75,15 @@ AppAsset::register($this);
 </footer>
 
 <?php $this->endBody() ?>
+<script type="text/javascript">
+if (window.hasOwnProperty('jqReady')) {
+    $(function() {
+        window.jqReady.forEach(function(f) {
+            f();
+        });
+    });
+}
+</script>
 </body>
 </html>
 <?php $this->endPage() ?>
