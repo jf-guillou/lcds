@@ -17,11 +17,9 @@ use Yii;
  * @property string $end_ts
  * @property string $add_ts
  * @property bool $enabled
- * @property int $owner_id
  * @property bool $editable
+ * @property Flow $flow
  * @property ContentType $type
- * @property FlowHasContent[] $flowHasContents
- * @property Flow[] $flows
  */
 class Content extends \yii\db\ActiveRecord
 {
@@ -39,13 +37,14 @@ class Content extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['name', 'type_id', 'owner_id'], 'required'],
-            [['type_id', 'duration', 'owner_id'], 'integer'],
+            [['name', 'flow_id', 'type_id'], 'required'],
+            [['flow_id', 'type_id', 'duration'], 'integer'],
             [['data'], 'string'],
             [['start_ts', 'end_ts', 'add_ts'], 'safe'],
             [['enabled', 'editable'], 'boolean'],
             [['name'], 'string', 'max' => 64],
             [['description'], 'string', 'max' => 1024],
+            [['flow_id'], 'exist', 'skipOnError' => true, 'targetClass' => Flow::className(), 'targetAttribute' => ['flow_id' => 'id']],
             [['type_id'], 'exist', 'skipOnError' => true, 'targetClass' => ContentType::className(), 'targetAttribute' => ['type_id' => 'id']],
         ];
     }
@@ -65,20 +64,26 @@ class Content extends \yii\db\ActiveRecord
             'start_ts' => Yii::t('app', 'Start Ts'),
             'end_ts' => Yii::t('app', 'End Ts'),
             'add_ts' => Yii::t('app', 'Add Ts'),
+            'flow_id' => Yii::t('app', 'Flow'),
             'enabled' => Yii::t('app', 'Enabled'),
-            'owner_id' => Yii::t('app', 'Owner ID'),
             'editable' => Yii::t('app', 'Editable'),
         ];
     }
 
-    public static function fromFlows($flows, $type)
     {
-        $contents = [];
-        foreach ($flows as $flow) {
-            $contents = array_merge($contents, $flow->contents);
         }
 
-        return $contents;
+    }
+
+    {
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getFlow()
+    {
+        return $this->hasOne(Flow::className(), ['id' => 'flow_id']);
     }
 
     /**
@@ -87,21 +92,5 @@ class Content extends \yii\db\ActiveRecord
     public function getType()
     {
         return $this->hasOne(ContentType::className(), ['id' => 'type_id']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getFlowHasContents()
-    {
-        return $this->hasMany(FlowHasContent::className(), ['content_id' => 'id']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getFlows()
-    {
-        return $this->hasMany(Flow::className(), ['id' => 'flow_id'])->viaTable('flow_has_content', ['content_id' => 'id']);
     }
 }

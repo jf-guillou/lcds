@@ -12,10 +12,9 @@ use Yii;
  * @property string $description
  * @property int $owner_id
  * @property int $parent_id
+ * @property Content[] $contents
  * @property Flow $parent
  * @property Flow[] $flows
- * @property FlowHasContent[] $flowHasContents
- * @property Content[] $contents
  * @property ScreenHasFlow[] $screenHasFlows
  * @property Screen[] $screens
  */
@@ -60,6 +59,14 @@ class Flow extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
+    public function getContents()
+    {
+        return $this->hasMany(Content::className(), ['flow_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
     public function getParent()
     {
         return $this->hasOne(self::className(), ['id' => 'parent_id']);
@@ -68,25 +75,9 @@ class Flow extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getFlows()
+    public function getChildren()
     {
         return $this->hasMany(self::className(), ['parent_id' => 'id']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getFlowHasContents()
-    {
-        return $this->hasMany(FlowHasContent::className(), ['flow_id' => 'id']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getContents()
-    {
-        return $this->hasMany(Content::className(), ['id' => 'content_id'])->viaTable('flow_has_content', ['flow_id' => 'id']);
     }
 
     /**
