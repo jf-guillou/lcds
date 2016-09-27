@@ -2,37 +2,72 @@
 
 namespace app\models;
 
-class User extends \yii\base\Object implements \yii\web\IdentityInterface
-{
-    public $id;
-    public $username;
-    public $password;
-    public $authKey;
-    public $accessToken;
+use Yii;
+use yii\db\Expression;
 
-    private static $users = [
-        '100' => [
-            'id' => '100',
-            'username' => 'admin',
-            'password' => 'admin',
-            'authKey' => 'test100key',
-            'accessToken' => '100-token',
-        ],
-        '101' => [
-            'id' => '101',
-            'username' => 'demo',
-            'password' => 'demo',
-            'authKey' => 'test101key',
-            'accessToken' => '101-token',
-        ],
-    ];
+/**
+ * This is the model class for table "user".
+ *
+ * @property string $username
+ * @property string $password
+ * @property string $hash
+ * @property string $language
+ * @property string $authkey
+ * @property string $access_token
+ * @property string $added_at
+ * @property string $last_login_at
+ * @property bool $fromLdap
+ * @property bool $remember_me
+ */
+class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
+{
+    public $password;
+    public $fromLdap = false;
+    public $remember_me = false;
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function tableName()
+    {
+        return 'user';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function rules()
+    {
+        return [
+            [['username', 'password'], 'required'],
+            [['added_at', 'last_login_at'], 'safe'],
+            [['language'], 'string', 'max' => 8],
+            [['username', 'password', 'hash', 'authkey', 'access_token'], 'string', 'max' => 64],
+            [['remember_me'], 'boolean'],
+        ];
+    }
+
+    public function attributeLabels()
+    {
+        return [
+            'username' => Yii::t('app', 'Username'),
+            'hash' => Yii::t('app', 'Hash'),
+            'password' => Yii::t('app', 'Password'),
+            'language' => Yii::t('app', 'Language'),
+            'authkey' => Yii::t('app', 'Authkey'),
+            'access_token' => Yii::t('app', 'Access token'),
+            'added_at' => Yii::t('app', 'Added at'),
+            'last_login_at' => Yii::t('app', 'Last login at'),
+            'remember_me' => Yii::t('app', 'Remember me'),
+        ];
+    }
 
     /**
      * {@inheritdoc}
      */
     public static function findIdentity($id)
     {
-        return isset(self::$users[$id]) ? new static(self::$users[$id]) : null;
+        return static::findOne($id);
     }
 
     /**
@@ -40,31 +75,7 @@ class User extends \yii\base\Object implements \yii\web\IdentityInterface
      */
     public static function findIdentityByAccessToken($token, $type = null)
     {
-        foreach (self::$users as $user) {
-            if ($user['accessToken'] === $token) {
-                return new static($user);
-            }
-        }
-
-        return;
-    }
-
-    /**
-     * Finds user by username.
-     *
-     * @param string $username
-     *
-     * @return static|null
-     */
-    public static function findByUsername($username)
-    {
-        foreach (self::$users as $user) {
-            if (strcasecmp($user['username'], $username) === 0) {
-                return new static($user);
-            }
-        }
-
-        return;
+        return static::findOne(['access_token' => $token]);
     }
 
     /**
@@ -72,7 +83,7 @@ class User extends \yii\base\Object implements \yii\web\IdentityInterface
      */
     public function getId()
     {
-        return $this->id;
+        return $this->username;
     }
 
     /**
@@ -80,7 +91,36 @@ class User extends \yii\base\Object implements \yii\web\IdentityInterface
      */
     public function getAuthKey()
     {
-        return $this->authKey;
+        return $this->authkey;
+    }
+
+    public function authenticate($password)
+    {
+        if (Yii::$app->params['useLdap'] && Yii::$app->ldap->authenticate($this->getId(), $password)) {
+            $this->fromLdap = true;
+
+            return true;
+        }
+
+        return $this->validatePassword($password);
+    }
+
+    public function setLastLogin()
+    {
+        $this->last_login_at = new Expression('NOW()');
+        $this->save();
+    }
+
+    public function initFromLDAP()
+    {
+        if (Yii::$app->params['useLdap'] && Yii::$app->ldap->authenticate($this->getId(), $this->password)) {
+            $this->fromLdap = true;
+            $this->save();
+
+            return $this;
+        }
+
+        return;
     }
 
     /**
@@ -88,7 +128,7 @@ class User extends \yii\base\Object implements \yii\web\IdentityInterface
      */
     public function validateAuthKey($authKey)
     {
-        return $this->authKey === $authKey;
+        return $this->getAuthkey() === $authkey;
     }
 
     /**
@@ -100,6 +140,25 @@ class User extends \yii\base\Object implements \yii\web\IdentityInterface
      */
     public function validatePassword($password)
     {
-        return $this->password === $password;
+        return Yii::$app->security->validatePassword($password, $this->hash);
+    }
+
+    public function beforeSave($insert)
+    {
+        if (parent::beforeSave($insert)) {
+            if ($this->isNewRecord) {
+                $this->language = Yii::$app->params['language'];
+                $this->authkey = Yii::$app->security->generateRandomString();
+                $this->access_token = Yii::$app->security->generateRandomString();
+                if (!$this->fromLdap) {
+                    $this->hash = Yii::$app->security->generatePasswordHash($this->password);
+                    $this->password = null;
+                }
+            }
+
+            return true;
+        }
+
+        return false;
     }
 }

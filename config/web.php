@@ -8,7 +8,7 @@ $config = [
     'bootstrap' => ['log'],
     'defaultRoute' => 'main/index',
     'sourceLanguage' => 'en-US',
-    'language' => 'en-US',
+    'language' => $params['language'],
     'components' => [
         'request' => [
             'cookieValidationKey' => $params['cookieValidationKey'],
@@ -42,6 +42,10 @@ $config = [
                     'levels' => ['error', 'warning'],
                 ],
             ],
+        ],
+        'ldap' => [
+            'class' => 'Edvlerblog\Ldap',
+            'options' => $params['ldapOptions'],
         ],
         'db' => require(__DIR__.'/db.php'),
     ],
