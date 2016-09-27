@@ -19,7 +19,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <h1><?= Html::encode($this->title) ?></h1>
 
-    <div class="content-upload">
+    <div id="content-upload">
         <div class="form-group field-upload-file">
             <label class="control-label" for="content-upload-file"><?= Yii::t('app', 'Paste or drag&drop the file or url to upload') ?></label>
             <div id="content-upload-file" class="file-upload">
@@ -34,24 +34,24 @@ $this->params['breadcrumbs'][] = $this->title;
         </div>
     </div>
 
-    <div class="content-form" style="display: none;">
+    <div id="content-form" style="display: none;">
 
         <?php $form = ActiveForm::begin(); ?>
 
         <div class="row">
             <div class="col-lg-4">
-                <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
+                <?= $form->field($model, 'name')->textInput(['maxlength' => true, 'id' => 'content-name']) ?>
             </div>
             <div class="col-lg-8">
-                <?= $form->field($model, 'description')->textInput(['maxlength' => true]) ?>
+                <?= $form->field($model, 'description')->textInput(['maxlength' => true, 'id' => 'content-description']) ?>
             </div>
         </div>
 
-        <?= $form->field($model, 'data')->hiddenInput()->label(false) ?>
+        <?= $form->field($model, 'data')->hiddenInput(['id' => 'content-data'])->label(false) ?>
 
         <div class="row">
             <div class="col-lg-2">
-                <?= $form->field($model, 'duration')->textInput() ?>
+                <?= $form->field($model, 'duration')->textInput(['maxlength' => true, 'id' => 'content-duration']) ?>
             </div>
             <div class="col-lg-5">
                 <?= $form->field($model, 'start_ts')->widget(DateTimePicker::className(), [
@@ -115,8 +115,8 @@ window.jqReady.push(function() {
     {
         uploaded = true;
         $('#content-data').val(path);
-        $('.content-upload').slideUp();
-        $('.content-form').slideDown();
+        $('#content-upload').slideUp();
+        $('#content-form').slideDown();
         $('#content-description').val(path.split('/').pop());
     }
 

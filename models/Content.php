@@ -3,7 +3,6 @@
 namespace app\models;
 
 use Yii;
-use app\models\upload\ContentUpload;
 
 /**
  * This is the model class for table "content".
@@ -23,6 +22,8 @@ use app\models\upload\ContentUpload;
  */
 class Content extends \yii\db\ActiveRecord
 {
+    const IS_FILE = false;
+
     /**
      * {@inheritdoc}
      */
@@ -69,28 +70,6 @@ class Content extends \yii\db\ActiveRecord
         ];
     }
 
-    public function shouldDeleteFile()
-    {
-        if ($this->type->kind == ContentType::KINDS['FILE']) {
-            return self::find()
-                ->joinWith(['type'])
-                ->where(['kind' => ContentType::KINDS['FILE']])
-                ->andWhere(['data' => $this->data])
-                ->count() == 1;
-        }
-
-        return false;
-    }
-
-    public function getRealFilepath()
-    {
-        if ($this->type->kind == ContentType::KINDS['FILE']) {
-            return ContentUpload::toRealPath($this->data);
-        }
-
-        return;
-    }
-
     /**
      * @return \yii\db\ActiveQuery
      */
@@ -105,5 +84,31 @@ class Content extends \yii\db\ActiveRecord
     public function getType()
     {
         return $this->hasOne(ContentType::className(), ['id' => 'type_id']);
+    }
+
+    public static function fromType($contentType)
+    {
+        if ($contentType->class_name) {
+            $className = 'app\\models\\types\\'.$contentType->class_name;
+            if (!class_exists($className)) {
+                throw new \Exception(Yii::t('app', 'Class doesn\'t exist'));
+            }
+
+            return $className;
+        } else {
+            return self;
+        }
+    }
+
+    public static function newFromType($contentType)
+    {
+        $class = self::fromType($contentType);
+
+        return new $class();
+    }
+
+    protected function shouldDeleteFile()
+    {
+        return false;
     }
 }

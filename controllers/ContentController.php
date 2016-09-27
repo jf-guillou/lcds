@@ -6,6 +6,7 @@ use Yii;
 use app\models\Content;
 use app\models\ContentType;
 use app\models\Flow;
+use app\models\types\Image;
 use yii\helpers\Url;
 use yii\data\ActiveDataProvider;
 use yii\web\Controller;
@@ -113,7 +114,7 @@ class ContentController extends Controller
                 'flow' => $flowId,
             ]);
         } else {
-            $model = new Content();
+            $model = Content::newFromType($contentType);
             if ($model->load(Yii::$app->request->post())) {
                 $model->flow_id = $flow->id;
                 $model->type_id = $contentType->id;
@@ -159,26 +160,12 @@ class ContentController extends Controller
             return ['success' => false, 'message' => Yii::t('app', 'Unsupported content type')];
         }
 
-        $className = 'app\\models\\upload\\'.$contentType->class_name;
-        $upload = new $className();
-        $upload->content = UploadedFile::getInstanceByName('content');
-        if ($upload->upload()) {
-            if ($upload->isValid()) {
-                return ['success' => true, 'path' => $upload->path, 'duration' => $upload->duration];
-            } else {
-                $upload->delete();
-
-                return ['success' => false, 'message' => Yii::t('app', 'Incorrect file')];
-            }
-        } else {
-            if (array_key_exists('content', $upload->errors)) {
-                return ['success' => false, 'message' => implode(', ', $upload->errors['content'])];
-            } elseif ($upload->content->error) {
-                return ['success' => false, 'message' => Yii::t('app', 'Upload failed {code}', ['code' => $upload->content->error])];
-            }
+        $upload = Content::newFromType($contentType);
+        if ($upload->upload(UploadedFile::getInstanceByName('content'))) {
+            return ['success' => true, 'path' => $upload->getWebFilepath(), 'duration' => $upload->getDuration()];
         }
 
-        return ['success' => false, 'message' => Yii::t('app', 'Upload failed')];
+        return ['success' => false, 'message' => $upload->getLoadError()];
     }
 
     public function actionSideload($type, $url)
@@ -190,27 +177,12 @@ class ContentController extends Controller
             return ['success' => false, 'message' => Yii::t('app', 'Unsupported content type')];
         }
 
-        $className = 'app\\models\\upload\\'.$contentType->class_name;
-        $upload = new $className();
+        $upload = Content::newFromType($contentType);
         if ($upload->sideload($url)) {
-            if ($upload->isValid()) {
-                return ['success' => true, 'path' => $upload->path, 'duration' => $upload->duration];
-            } else {
-                $upload->delete();
-
-                return ['success' => false, 'message' => Yii::t('app', 'Incorrect file')];
-            }
-        } else {
-            if ($upload->error) {
-                return ['success' => false, 'message' => $upload->error];
-            }
+            return ['success' => true, 'path' => $upload->getWebFilepath(), 'duration' => $upload->getDuration()];
         }
 
-        return ['success' => false, 'message' => Yii::t('app', 'Sideload failed')];
-    }
-
-    public function actionPollProgress()
-    {
+        return ['success' => false, 'message' => $upload->getLoadError()];
     }
 
     /**
@@ -245,13 +217,7 @@ class ContentController extends Controller
      */
     public function actionDelete($id)
     {
-        $model = $this->findModel($id);
-
-        if ($model->shouldDeleteFile()) {
-            unlink($model->getRealFilepath());
-        }
-
-        $model->delete();
+        $this->findModel($id)->delete();
 
         return $this->redirect(['index']);
     }
@@ -280,7 +246,9 @@ class ContentController extends Controller
     protected function findModel($id)
     {
         if (($model = Content::findOne($id)) !== null) {
-            return $model;
+            $class = Content::fromType($model->type);
+
+            return $class === Content::class ? $model : $class::findOne($id);
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');
         }
@@ -288,6 +256,7 @@ class ContentController extends Controller
 
     public function actionTest($url)
     {
-        var_dump(\app\helpers\VideoDL::dl($url));
+        $media = new Image();
+        var_dump($media->sideload($url));
     }
 }
