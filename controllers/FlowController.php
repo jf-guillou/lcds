@@ -7,14 +7,13 @@ use app\models\Flow;
 use app\models\Content;
 use app\models\ContentType;
 use yii\data\ActiveDataProvider;
-use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 
 /**
  * FlowController implements the CRUD actions for Flow model.
  */
-class FlowController extends Controller
+class FlowController extends BaseController
 {
     /**
      * {@inheritdoc}

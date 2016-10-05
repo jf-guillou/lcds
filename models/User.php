@@ -149,7 +149,7 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
     {
         if (parent::beforeSave($insert)) {
             if ($this->isNewRecord) {
-                $this->language = Yii::$app->params['language'];
+                $this->language = Yii::$app->session->get('language', Yii::$app->sourceLanguage);
                 $this->authkey = Yii::$app->security->generateRandomString();
                 $this->access_token = Yii::$app->security->generateRandomString();
                 if (!$this->fromLdap) {
@@ -162,6 +162,17 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
         }
 
         return false;
+    }
+
+    public function setLanguage($language)
+    {
+        $this->language = $language;
+        $this->save();
+    }
+
+    public function getLanguage()
+    {
+        return $this->language;
     }
 
     /**

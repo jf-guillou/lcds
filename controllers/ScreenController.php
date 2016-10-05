@@ -6,14 +6,13 @@ use Yii;
 use app\models\Screen;
 use app\models\ScreenTemplate;
 use yii\data\ActiveDataProvider;
-use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 
 /**
  * ScreenController implements the CRUD actions for Screen model.
  */
-class ScreenController extends Controller
+class ScreenController extends BaseController
 {
     /**
      * {@inheritdoc}

@@ -9,7 +9,6 @@ use app\models\Flow;
 use app\models\types\Image;
 use yii\helpers\Url;
 use yii\data\ActiveDataProvider;
-use yii\web\Controller;
 use yii\web\UploadedFile;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -17,7 +16,7 @@ use yii\filters\VerbFilter;
 /**
  * ContentController implements the CRUD actions for Content model.
  */
-class ContentController extends Controller
+class ContentController extends BaseController
 {
     /**
      * {@inheritdoc}

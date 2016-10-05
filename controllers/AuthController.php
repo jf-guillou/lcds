@@ -4,12 +4,11 @@ namespace app\controllers;
 
 use Yii;
 use app\models\User;
-use yii\web\Controller;
 
 /**
  * ContentController implements the CRUD actions for Content model.
  */
-class AuthController extends Controller
+class AuthController extends BaseController
 {
     public function actionIndex()
     {

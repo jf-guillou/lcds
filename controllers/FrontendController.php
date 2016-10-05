@@ -5,7 +5,6 @@ namespace app\controllers;
 use Yii;
 use yii\helpers\Url;
 use yii\helpers\Html;
-use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\db\Expression;
 use app\models\Screen;
@@ -14,7 +13,7 @@ use app\models\Flow;
 use app\models\Content;
 use app\models\ContentType;
 
-class FrontendController extends Controller
+class FrontendController extends BaseController
 {
     public $layout = 'frontend';
     public $defaultScreen = 1;

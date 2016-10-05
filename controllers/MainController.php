@@ -2,9 +2,7 @@
 
 namespace app\controllers;
 
-use yii\web\Controller;
-
-class MainController extends Controller
+class MainController extends BaseController
 {
     public function actions()
     {

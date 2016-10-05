@@ -5,14 +5,13 @@ namespace app\controllers;
 use Yii;
 use app\models\ContentType;
 use yii\data\ActiveDataProvider;
-use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 
 /**
  * ContentTypeController implements the CRUD actions for ContentType model.
  */
-class ContentTypeController extends Controller
+class ContentTypeController extends BaseController
 {
     /**
      * @inheritdoc
