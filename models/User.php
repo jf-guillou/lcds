@@ -107,12 +107,6 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
         return $this->validatePassword($password);
     }
 
-    public function setLastLogin()
-    {
-        $this->last_login_at = new Expression('NOW()');
-        $this->save();
-    }
-
     public function initFromLDAP()
     {
         if (Yii::$app->params['useLdap'] && Yii::$app->ldap->authenticate($this->getId(), $this->password)) {
@@ -125,10 +119,24 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
         return;
     }
 
+    public function findInLdap()
+    {
+        if (Yii::$app->params['useLdap']) {
+            $ldapUser = Yii::$app->ldap->users()->find($this->getId());
+            if ($ldapUser) {
+                $this->fromLdap = true;
+
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     /**
      * {@inheritdoc}
      */
-    public function validateAuthKey($authKey)
+    public function validateAuthKey($authkey)
     {
         return $this->getAuthkey() === $authkey;
     }
@@ -164,6 +172,15 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
         return false;
     }
 
+    public function afterLogin($identity, $cookieBased, $duration)
+    {
+        $this->last_login_at = new Expression('NOW()');
+
+        $this->save();
+
+        parent::afterLogin();
+    }
+
     public function setLanguage($language)
     {
         $this->language = $language;
@@ -189,5 +206,18 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
     public function getFlows()
     {
         return $this->hasMany(Flow::className(), ['id' => 'flow_id'])->viaTable('user_has_flow', ['user_username' => 'username']);
+    }
+
+    public function getRoles()
+    {
+        return Yii::$app->authManager->getRolesByUser($this->getId());
+    }
+
+    public function getRole()
+    {
+        $roles = $this->getRoles();
+        $roleNames = array_keys($roles);
+
+        return count($roleNames) ? $roles[$roleNames[0]]->name : null;
     }
 }
