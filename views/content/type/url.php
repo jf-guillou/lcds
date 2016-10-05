@@ -30,7 +30,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
         <div class="row">
             <div class="col-lg-8">
-                <?= $form->field($model, 'data')->textInput(['maxlength' => true])->label(Yii::t('app', 'URL')) ?>
+                <?= $form->field($model, 'data')->textInput(['maxlength' => true, 'id' => 'content-data'])->label(Yii::t('app', 'URL')) ?>
             </div>
             <div class="col-lg-4">
                 <div id="content-preview">
