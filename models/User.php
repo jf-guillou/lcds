@@ -18,6 +18,8 @@ use yii\db\Expression;
  * @property string $last_login_at
  * @property bool $fromLdap
  * @property bool $remember_me
+ * @property UserHasFlow[] $userHasFlows
+ * @property Flow[] $flows
  */
 class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
 {
@@ -160,5 +162,21 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
         }
 
         return false;
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getUserHasFlows()
+    {
+        return $this->hasMany(UserHasFlow::className(), ['user_username' => 'username']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getFlows()
+    {
+        return $this->hasMany(Flow::className(), ['id' => 'flow_id'])->viaTable('user_has_flow', ['user_username' => 'username']);
     }
 }

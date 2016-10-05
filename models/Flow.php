@@ -16,6 +16,8 @@ use Yii;
  * @property Flow[] $flows
  * @property ScreenHasFlow[] $screenHasFlows
  * @property Screen[] $screens
+ * @property UserHasFlow[] $userHasFlows
+ * @property User[] $userUsernames
  */
 class Flow extends \yii\db\ActiveRecord
 {
@@ -92,5 +94,21 @@ class Flow extends \yii\db\ActiveRecord
     public function getScreens()
     {
         return $this->hasMany(Screen::className(), ['id' => 'screen_id'])->viaTable('screen_has_flow', ['flow_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getUserHasFlows()
+    {
+        return $this->hasMany(UserHasFlow::className(), ['flow_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getUsers()
+    {
+        return $this->hasMany(User::className(), ['username' => 'user_username'])->viaTable('user_has_flow', ['flow_id' => 'id']);
     }
 }
