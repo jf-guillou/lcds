@@ -47,6 +47,9 @@ $config = [
             'class' => 'Edvlerblog\Ldap',
             'options' => $params['ldapOptions'],
         ],
+        'authManager' => [
+            'class' => 'yii\rbac\DbManager',
+        ],
         'db' => require(__DIR__.'/db.php'),
     ],
     'params' => $params,
