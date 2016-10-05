@@ -7,6 +7,7 @@ use app\models\ContentType;
 use yii\data\ActiveDataProvider;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\filters\AccessControl;
 
 /**
  * ContentTypeController implements the CRUD actions for ContentType model.
@@ -14,7 +15,7 @@ use yii\filters\VerbFilter;
 class ContentTypeController extends BaseController
 {
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function behaviors()
     {
@@ -25,11 +26,19 @@ class ContentTypeController extends BaseController
                     'delete' => ['POST'],
                 ],
             ],
+            'access' => [
+                'class' => AccessControl::className(),
+                'only' => ['index', 'view', 'create', 'update', 'delete'],
+                'rules' => [
+                    ['allow' => true, 'actions' => ['index', 'view', 'create', 'update', 'delete'], 'roles' => ['admin']],
+                ],
+            ],
         ];
     }
 
     /**
      * Lists all ContentType models.
+     *
      * @return mixed
      */
     public function actionIndex()
@@ -45,7 +54,9 @@ class ContentTypeController extends BaseController
 
     /**
      * Displays a single ContentType model.
-     * @param integer $id
+     *
+     * @param int $id
+     *
      * @return mixed
      */
     public function actionView($id)
@@ -58,6 +69,7 @@ class ContentTypeController extends BaseController
     /**
      * Creates a new ContentType model.
      * If creation is successful, the browser will be redirected to the 'view' page.
+     *
      * @return mixed
      */
     public function actionCreate()
@@ -76,7 +88,9 @@ class ContentTypeController extends BaseController
     /**
      * Updates an existing ContentType model.
      * If update is successful, the browser will be redirected to the 'view' page.
-     * @param integer $id
+     *
+     * @param int $id
+     *
      * @return mixed
      */
     public function actionUpdate($id)
@@ -95,7 +109,9 @@ class ContentTypeController extends BaseController
     /**
      * Deletes an existing ContentType model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
-     * @param integer $id
+     *
+     * @param int $id
+     *
      * @return mixed
      */
     public function actionDelete($id)
@@ -108,8 +124,11 @@ class ContentTypeController extends BaseController
     /**
      * Finds the ContentType model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
-     * @param integer $id
+     *
+     * @param int $id
+     *
      * @return ContentType the loaded model
+     *
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($id)

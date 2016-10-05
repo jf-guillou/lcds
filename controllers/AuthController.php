@@ -3,6 +3,7 @@
 namespace app\controllers;
 
 use Yii;
+use yii\filters\AccessControl;
 use app\models\User;
 
 /**
@@ -10,6 +11,20 @@ use app\models\User;
  */
 class AuthController extends BaseController
 {
+    public function behaviors()
+    {
+        return [
+            'access' => [
+                'class' => AccessControl::className(),
+                'only' => ['login', 'logout'],
+                'rules' => [
+                    ['allow' => true, 'actions' => ['login'], 'roles' => ['?']],
+                    ['allow' => true, 'actions' => ['logout'], 'roles' => ['@']],
+                ],
+            ],
+        ];
+    }
+
     public function actionIndex()
     {
         return $this->actionLogin();
@@ -39,7 +54,6 @@ class AuthController extends BaseController
             if ($identity || ($identity = $model->initFromLDAP()) !== null) {
                 if ($identity->authenticate($model->password)) {
                     Yii::$app->user->enableAutoLogin = $model->remember_me;
-                    $identity->setLastLogin();
                     Yii::$app->user->login($identity, Yii::$app->params['cookieDuration']);
 
                     return $this->goBack();

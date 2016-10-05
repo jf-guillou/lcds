@@ -9,6 +9,7 @@ use app\models\ContentType;
 use yii\data\ActiveDataProvider;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\filters\AccessControl;
 
 /**
  * FlowController implements the CRUD actions for Flow model.
@@ -27,6 +28,14 @@ class FlowController extends BaseController
                     'delete' => ['POST'],
                 ],
             ],
+            'access' => [
+                'class' => AccessControl::className(),
+                'only' => ['index', 'view', 'create', 'update', 'delete'],
+                'rules' => [
+                    ['allow' => true, 'actions' => ['index', 'view'], 'roles' => ['@']],
+                    ['allow' => true, 'actions' => ['create', 'update', 'delete'], 'roles' => ['admin']],
+                ],
+            ],
         ];
     }
 
@@ -37,9 +46,17 @@ class FlowController extends BaseController
      */
     public function actionIndex()
     {
-        $dataProvider = new ActiveDataProvider([
-            'query' => Flow::find(),
-        ]);
+        if (Yii::$app->user->can('setFlowContent')) {
+            $dataProvider = new ActiveDataProvider([
+                'query' => Flow::find(),
+            ]);
+        } elseif (Yii::$app->user->can('setOwnFlowContent')) {
+            $dataProvider = new ActiveDataProvider([
+                'query' => Flow::find()->joinWith(['users'])->where(['username' => Yii::$app->user->identity->username]),
+            ]);
+        } else {
+            throw new \yii\web\ForbiddenHttpException();
+        }
 
         return $this->render('index', [
             'dataProvider' => $dataProvider,
@@ -55,6 +72,11 @@ class FlowController extends BaseController
      */
     public function actionView($id)
     {
+        $model = $this->findModel($id);
+        if (!Yii::$app->user->can('setFlowContent') && !(Yii::$app->user->can('setOwnFlowContent') && in_array(Yii::$app->user->identity, $model->users))) {
+            throw new \yii\web\ForbiddenHttpException();
+        }
+
         $dataProvider = new ActiveDataProvider([
             'query' => Content::find()->joinWith(['type', 'flow'])->where([Flow::tableName().'.id' => $id]),
         ]);

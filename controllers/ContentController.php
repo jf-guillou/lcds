@@ -6,11 +6,11 @@ use Yii;
 use app\models\Content;
 use app\models\ContentType;
 use app\models\Flow;
-use app\models\types\Image;
 use yii\helpers\Url;
 use yii\data\ActiveDataProvider;
 use yii\web\UploadedFile;
 use yii\web\NotFoundHttpException;
+use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 
 /**
@@ -30,6 +30,14 @@ class ContentController extends BaseController
                     'delete' => ['POST'],
                 ],
             ],
+            'access' => [
+                'class' => AccessControl::className(),
+                'only' => ['index', 'view', 'create', 'generate', 'upload', 'sideload', 'update', 'delete', 'toggle'],
+                'rules' => [
+                    ['allow' => true, 'actions' => ['create'], 'roles' => ['admin']],
+                    ['allow' => true, 'actions' => ['index', 'view', 'generate', 'upload', 'sideload', 'update', 'delete', 'toggle'], 'roles' => ['@']],
+                ],
+            ],
         ];
     }
 
@@ -40,9 +48,17 @@ class ContentController extends BaseController
      */
     public function actionIndex()
     {
-        $dataProvider = new ActiveDataProvider([
-            'query' => Content::find()->joinWith('type'),
-        ]);
+        if (Yii::$app->user->can('setFlowContent')) {
+            $dataProvider = new ActiveDataProvider([
+                'query' => Content::find()->joinWith(['type']),
+            ]);
+        } elseif (Yii::$app->user->can('setOwnFlowContent')) {
+            $dataProvider = new ActiveDataProvider([
+                'query' => Content::find()->joinWith(['type', 'flow.users'])->where(['username' => Yii::$app->user->identity->username]),
+            ]);
+        } else {
+            throw new \yii\web\ForbiddenHttpException();
+        }
 
         $dataProvider->sort->attributes['type.name'] = [
             'asc' => [ContentType::tableName().'.name' => SORT_ASC],
@@ -63,8 +79,13 @@ class ContentController extends BaseController
      */
     public function actionView($id)
     {
+        $model = $this->findModel($id);
+        if (!Yii::$app->user->can('setFlowContent') && !(Yii::$app->user->can('setOwnFlowContent') && in_array(Yii::$app->user->identity, $model->flow->users))) {
+            throw new \yii\web\ForbiddenHttpException();
+        }
+
         return $this->render('view', [
-            'model' => $this->findModel($id),
+            'model' => $model,
         ]);
     }
 
@@ -100,6 +121,9 @@ class ContentController extends BaseController
         $flow = Flow::findOne($flowId);
         if ($flow === null) {
             throw new NotFoundHttpException(Yii::t('app', 'The requested page does not exist.'));
+        }
+        if (!Yii::$app->user->can('setFlowContent') && !(Yii::$app->user->can('setOwnFlowContent') && in_array(Yii::$app->user->identity, $flow->users))) {
+            throw new \yii\web\ForbiddenHttpException();
         }
 
         $contentType = ContentType::findOne($type);
@@ -154,6 +178,10 @@ class ContentController extends BaseController
     {
         Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
 
+        if (!Yii::$app->user->can('upload')) {
+            return ['success' => false, 'message' => Yii::t('app', 'Not authorized')];
+        }
+
         $contentType = ContentType::findOne($type);
         if ($contentType === null || $contentType->class_name === null) {
             return ['success' => false, 'message' => Yii::t('app', 'Unsupported content type')];
@@ -170,6 +198,10 @@ class ContentController extends BaseController
     public function actionSideload($type, $url)
     {
         Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+
+        if (!Yii::$app->user->can('upload')) {
+            return ['success' => false, 'message' => Yii::t('app', 'Not authorized')];
+        }
 
         $contentType = ContentType::findOne($type);
         if ($contentType === null || $contentType->class_name === null) {
@@ -196,6 +228,10 @@ class ContentController extends BaseController
     {
         $model = $this->findModel($id);
 
+        if (!Yii::$app->user->can('setFlowContent') && !(Yii::$app->user->can('setOwnFlowContent') && in_array(Yii::$app->user->identity, $model->flow->users))) {
+            throw new \yii\web\ForbiddenHttpException();
+        }
+
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);
         } else {
@@ -216,7 +252,13 @@ class ContentController extends BaseController
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
+        $model = $this->findModel($id);
+
+        if (!Yii::$app->user->can('setFlowContent') && !(Yii::$app->user->can('setOwnFlowContent') && in_array(Yii::$app->user->identity, $model->flow->users))) {
+            throw new \yii\web\ForbiddenHttpException();
+        }
+
+        $model->delete();
 
         return $this->redirect(['index']);
     }
@@ -224,6 +266,10 @@ class ContentController extends BaseController
     public function actionToggle($id)
     {
         $model = $this->findModel($id);
+
+        if (!Yii::$app->user->can('setFlowContent') && !(Yii::$app->user->can('setOwnFlowContent') && in_array(Yii::$app->user->identity, $model->flow->users))) {
+            throw new \yii\web\ForbiddenHttpException();
+        }
 
         $model->enabled = !$model->enabled;
 
@@ -251,11 +297,5 @@ class ContentController extends BaseController
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');
         }
-    }
-
-    public function actionTest($url)
-    {
-        $media = new Image();
-        var_dump($media->sideload($url));
     }
 }

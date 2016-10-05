@@ -8,6 +8,7 @@ use app\models\ScreenTemplate;
 use yii\data\ActiveDataProvider;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\filters\AccessControl;
 
 /**
  * ScreenController implements the CRUD actions for Screen model.
@@ -24,6 +25,13 @@ class ScreenController extends BaseController
                 'class' => VerbFilter::className(),
                 'actions' => [
                     'delete' => ['POST'],
+                ],
+            ],
+            'access' => [
+                'class' => AccessControl::className(),
+                'only' => ['index', 'view', 'create', 'update', 'delete'],
+                'rules' => [
+                    ['allow' => true, 'actions' => ['index', 'view', 'create', 'update', 'delete'], 'roles' => ['setScreens']],
                 ],
             ],
         ];

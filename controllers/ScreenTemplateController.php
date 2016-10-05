@@ -13,11 +13,12 @@ use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\web\UploadedFile;
 use yii\filters\VerbFilter;
+use yii\filters\AccessControl;
 
 /**
  * ScreentemplateController implements the CRUD actions for ScreenTemplate model.
  */
-class ScreenTemplateController extends Controller
+class ScreenTemplateController extends BaseController
 {
     /**
      * {@inheritdoc}
@@ -29,6 +30,13 @@ class ScreenTemplateController extends Controller
                 'class' => VerbFilter::className(),
                 'actions' => [
                     'delete' => ['POST'],
+                ],
+            ],
+            'access' => [
+                'class' => AccessControl::className(),
+                'only' => ['index', 'view', 'add-field', 'get-field', 'edit-field', 'set-field-pos', 'delete-field', 'create', 'update', 'delete'],
+                'rules' => [
+                    ['allow' => true, 'actions' => ['index', 'view', 'add-field', 'get-field', 'edit-field', 'set-field-pos', 'delete-field', 'create', 'update', 'delete'], 'roles' => ['setTemplates']],
                 ],
             ],
         ];
