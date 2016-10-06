@@ -46,17 +46,14 @@ class FlowController extends BaseController
      */
     public function actionIndex()
     {
-        if (Yii::$app->user->can('setFlowContent')) {
-            $dataProvider = new ActiveDataProvider([
-                'query' => Flow::find(),
-            ]);
-        } elseif (Yii::$app->user->can('setOwnFlowContent')) {
-            $dataProvider = new ActiveDataProvider([
-                'query' => Flow::find()->joinWith(['users'])->where(['username' => Yii::$app->user->identity->username]),
-            ]);
-        } else {
+        $query = Flow::availableQuery(Yii::$app->user);
+        if ($query === null) {
             throw new \yii\web\ForbiddenHttpException();
         }
+
+        $dataProvider = new ActiveDataProvider([
+            'query' => $query,
+        ]);
 
         return $this->render('index', [
             'dataProvider' => $dataProvider,
@@ -73,7 +70,7 @@ class FlowController extends BaseController
     public function actionView($id)
     {
         $model = $this->findModel($id);
-        if (!Yii::$app->user->can('setFlowContent') && !(Yii::$app->user->can('setOwnFlowContent') && in_array(Yii::$app->user->identity, $model->users))) {
+        if (!$model->canView(Yii::$app->user)) {
             throw new \yii\web\ForbiddenHttpException();
         }
 

@@ -111,4 +111,25 @@ class Flow extends \yii\db\ActiveRecord
     {
         return $this->hasMany(User::className(), ['username' => 'user_username'])->viaTable('user_has_flow', ['flow_id' => 'id']);
     }
+
+    public static function availableQuery($user)
+    {
+        if ($user->can('setFlowContent')) {
+            return self::find();
+        } elseif ($user->can('setOwnFlowContent')) {
+            return self::find()->joinWith(['users'])->where(['username' => $user->identity->username]);
+        }
+    }
+
+    public function canView($user)
+    {
+        if ($user->can('setFlowContent')) {
+            return true;
+        }
+        if ($user->can('setOwnFlowContent') && in_array($user->identity, $this->users)) {
+            return true;
+        }
+
+        return false;
+    }
 }

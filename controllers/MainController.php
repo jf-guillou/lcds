@@ -15,6 +15,6 @@ class MainController extends BaseController
 
     public function actionIndex()
     {
-        return '';
+        return $this->render('index');
     }
 }

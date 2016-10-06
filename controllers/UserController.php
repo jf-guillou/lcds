@@ -4,6 +4,9 @@ namespace app\controllers;
 
 use Yii;
 use app\models\User;
+use app\models\UserLogin;
+use app\models\Flow;
+use yii\helpers\ArrayHelper;
 use yii\data\ActiveDataProvider;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -29,9 +32,9 @@ class UserController extends Controller
             ],
             'access' => [
                 'class' => AccessControl::className(),
-                'only' => ['index', 'view', 'create', 'import', 'delete', 'set-role'],
+                'only' => ['index', 'view', 'create', 'import', 'delete', 'set-roles'],
                 'rules' => [
-                    ['allow' => true, 'actions' => ['index', 'view', 'create', 'delete', 'set-role'], 'roles' => ['admin']],
+                    ['allow' => true, 'actions' => ['index', 'view', 'create', 'delete', 'set-roles'], 'roles' => ['admin']],
                     ['allow' => true, 'actions' => ['import'], 'matchCallback' => function ($rule, $action) {
                         return Yii::$app->params['useLdap'];
                     }],
@@ -78,28 +81,40 @@ class UserController extends Controller
      */
     public function actionCreate()
     {
-        $model = new User();
+        $model = new UserLogin();
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->username]);
-        } else {
-            return $this->render('create', [
-                'model' => $model,
-            ]);
+        if ($model->load(Yii::$app->request->post()) && $model->validate()) {
+            if (!User::findIdentity($model->username)) {
+                if (($user = User::create($model->username, $model->password)) !== null) {
+                    return $this->redirect(['view', 'id' => $user->getId()]);
+                } else {
+                    $model->addError('username', Yii::t('app', 'User creation failed'));
+                }
+            } else {
+                $model->addError('username', Yii::t('app', 'This user is already registered'));
+            }
         }
+
+        return $this->render('create', [
+            'model' => $model,
+        ]);
     }
 
     public function actionImport()
     {
-        $model = new User();
+        $model = new UserLogin();
 
         if ($model->load(Yii::$app->request->post()) && $model->validate(['username'])) {
-            if ($model->findInLdap()) {
-                $model->save(false);
+            if (!User::findIdentity($model->username)) {
+                if (($user = User::findInLdap($model)) !== null) {
+                    $user->save(false);
 
-                return $this->redirect(['view', 'id' => $model->username]);
+                    return $this->redirect(['view', 'id' => $user->username]);
+                } else {
+                    $model->addError('username', Yii::t('app', 'This user doesn\'t exist in LDAP'));
+                }
             } else {
-                $model->addError('username', Yii::t('app', 'This user doesn\'t exist in LDAP'));
+                $model->addError('username', Yii::t('app', 'This user is already registered'));
             }
         }
 
@@ -121,6 +136,35 @@ class UserController extends Controller
         $this->findModel($id)->delete();
 
         return $this->redirect(['index']);
+    }
+
+    public function actionSetRoles($id)
+    {
+        $model = $this->findModel($id);
+        $auth = Yii::$app->authManager;
+
+        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            return $this->redirect(['view', 'id' => $model->username]);
+        }
+
+        $roles = $auth->getRoles();
+        $rolesArray = ['' => Yii::t('app', 'None')];
+        $flowableRoles = [];
+        foreach ($roles as $name => $role) {
+            $rolesArray[$name] = Yii::t('app', $name);
+            if ($role->data && array_key_exists('requireFlow', $role->data)) {
+                $flowableRoles[] = $name;
+            }
+        }
+
+        $flows = ArrayHelper::map(Flow::find()->all(), 'id', 'name');
+
+        return $this->render('set-roles', [
+            'model' => $model,
+            'roles' => $rolesArray,
+            'flows' => $flows,
+            'flowableRoles' => $flowableRoles,
+        ]);
     }
 
     /**
@@ -154,33 +198,5 @@ class UserController extends Controller
         }
 
         return $this->goBack();
-    }
-
-    public function actionSetRole($username, $roleName)
-    {
-        $auth = Yii::$app->authManager;
-        $role = $auth->getRole($roleName);
-        if ($role) {
-            $auth->assign($role, $username);
-        }
-
-        return $this->goBack();
-    }
-    public function actionSetRole2($username, $roleName)
-    {
-        $auth = Yii::$app->authManager;
-        $role = $auth->getRole($roleName);
-        if ($role) {
-            $auth->assign($role, $username);
-        }
-
-        return $this->goBack();
-    }
-
-    public function actionRoles($username)
-    {
-        $auth = Yii::$app->authManager;
-
-        var_dump($auth->getRolesByUser($username));
     }
 }

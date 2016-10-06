@@ -14,7 +14,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <h1><?= Html::encode($this->title) ?></h1>
 
     <p>
-        <?= Html::a(Yii::t('app', 'Create Flow'), ['create'], ['class' => 'btn btn-success']) ?>
+        <?= \Yii::$app->user->can('admin') ? Html::a(Yii::t('app', 'Create Flow'), ['create'], ['class' => 'btn btn-success']) : '' ?>
     </p>
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
@@ -26,7 +26,13 @@ $this->params['breadcrumbs'][] = $this->title;
             'description',
             'parent.name',
 
-            ['class' => 'yii\grid\ActionColumn'],
+            [
+                'class' => 'yii\grid\ActionColumn',
+                'visibleButtons' => [
+                    'update' => \Yii::$app->user->can('update'),
+                    'delete' => \Yii::$app->user->can('delete'),
+                ],
+            ],
         ],
     ]); ?>
 </div>

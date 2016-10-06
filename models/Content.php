@@ -111,4 +111,25 @@ class Content extends \yii\db\ActiveRecord
     {
         return false;
     }
+
+    public static function availableQuery($user)
+    {
+        if ($user->can('setFlowContent')) {
+            return self::find()->joinWith(['type']);
+        } elseif ($user->can('setOwnFlowContent')) {
+            return self::find()->joinWith(['type', 'flow.users'])->where(['username' => $user->identity->username]);
+        }
+    }
+
+    public function canView($user)
+    {
+        if ($user->can('setFlowContent')) {
+            return true;
+        }
+        if ($user->can('setOwnFlowContent') && in_array($user->identity, $this->flow->users)) {
+            return true;
+        }
+
+        return false;
+    }
 }

@@ -48,17 +48,14 @@ class ContentController extends BaseController
      */
     public function actionIndex()
     {
-        if (Yii::$app->user->can('setFlowContent')) {
-            $dataProvider = new ActiveDataProvider([
-                'query' => Content::find()->joinWith(['type']),
-            ]);
-        } elseif (Yii::$app->user->can('setOwnFlowContent')) {
-            $dataProvider = new ActiveDataProvider([
-                'query' => Content::find()->joinWith(['type', 'flow.users'])->where(['username' => Yii::$app->user->identity->username]),
-            ]);
-        } else {
+        $query = Content::availableQuery(Yii::$app->user);
+        if ($query === null) {
             throw new \yii\web\ForbiddenHttpException();
         }
+
+        $dataProvider = new ActiveDataProvider([
+            'query' => $query,
+        ]);
 
         $dataProvider->sort->attributes['type.name'] = [
             'asc' => [ContentType::tableName().'.name' => SORT_ASC],
@@ -80,7 +77,7 @@ class ContentController extends BaseController
     public function actionView($id)
     {
         $model = $this->findModel($id);
-        if (!Yii::$app->user->can('setFlowContent') && !(Yii::$app->user->can('setOwnFlowContent') && in_array(Yii::$app->user->identity, $model->flow->users))) {
+        if (!$model->canView(Yii::$app->user)) {
             throw new \yii\web\ForbiddenHttpException();
         }
 
@@ -122,7 +119,8 @@ class ContentController extends BaseController
         if ($flow === null) {
             throw new NotFoundHttpException(Yii::t('app', 'The requested page does not exist.'));
         }
-        if (!Yii::$app->user->can('setFlowContent') && !(Yii::$app->user->can('setOwnFlowContent') && in_array(Yii::$app->user->identity, $flow->users))) {
+
+        if (!$flow->canView(Yii::$app->user)) {
             throw new \yii\web\ForbiddenHttpException();
         }
 
@@ -228,7 +226,7 @@ class ContentController extends BaseController
     {
         $model = $this->findModel($id);
 
-        if (!Yii::$app->user->can('setFlowContent') && !(Yii::$app->user->can('setOwnFlowContent') && in_array(Yii::$app->user->identity, $model->flow->users))) {
+        if (!$model->canView(Yii::$app->user)) {
             throw new \yii\web\ForbiddenHttpException();
         }
 
@@ -254,7 +252,7 @@ class ContentController extends BaseController
     {
         $model = $this->findModel($id);
 
-        if (!Yii::$app->user->can('setFlowContent') && !(Yii::$app->user->can('setOwnFlowContent') && in_array(Yii::$app->user->identity, $model->flow->users))) {
+        if (!$model->canView(Yii::$app->user)) {
             throw new \yii\web\ForbiddenHttpException();
         }
 
@@ -267,7 +265,7 @@ class ContentController extends BaseController
     {
         $model = $this->findModel($id);
 
-        if (!Yii::$app->user->can('setFlowContent') && !(Yii::$app->user->can('setOwnFlowContent') && in_array(Yii::$app->user->identity, $model->flow->users))) {
+        if (!$model->canView(Yii::$app->user)) {
             throw new \yii\web\ForbiddenHttpException();
         }
 

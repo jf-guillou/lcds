@@ -49,6 +49,7 @@ class RbacController extends Controller
          */
 
         $contentCreator = $auth->createRole('Content creator');
+        $contentCreator->data = ['requireFlow' => true];
         $auth->add($contentCreator);
         $auth->addChild($contentCreator, $upload);
         $auth->addChild($contentCreator, $setOwnFlowContent);
@@ -64,5 +65,13 @@ class RbacController extends Controller
         $auth->add($admin);
         $auth->addChild($admin, $administration);
         $auth->addChild($admin, $screenManager);
+    }
+
+    public function actionUpdate()
+    {
+        $auth = Yii::$app->authManager;
+        $contentCreator = $auth->getRole('Content creator');
+        $contentCreator->data = ['requireFlow' => true];
+        $auth->update('Content creator', $contentCreator);
     }
 }

@@ -36,11 +36,12 @@ AppAsset::register($this);
     echo Nav::widget([
         'options' => ['class' => 'navbar-nav navbar-right'],
         'items' => [
-            ['label' => Yii::t('app', 'Templates'), 'url' => ['/screen-template']],
-            ['label' => Yii::t('app', 'Screens'), 'url' => ['/screen']],
-            ['label' => Yii::t('app', 'Flows'), 'url' => ['/flow']],
-            ['label' => Yii::t('app', 'Content'), 'url' => ['/content']],
-            ['label' => Yii::t('app', 'Content types'), 'url' => ['/content-type']],
+            ['label' => Yii::t('app', 'Templates'), 'url' => ['/screen-template'], 'visible' => Yii::$app->user->can('setTemplates')],
+            ['label' => Yii::t('app', 'Screens'), 'url' => ['/screen'], 'visible' => Yii::$app->user->can('setScreens')],
+            ['label' => Yii::t('app', 'Flows'), 'url' => ['/flow'], 'visible' => Yii::$app->user->can('setOwnFlowContent')],
+            ['label' => Yii::t('app', 'Content'), 'url' => ['/content'], 'visible' => Yii::$app->user->can('setFlowContent')],
+            ['label' => Yii::t('app', 'Content types'), 'url' => ['/content-type'], 'visible' => Yii::$app->user->can('admin')],
+            ['label' => Yii::t('app', 'Users'), 'url' => ['/user'], 'visible' => Yii::$app->user->can('admin')],
             Yii::$app->user->isGuest ? (
                 ['label' => Yii::t('app', 'Login'), 'url' => ['/auth/login']]
             ) : (
