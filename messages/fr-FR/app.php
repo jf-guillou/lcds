@@ -66,6 +66,7 @@ return [
     'Ticker' => 'Bandeau texte',
 
     'Parent flow' => 'Flux parent',
+    'Append URL parameters' => 'Paramètres suffixe URL',
 
     'Direct link to an image on an internet website. Hosted image is usually more appropriate.' => 'Lien vers une image depuis un site. Une image hébergée est généralement plus appropriée.',
     'Textual content, will be adjusted to be displayed as big as possible.' => 'Texte simple dont la taille sera ajustée pour être affichée de manière optimale',

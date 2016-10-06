@@ -6,8 +6,9 @@ use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
 
+$title = Yii::t('app', 'Edit field').' '.$field->id.' ('.$field->template_id.')';
 Modal::begin([
-    'header' => '<h2>'.Yii::t('app', 'Edit field').'</h2>',
+    'header' => '<h2>'.$title.'</h2>',
 ]);
 
 $form = ActiveForm::begin([
@@ -15,15 +16,6 @@ $form = ActiveForm::begin([
     ]);
 
 ?>
-
-<div class="row">
-    <div class="col-lg-6">
-        <?= $form->field($field, 'id')->textInput(['maxlength' => true, 'readonly' => true]); ?>
-    </div>
-    <div class="col-lg-6">
-        <?= $form->field($field, 'template_id')->textInput(['maxlength' => true, 'readonly' => true]); ?>
-    </div>
-</div>
 
 <div class="row">
     <div class="col-lg-3">

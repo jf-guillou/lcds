@@ -59,7 +59,8 @@ class Field extends \yii\db\ActiveRecord
             'y2' => Yii::t('app', 'Y2'),
             'css' => Yii::t('app', 'CSS'),
             'js' => Yii::t('app', 'JS'),
-            'append_params' => Yii::t('app', 'Append params'),
+            'append_params' => Yii::t('app', 'Append URL parameters'),
+            'contentTypes' => Yii::t('app', 'Content types'),
         ];
     }
 
