@@ -25,7 +25,6 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
 {
     public $password;
     public $fromLdap = false;
-    public $remember_me = false;
 
     /**
      * {@inheritdoc}
@@ -41,11 +40,10 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
     public function rules()
     {
         return [
-            [['username', 'password'], 'required'],
-            [['added_at', 'last_login_at'], 'safe'],
+            [['username'], 'required'],
+            [['added_at', 'last_login_at', 'role', 'flows'], 'safe'],
             [['language'], 'string', 'max' => 8],
-            [['username', 'password', 'hash', 'authkey', 'access_token'], 'string', 'max' => 64],
-            [['remember_me'], 'boolean'],
+            [['username', 'hash', 'authkey', 'access_token'], 'string', 'max' => 64],
         ];
     }
 
@@ -54,13 +52,13 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
         return [
             'username' => Yii::t('app', 'Username'),
             'hash' => Yii::t('app', 'Hash'),
-            'password' => Yii::t('app', 'Password'),
             'language' => Yii::t('app', 'Language'),
             'authkey' => Yii::t('app', 'Authkey'),
             'access_token' => Yii::t('app', 'Access token'),
             'added_at' => Yii::t('app', 'Added at'),
             'last_login_at' => Yii::t('app', 'Last login at'),
-            'remember_me' => Yii::t('app', 'Remember me'),
+            'role' => Yii::t('app', 'Role'),
+            'flows' => Yii::t('app', 'Flows'),
         ];
     }
 
@@ -69,7 +67,12 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
      */
     public static function findIdentity($id)
     {
-        return static::findOne($id);
+        $user = static::findOne($id);
+        if (!$user) {
+            $user = self::findInLdap($id);
+        }
+
+        return $user;
     }
 
     /**
@@ -96,8 +99,18 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
         return $this->authkey;
     }
 
+    public static function create($username, $password)
+    {
+        $user = new self();
+        $user->username = $username;
+        $user->password = $password;
+
+        return $user->save() ? $user : null;
+    }
+
     public function authenticate($password)
     {
+        $this->password = $password;
         if (Yii::$app->params['useLdap'] && Yii::$app->ldap->authenticate($this->getId(), $password)) {
             $this->fromLdap = true;
 
@@ -107,30 +120,18 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
         return $this->validatePassword($password);
     }
 
-    public function initFromLDAP()
-    {
-        if (Yii::$app->params['useLdap'] && Yii::$app->ldap->authenticate($this->getId(), $this->password)) {
-            $this->fromLdap = true;
-            $this->save();
-
-            return $this;
-        }
-
-        return;
-    }
-
-    public function findInLdap()
+    public static function findInLdap($id)
     {
         if (Yii::$app->params['useLdap']) {
-            $ldapUser = Yii::$app->ldap->users()->find($this->getId());
+            $ldapUser = Yii::$app->ldap->users()->find($id);
             if ($ldapUser) {
-                $this->fromLdap = true;
+                $user = new self();
+                $user->username = $id;
+                $user->fromLdap = true;
 
-                return true;
+                return $user;
             }
         }
-
-        return false;
     }
 
     /**
@@ -150,7 +151,19 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
      */
     public function validatePassword($password)
     {
+        if (!$this->hash) {
+            return false;
+        }
+
         return Yii::$app->security->validatePassword($password, $this->hash);
+    }
+
+    public function afterFind()
+    {
+        parent::afterFind();
+        if ($this->hash === null) {
+            $this->fromLdap = true;
+        }
     }
 
     public function beforeSave($insert)
@@ -160,7 +173,7 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
                 $this->language = Yii::$app->session->get('language', Yii::$app->sourceLanguage);
                 $this->authkey = Yii::$app->security->generateRandomString();
                 $this->access_token = Yii::$app->security->generateRandomString();
-                if (!$this->fromLdap) {
+                if (!$this->fromLdap && $this->password) {
                     $this->hash = Yii::$app->security->generatePasswordHash($this->password);
                     $this->password = null;
                 }
@@ -172,13 +185,11 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
         return false;
     }
 
-    public function afterLogin($identity, $cookieBased, $duration)
+    public static function afterLogin($event)
     {
-        $this->last_login_at = new Expression('NOW()');
+        $event->identity->last_login_at = new Expression('NOW()');
 
-        $this->save();
-
-        parent::afterLogin();
+        $event->identity->save();
     }
 
     public function setLanguage($language)
@@ -208,16 +219,52 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
         return $this->hasMany(Flow::className(), ['id' => 'flow_id'])->viaTable('user_has_flow', ['user_username' => 'username']);
     }
 
-    public function getRoles()
+    public function setFlows($flows)
     {
-        return Yii::$app->authManager->getRolesByUser($this->getId());
+        if ($flows === '' || count($flows) === 0) {
+            $this->unlinkAll('flows', true);
+        } else {
+            $prevFlows = [];
+            foreach ($this->flows as $f) {
+                $prevFlows[] = $f->id;
+            }
+
+            $unlink = array_diff($prevFlows, $flows);
+            if (count($unlink)) {
+                $uFlows = Flow::findAll($unlink);
+                foreach ($uFlows as $f) {
+                    $this->unlink('flows', $f, true);
+                }
+            }
+
+            $link = array_diff($flows, $prevFlows);
+            if (count($link)) {
+                $lFlows = Flow::findAll($link);
+                foreach ($lFlows as $f) {
+                    $this->link('flows', $f);
+                }
+            }
+        }
+
+        return true;
     }
 
     public function getRole()
     {
-        $roles = $this->getRoles();
+        $roles = Yii::$app->authManager->getRolesByUser($this->getId());
         $roleNames = array_keys($roles);
 
-        return count($roleNames) ? $roles[$roleNames[0]]->name : null;
+        return count($roleNames) ? $roleNames[0] : null;
+    }
+
+    public function setRole($role)
+    {
+        $auth = Yii::$app->authManager;
+        $auth->revokeAll($this->getId());
+        if (($r = $auth->getRole($role)) !== null) {
+            return $auth->assign($r, $this->getId()) !== null;
+        }
+
+        return false;
     }
 }

@@ -5,6 +5,8 @@ return [
     'cookieValidationKey' => 'DMod58d6E6qs0cqpOdqecv38mnjgqIOc',
     'debugAllowedIPs' => null,
     'proxy' => false,
+    'useKerberos' => false,
+    'kerberosPrincipalVar' => 'REDIRECT_REMOTE_USER',
     'useLdap' => false,
     'ldapOptions' => [
         'port' => 389,

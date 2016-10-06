@@ -5,6 +5,7 @@ namespace app\controllers;
 use Yii;
 use yii\filters\AccessControl;
 use app\models\User;
+use app\models\UserLogin;
 
 /**
  * ContentController implements the CRUD actions for Content model.
@@ -25,6 +26,13 @@ class AuthController extends BaseController
         ];
     }
 
+    public function init()
+    {
+        parent::init();
+
+        Yii::$app->user->on(\yii\web\User::EVENT_AFTER_LOGIN, ['app\models\User', 'afterLogin']);
+    }
+
     public function actionIndex()
     {
         return $this->actionLogin();
@@ -36,8 +44,8 @@ class AuthController extends BaseController
             return $this->goBack();
         }
 
-        if (isset($_SERVER['REDIRECT_REMOTE_USER'])) {
-            $username = $_SERVER['REDIRECT_REMOTE_USER'];
+        if (Yii::$app->params['useKerberos'] && isset($_SERVER[Yii::$app->params['kerberosPrincipalVar']])) {
+            $username = $_SERVER[Yii::$app->params['kerberosPrincipalVar']];
 
             $identity = User::findIdentity($username);
             if ($identity) {
@@ -47,17 +55,15 @@ class AuthController extends BaseController
             }
         }
 
-        $model = new User();
-        if ($model->load(Yii::$app->request->post())) {
+        $model = new UserLogin();
+        if ($model->load(Yii::$app->request->post()) && $model->validate()) {
             // Try to login
-            $identity = User::findIdentity($model->getId());
-            if ($identity || ($identity = $model->initFromLDAP()) !== null) {
-                if ($identity->authenticate($model->password)) {
-                    Yii::$app->user->enableAutoLogin = $model->remember_me;
-                    Yii::$app->user->login($identity, Yii::$app->params['cookieDuration']);
+            $identity = User::findIdentity($model->username);
+            if ($identity !== null && $identity->authenticate($model->password)) {
+                Yii::$app->user->enableAutoLogin = $model->remember_me;
+                Yii::$app->user->login($identity, Yii::$app->params['cookieDuration']);
 
-                    return $this->goBack();
-                }
+                return $this->goBack();
             }
             $model->addError('username', Yii::t('app', 'Username or password incorrect'));
         }
