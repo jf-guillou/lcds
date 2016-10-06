@@ -2,6 +2,7 @@
 
 namespace app\models\types;
 
+use yii\helpers\FileHelper;
 use app\models\Content;
 
 /**
@@ -9,7 +10,7 @@ use app\models\Content;
  */
 class Background extends Image
 {
-    const TYPE = 'background';
+    const TYPE = 'image';
     const TYPE_PATH = 'background/';
 
     public static function getAllWithPath()
@@ -22,5 +23,12 @@ class Background extends Image
         }
 
         return $contents;
+    }
+
+    public function backgroundSet()
+    {
+        if ($this->tmp) {
+            $this->tmp->delete();
+        }
     }
 }

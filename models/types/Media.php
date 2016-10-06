@@ -23,6 +23,10 @@ class Media extends Content
 
     public function upload($fileInstance)
     {
+        if ($fileInstance === null) {
+            return false;
+        }
+
         $this->tmp = new TempFile();
         $type = static::TYPE;
         $this->tmp->$type = $fileInstance;

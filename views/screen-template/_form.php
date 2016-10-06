@@ -16,7 +16,7 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'background')->radioList($backgrounds, ['encode' => false]) ?>
 
-    <?= $form->field($image, 'content')->fileInput() ?>
+    <?= $form->field($image, 'data')->fileInput() ?>
 
     <?= $form->field($model, 'css')->textarea(['rows' => 6]) ?>
 

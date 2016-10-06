@@ -33,7 +33,10 @@ $this->params['breadcrumbs'][] = $this->title;
             //'id',
             'name',
             'description',
-            'parent_id.name',
+            [
+                'attribute' => 'parent.name',
+                'label' => Yii::t('app', 'Parent flow'),
+            ],
         ],
     ]) ?>
 

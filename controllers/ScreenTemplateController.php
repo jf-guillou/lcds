@@ -5,7 +5,7 @@ namespace app\controllers;
 use Yii;
 use app\models\ContentType;
 use app\models\ScreenTemplate;
-use app\models\upload\BackgroundUpload;
+use app\models\types\Background;
 use app\models\Field;
 use yii\data\ActiveDataProvider;
 use yii\helpers\Url;
@@ -211,15 +211,16 @@ class ScreenTemplateController extends BaseController
     public function actionCreate()
     {
         $model = new ScreenTemplate();
-        $image = new BackgroundUpload();
+        $image = new Background();
 
         if ($model->load(Yii::$app->request->post())) {
-            $image->content = UploadedFile::getInstance($image, 'content');
-            if ($image->upload()) {
-                $model->background = Url::to($upload->path);
+            if ($image->upload(UploadedFile::getInstance($image, 'data'))) {
+                $model->background = Url::to($image->getWebFilepath());
             }
 
             if ($model->save()) {
+                $image->backgroundSet();
+
                 return $this->redirect(['view', 'id' => $model->id]);
             }
         }
@@ -244,16 +245,16 @@ class ScreenTemplateController extends BaseController
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
-        $image = new BackgroundUpload();
+        $image = new Background();
 
         if ($model->load(Yii::$app->request->post())) {
-            $image->content = UploadedFile::getInstance($image, 'content');
-            $imagePath = $image->upload();
-            if ($imagePath) {
-                $model->background = Url::to($imagePath);
+            if ($image->upload(UploadedFile::getInstance($image, 'data'))) {
+                $model->background = Url::to($image->getWebFilepath());
             }
 
             if ($model->save()) {
+                $image->backgroundSet();
+
                 return $this->redirect(['view', 'id' => $model->id]);
             }
         }
@@ -269,7 +270,7 @@ class ScreenTemplateController extends BaseController
 
     public static function getBackgroundRadios()
     {
-        $backgrounds = BackgroundUpload::getAllWithPath();
+        $backgrounds = Background::getAllWithPath();
 
         $radio = [];
         foreach ($backgrounds as $name => $path) {

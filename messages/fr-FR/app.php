@@ -54,6 +54,8 @@ return [
     'Start at' => 'Début le',
     'End' => 'Fin',
     'End on' => 'Fin le',
+    'Added at' => 'Ajouté le',
+    'Enabled' => 'Actif',
 
     'Date&Time' => 'Horodatage',
     'Image' => 'Image',
@@ -63,11 +65,15 @@ return [
     'Text' => 'Texte',
     'Ticker' => 'Bandeau texte',
 
+    'Parent flow' => 'Flux parent',
+
     'Direct link to an image on an internet website. Hosted image is usually more appropriate.' => 'Lien vers une image depuis un site. Une image hébergée est généralement plus appropriée.',
     'Textual content, will be adjusted to be displayed as big as possible.' => 'Texte simple dont la taille sera ajustée pour être affichée de manière optimale',
     'Short text content, usually under 50 characters with a short duration.' => 'Texte court (< 50 caractères) avec une durée d\'affichage réduite.',
     'Upload an image to servers.' => 'Envoyer une image sur les serveurs.',
     'Upload a video to servers.' => 'Envoyer une video sur les serveurs.',
+    'Display an RSS feed inline.' => 'Affiche un flux RSS',
+    'Display an agenda from an RSS feed.' => 'Affiche un agenda basé sur un flux RSS',
 
     'Are you sure you want to delete this item?' => 'Êtes-vous sur de vouloir supprimer cet objet ?',
 ];
