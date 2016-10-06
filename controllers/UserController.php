@@ -185,18 +185,4 @@ class UserController extends Controller
             throw new NotFoundHttpException('The requested page does not exist.');
         }
     }
-
-    public function actionLanguage($language)
-    {
-        Yii::$app->session->set('language', $language);
-        Yii::$app->response->cookies->add(new \yii\web\Cookie([
-            'name' => 'language',
-            'value' => $language,
-        ]));
-        if (!Yii::$app->user->isGuest) {
-            Yii::$app->user->identity->setLanguage($language);
-        }
-
-        return $this->goBack();
-    }
 }

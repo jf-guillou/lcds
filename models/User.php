@@ -11,7 +11,6 @@ use yii\db\Expression;
  * @property string $username
  * @property string $password
  * @property string $hash
- * @property string $language
  * @property string $authkey
  * @property string $access_token
  * @property string $added_at
@@ -42,7 +41,6 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
         return [
             [['username'], 'required'],
             [['added_at', 'last_login_at', 'role', 'flows'], 'safe'],
-            [['language'], 'string', 'max' => 8],
             [['username', 'hash', 'authkey', 'access_token'], 'string', 'max' => 64],
         ];
     }
@@ -52,7 +50,6 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
         return [
             'username' => Yii::t('app', 'Username'),
             'hash' => Yii::t('app', 'Hash'),
-            'language' => Yii::t('app', 'Language'),
             'authkey' => Yii::t('app', 'Authkey'),
             'access_token' => Yii::t('app', 'Access token'),
             'added_at' => Yii::t('app', 'Added at'),
@@ -170,7 +167,6 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
     {
         if (parent::beforeSave($insert)) {
             if ($this->isNewRecord) {
-                $this->language = Yii::$app->session->get('language', Yii::$app->sourceLanguage);
                 $this->authkey = Yii::$app->security->generateRandomString();
                 $this->access_token = Yii::$app->security->generateRandomString();
                 if (!$this->fromLdap && $this->password) {
@@ -190,17 +186,6 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
         $event->identity->last_login_at = new Expression('NOW()');
 
         $event->identity->save();
-    }
-
-    public function setLanguage($language)
-    {
-        $this->language = $language;
-        $this->save();
-    }
-
-    public function getLanguage()
-    {
-        return $this->language;
     }
 
     /**
