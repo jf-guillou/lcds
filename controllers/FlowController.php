@@ -33,7 +33,7 @@ class FlowController extends BaseController
                 'only' => ['index', 'view', 'create', 'update', 'delete'],
                 'rules' => [
                     ['allow' => true, 'actions' => ['index', 'view'], 'roles' => ['@']],
-                    ['allow' => true, 'actions' => ['create', 'update', 'delete'], 'roles' => ['admin']],
+                    ['allow' => true, 'actions' => ['create', 'update', 'delete'], 'roles' => ['setFlows']],
                 ],
             ],
         ];

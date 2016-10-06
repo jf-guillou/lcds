@@ -34,7 +34,7 @@ class ContentController extends BaseController
                 'class' => AccessControl::className(),
                 'only' => ['index', 'view', 'create', 'generate', 'upload', 'sideload', 'update', 'delete', 'toggle'],
                 'rules' => [
-                    ['allow' => true, 'actions' => ['create'], 'roles' => ['admin']],
+                    ['allow' => true, 'actions' => ['create'], 'roles' => ['setContent']],
                     ['allow' => true, 'actions' => ['index', 'view', 'generate', 'upload', 'sideload', 'update', 'delete', 'toggle'], 'roles' => ['@']],
                 ],
             ],

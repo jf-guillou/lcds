@@ -30,7 +30,7 @@ class ContentTypeController extends BaseController
                 'class' => AccessControl::className(),
                 'only' => ['index', 'view', 'create', 'update', 'delete'],
                 'rules' => [
-                    ['allow' => true, 'actions' => ['index', 'view', 'create', 'update', 'delete'], 'roles' => ['admin']],
+                    ['allow' => true, 'actions' => ['index', 'view', 'create', 'update', 'delete'], 'roles' => ['setContentTypes']],
                 ],
             ],
         ];
