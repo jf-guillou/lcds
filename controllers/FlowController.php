@@ -5,7 +5,6 @@ namespace app\controllers;
 use Yii;
 use app\models\Flow;
 use app\models\Content;
-use app\models\ContentType;
 use yii\data\ActiveDataProvider;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -75,13 +74,8 @@ class FlowController extends BaseController
         }
 
         $dataProvider = new ActiveDataProvider([
-            'query' => Content::find()->joinWith(['type', 'flow'])->where([Flow::tableName().'.id' => $id]),
+            'query' => Content::find()->joinWith(['flow'])->where([Flow::tableName().'.id' => $id]),
         ]);
-
-        $dataProvider->sort->attributes['type.name'] = [
-            'asc' => [ContentType::tableName().'.name' => SORT_ASC],
-            'desc' => [ContentType::tableName().'.name' => SORT_DESC],
-        ];
 
         return $this->render('view', [
             'model' => $this->findModel($id),

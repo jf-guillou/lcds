@@ -5,6 +5,7 @@ namespace app\models\types;
 use Yii;
 use Mhor\MediaInfo\MediaInfo;
 use yii\helpers\FileHelper;
+use yii\helpers\Url;
 use yii\web\UploadedFile;
 use app\models\Content;
 use app\models\ContentType;
@@ -169,7 +170,7 @@ class Media extends Content
         if (static::IS_FILE) {
             return self::find()
                 ->joinWith(['type'])
-                ->where(['kind' => ContentType::KINDS['FILE']])
+                ->where([ContentType::tableName().'.id' => ContentType::getAllFileTypeIds()])
                 ->andWhere(['data' => $this->data])
                 ->count() == 0;
         }
@@ -210,5 +211,10 @@ class Media extends Content
             unlink($this->getRealFilepath());
         }
         parent::afterDelete();
+    }
+
+    public static function processData($data)
+    {
+        return Url::to($data);
     }
 }

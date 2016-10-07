@@ -7,16 +7,15 @@ use Yii;
 /**
  * This is the model class for table "field_has_content_type".
  *
- * @property integer $field_id
- * @property integer $content_type_id
- *
+ * @property int $field_id
+ * @property int $content_type_id
  * @property Field $field
  * @property ContentType $contentType
  */
 class FieldHasContentType extends \yii\db\ActiveRecord
 {
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public static function tableName()
     {
@@ -24,7 +23,7 @@ class FieldHasContentType extends \yii\db\ActiveRecord
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function rules()
     {
@@ -37,13 +36,13 @@ class FieldHasContentType extends \yii\db\ActiveRecord
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function attributeLabels()
     {
         return [
             'field_id' => Yii::t('app', 'Field ID'),
-            'content_type_id' => Yii::t('app', 'Content Type ID'),
+            'content_type_id' => Yii::t('app', 'Content Type'),
         ];
     }
 

@@ -15,7 +15,6 @@ use Yii;
  * @property float $y2
  * @property string $css
  * @property string $js
- * @property string $append_params
  * @property ScreenTemplate $template
  * @property FieldHasContentType[] $fieldHasContentTypes
  * @property ContentType[] $contentTypes
@@ -40,7 +39,6 @@ class Field extends \yii\db\ActiveRecord
             [['template_id'], 'integer'],
             [['x1', 'y1', 'x2', 'y2'], 'number'],
             [['css', 'js'], 'string'],
-            [['append_params'], 'string', 'max' => 1024],
             [['template_id'], 'exist', 'skipOnError' => true, 'targetClass' => ScreenTemplate::className(), 'targetAttribute' => ['template_id' => 'id']],
         ];
     }
@@ -59,7 +57,6 @@ class Field extends \yii\db\ActiveRecord
             'y2' => Yii::t('app', 'Y2'),
             'css' => Yii::t('app', 'CSS'),
             'js' => Yii::t('app', 'JS'),
-            'append_params' => Yii::t('app', 'Append URL parameters'),
             'contentTypes' => Yii::t('app', 'Content types'),
         ];
     }
@@ -94,5 +91,20 @@ class Field extends \yii\db\ActiveRecord
     public function getContentTypes()
     {
         return $this->hasMany(ContentType::className(), ['id' => 'content_type_id'])->viaTable('field_has_content_type', ['field_id' => 'id']);
+    }
+
+    public function mergeData($data)
+    {
+        return str_replace([
+            '%x1%',
+            '%x2%',
+            '%y1%',
+            '%y2%',
+        ], [
+            $this->x1,
+            $this->x2,
+            $this->y1,
+            $this->y2,
+        ], $data);
     }
 }

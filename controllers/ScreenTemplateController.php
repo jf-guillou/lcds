@@ -149,12 +149,12 @@ class ScreenTemplateController extends BaseController
 
         $allContentTypes = ContentType::find()->all();
         $contentTypesArray = array_reduce($allContentTypes, function ($a, $c) {
-            $a[$c->id] = Yii::t('app', $c->name);
+            $a[$c->id] = $c->name;
 
             return $a;
         }, []);
         $selfCTypes = array_reduce($allContentTypes, function ($a, $c) {
-            if ($c->self_update) {
+            if ($c->selfUpdate) {
                 $a[] = $c->id;
             }
 

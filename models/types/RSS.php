@@ -9,4 +9,8 @@ use app\models\Content;
  */
 class RSS extends Content
 {
+    public static $typeName = 'RSS';
+    public static $typeDescription = 'Display an RSS feed inline.';
+    public static $html = '<div class="rss" data-url="%data%"></div>';
+    public static $kind = 'url';
 }

@@ -16,8 +16,7 @@ $js = [];
 <?php
 foreach ($types as $type) :
     if ($type->css) {
-        //$css[] = '.field_'.$type->id.' {'.$type->css.'}';
-        $css[] = $type->css;
+        $css[] = str_replace('%field%', '.field_'.$type->id, $type->css);
     }
     if ($type->js) {
         $js[] = str_replace('%field%', '.field_'.$type->id, $type->js);
@@ -53,7 +52,7 @@ foreach ($fields as $field) :
         return 'field_'.$ct;
     }, $contentTypes);
 
-    $isSelfUpdate = count($field->contentTypes) > 0 && $field->contentTypes[0]->self_update;
+    $isSelfUpdate = count($field->contentTypes) > 0 && $field->contentTypes[0]->selfUpdate;
     $selfHtml = $isSelfUpdate ? $field->contentTypes[0]->html : ''
 ?>
 <div

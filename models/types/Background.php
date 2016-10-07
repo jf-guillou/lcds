@@ -13,6 +13,8 @@ class Background extends Image
     const TYPE = 'image';
     const TYPE_PATH = 'background/';
 
+    public static $typeName = 'Background';
+
     public static function getAllWithPath()
     {
         $files = FileHelper::findFiles(self::BASE_PATH.self::TYPE_PATH);

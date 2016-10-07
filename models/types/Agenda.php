@@ -7,4 +7,7 @@ namespace app\models\types;
  */
 class Agenda extends RSS
 {
+    public static $typeName = 'Agenda';
+    public static $typeDescription = 'Display an agenda from an RSS feed.';
+    public static $html = '<div class="agenda" data-url="%data%"></div>';
 }

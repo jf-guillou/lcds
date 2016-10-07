@@ -4,7 +4,6 @@ namespace app\controllers;
 
 use Yii;
 use yii\helpers\Url;
-use yii\helpers\Html;
 use yii\web\NotFoundHttpException;
 use yii\db\Expression;
 use app\models\Screen;
@@ -37,7 +36,7 @@ class FrontendController extends BaseController
             'fields' => $screen->template->fields,
             'updateUrl' => Url::to(['frontend/update', 'id' => $id]),
             'nextUrl' => Url::to(['frontend/next', 'id' => $id, 'fieldid' => '']),
-            'types' => ContentType::find()->all(),
+            'types' => ContentType::getAll(),
         ];
 
         return $this->render('default', $content);
@@ -86,7 +85,7 @@ class FrontendController extends BaseController
 
         // Get content for flows and field type
         $contents = Content::find()
-            ->joinWith(['flow', 'type'])
+            ->joinWith(['flow'])
             ->where(['type_id' => $contentTypes])
             ->andWhere([Flow::tableName().'.id' => $flowIds])
             ->andWhere(['enabled' => true])
@@ -95,26 +94,9 @@ class FrontendController extends BaseController
             ->all();
 
         $next = array_map(function ($c) use ($field) {
-            $data = $c->data;
-            if ($c->type->append_params) {
-                $data .= (strpos($data, '?') === false ? '?' : '&').str_replace(['%x1%', '%x2%', '%y1%', '%y2%'], [$field->x1, $field->x2, $field->y1, $field->y2], $c->type->append_params);
-            }
-            if ($field->append_params) {
-                $data .= (strpos($data, '?') === false ? '?' : '&').str_replace(['%x1%', '%x2%', '%y1%', '%y2%'], [$field->x1, $field->x2, $field->y1, $field->y2], $field->append_params);
-            }
-
-            switch ($c->type->kind) {
-                case ContentType::KINDS['FILE']:
-                    $data = Url::to($data);
-                    break;
-                case ContentType::KINDS['TEXT']:
-                    $data = nl2br(Html::encode($data));
-                    break;
-            }
-
             return [
                 'id' => $c->id,
-                'data' => str_replace('%data%', $data, $c->type->html),
+                'data' => $field->mergeData($c->getData()),
                 'duration' => $c->duration,
                 'type' => $c->type_id,
             ];

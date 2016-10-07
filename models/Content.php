@@ -10,7 +10,8 @@ use Yii;
  * @property int $id
  * @property string $name
  * @property string $description
- * @property int $type_id
+ * @property int $flow_id
+ * @property string $type_id
  * @property string $data
  * @property int $duration
  * @property string $start_ts
@@ -23,6 +24,16 @@ use Yii;
 class Content extends \yii\db\ActiveRecord
 {
     const IS_FILE = false;
+    const SUB_PATH = 'app\\models\\types\\';
+
+    public static $typeName = null;
+    public static $typeDescription = null;
+    public static $html = null;
+    public static $css = null;
+    public static $js = null;
+    public static $appendParams = null;
+    public static $selfUpdate = false;
+    public static $kind = null;
 
     /**
      * {@inheritdoc}
@@ -39,11 +50,12 @@ class Content extends \yii\db\ActiveRecord
     {
         return [
             [['name', 'flow_id', 'type_id'], 'required'],
-            [['flow_id', 'type_id', 'duration'], 'integer'],
+            [['flow_id', 'duration'], 'integer'],
             [['data'], 'string'],
             [['start_ts', 'end_ts', 'add_ts'], 'safe'],
             [['enabled'], 'boolean'],
             [['name'], 'string', 'max' => 64],
+            [['type_id'], 'string', 'max' => 45],
             [['description'], 'string', 'max' => 1024],
             [['flow_id'], 'exist', 'skipOnError' => true, 'targetClass' => Flow::className(), 'targetAttribute' => ['flow_id' => 'id']],
             [['type_id'], 'exist', 'skipOnError' => true, 'targetClass' => ContentType::className(), 'targetAttribute' => ['type_id' => 'id']],
@@ -86,23 +98,31 @@ class Content extends \yii\db\ActiveRecord
         return $this->hasOne(ContentType::className(), ['id' => 'type_id']);
     }
 
-    public static function fromType($contentType)
+    public static function fromType($typeId)
     {
-        if ($contentType->class_name) {
-            $className = 'app\\models\\types\\'.$contentType->class_name;
-            if (!class_exists($className)) {
-                throw new \Exception(Yii::t('app', 'Class doesn\'t exist'));
-            }
-
-            return $className;
-        } else {
-            return self;
+        $className = self::SUB_PATH.$typeId;
+        if (!class_exists($className)) {
+            throw new \Exception(Yii::t('app', 'Content type class does not exist'));
         }
+
+        return $className;
     }
 
-    public static function newFromType($contentType)
+    public static function newFromType($typeId)
     {
-        $class = self::fromType($contentType);
+        $className = self::fromType($typeId);
+
+        return new $className();
+    }
+
+    public static function instantiate($row)
+    {
+        $typeId = $row['type_id'];
+        if (!$typeId) {
+            throw new Exception(Yii::t('app', 'Content type class not set'));
+        }
+
+        $class = self::fromType($typeId);
 
         return new $class();
     }
@@ -115,9 +135,9 @@ class Content extends \yii\db\ActiveRecord
     public static function availableQuery($user)
     {
         if ($user->can('setFlowContent')) {
-            return self::find()->joinWith(['type']);
+            return self::find();
         } elseif ($user->can('setOwnFlowContent')) {
-            return self::find()->joinWith(['type', 'flow.users'])->where(['username' => $user->identity->username]);
+            return self::find()->joinWith(['flow.users'])->where(['username' => $user->identity->username]);
         }
     }
 
@@ -131,5 +151,26 @@ class Content extends \yii\db\ActiveRecord
         }
 
         return false;
+    }
+
+    public static function processData($data)
+    {
+        return $data;
+    }
+
+    public function getData()
+    {
+        $data = $this->data;
+        if ($this::$appendParams) {
+            $data .= (strpos($data, '?') === false ? '?' : '&').$this::$appendParams;
+        }
+
+        $data = static::processData($data);
+
+        if ($this::$html) {
+            return str_replace('%data%', $data, $this::$html);
+        }
+
+        return $data;
     }
 }

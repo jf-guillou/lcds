@@ -52,13 +52,7 @@ $this->params['breadcrumbs'][] = $this->title;
             //'id',
             'name',
             'description',
-            [
-                'attribute' => 'type.name',
-                'label' => \Yii::t('app', 'Type'),
-                'value' => function ($model, $key, $index, $column) {
-                    return \Yii::t('app', $model->type->name);
-                },
-            ],
+            'type.name',
             //'data:ntext',
             // 'duration',
             // 'start_ts',

@@ -42,8 +42,6 @@ $form = ActiveForm::begin([
 
 <?= $form->field($field, 'js')->textarea(['rows' => 5]) ?>
 
-<?= $form->field($field, 'append_params')->textInput(['maxlength' => true]) ?>
-
 <div class="form-group">
     <?= Html::submitButton(Yii::t('app', 'Update'), ['class' => 'btn btn-primary']) ?>
     <?= Html::a(Yii::t('app', 'Delete'), ['delete-field', 'id' => $field->id], ['class' => 'btn btn-danger field-delete']) ?>

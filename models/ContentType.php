@@ -3,27 +3,36 @@
 namespace app\models;
 
 use Yii;
-use yii\models\Content;
 
 /**
  * This is the model class for table "content_type".
  *
- * @property int $id
- * @property string $name
- * @property string $description
- * @property string $html
- * @property string $css
- * @property string $js
- * @property string $append_params
- * @property bool $self_update
- * @property string $kind
- * @property string $class_name
+ * @property string $id Class name
  * @property Content[] $contents
  * @property FieldHasContentType[] $fieldHasContentTypes
  * @property Field[] $fields
  */
 class ContentType extends \yii\db\ActiveRecord
 {
+    public $_name;
+    public $_description;
+    public $html;
+    public $css;
+    public $js;
+    public $appendParams;
+    public $selfUpdate;
+    public $kind;
+    public static $typeAttributes = [
+        'typeName' => '_name',
+        'typeDescription' => '_description',
+        'html' => 'html',
+        'css' => 'css',
+        'js' => 'js',
+        'appendParams' => 'appendParams',
+        'selfUpdate' => 'selfUpdate',
+        'kind' => 'kind',
+    ];
+
     const KINDS = [
         'RAW' => 'raw',
         'URL' => 'url',
@@ -45,12 +54,8 @@ class ContentType extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['name'], 'required'],
-            [['description', 'html', 'css', 'js'], 'string'],
-            [['self_update'], 'boolean'],
-            [['name', 'class_name'], 'string', 'max' => 45],
-            [['append_params'], 'string', 'max' => 1024],
-            [['kind'], 'in', 'range' => self::KINDS],
+            [['id'], 'required'],
+            [['id'], 'string', 'max' => 45],
         ];
     }
 
@@ -61,43 +66,52 @@ class ContentType extends \yii\db\ActiveRecord
     {
         return [
             'id' => Yii::t('app', 'ID'),
-            'name' => Yii::t('app', 'Name'),
-            'description' => Yii::t('app', 'Description'),
-            'html' => Yii::t('app', 'Html'),
-            'css' => Yii::t('app', 'CSS'),
-            'js' => Yii::t('app', 'JS'),
-            'append_params' => Yii::t('app', 'Append Params'),
-            'self_update' => Yii::t('app', 'Can Update'),
-            'kind' => Yii::t('app', 'Kind'),
-            'class_name' => Yii::t('app', 'Class Name'),
+            'name' => Yii::t('app', 'Type'),
         ];
     }
 
-    public static function getQuery($selfupdate = null)
+    public static function instantiate($row)
     {
-        if ($selfupdate === null) {
-            return self::find();
-        } else {
-            return self::find()->where(['self_update' => $selfupdate ? true : false]);
+        $t = new static();
+        $c = Content::fromType($row['id']);
+        foreach ($t::$typeAttributes as $cAtt => $tAtt) {
+            if ($c::$$cAtt !== null) {
+                $t->$tAtt = $c::$$cAtt;
+            }
         }
+
+        return $t;
     }
 
-    public static function getAll($selfupdate = null)
+    public static function getAll($selfUpdate = null)
     {
-        return self::getQuery($selfupdate)->all();
+        $types = self::find()->all();
+
+        return array_filter($types, function ($t) use ($selfUpdate) {
+            return $selfUpdate === null || $t->selfUpdate == $selfUpdate;
+        });
     }
 
-    public static function getAllList($selfupdate = null)
+    public static function getAllList($selfUpdate = null)
     {
-        $types = self::getAll($selfupdate);
+        $types = self::getAll($selfUpdate);
 
         $list = [];
 
         foreach ($types as $t) {
-            $list[$t->id] = Yii::t('app', $t->name);
+            $list[$t->id] = $t->name;
         }
 
         return $list;
+    }
+
+    public function getAllFileTypeIds()
+    {
+        $types = self::find()->all();
+
+        return array_filter(array_map($types, function ($t) {
+            return $t->kind == self::KINDS['FILE'] ? $t->id : null;
+        }));
     }
 
     /**
@@ -122,5 +136,15 @@ class ContentType extends \yii\db\ActiveRecord
     public function getFields()
     {
         return $this->hasMany(Field::className(), ['id' => 'field_id'])->viaTable('field_has_content_type', ['content_type_id' => 'id']);
+    }
+
+    public function getName()
+    {
+        return \Yii::t('app', $this->_name);
+    }
+
+    public function getDescription()
+    {
+        return \Yii::t('app', $this->_description);
     }
 }

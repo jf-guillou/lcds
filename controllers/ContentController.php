@@ -180,12 +180,7 @@ class ContentController extends BaseController
             return ['success' => false, 'message' => Yii::t('app', 'Not authorized')];
         }
 
-        $contentType = ContentType::findOne($type);
-        if ($contentType === null || $contentType->class_name === null) {
-            return ['success' => false, 'message' => Yii::t('app', 'Unsupported content type')];
-        }
-
-        $upload = Content::newFromType($contentType);
+        $upload = Content::newFromType($type);
         if ($upload->upload(UploadedFile::getInstanceByName('content'))) {
             return ['success' => true, 'path' => $upload->getWebFilepath(), 'duration' => $upload->getDuration()];
         }
@@ -201,12 +196,7 @@ class ContentController extends BaseController
             return ['success' => false, 'message' => Yii::t('app', 'Not authorized')];
         }
 
-        $contentType = ContentType::findOne($type);
-        if ($contentType === null || $contentType->class_name === null) {
-            return ['success' => false, 'message' => Yii::t('app', 'Unsupported content type')];
-        }
-
-        $upload = Content::newFromType($contentType);
+        $upload = Content::newFromType($type);
         if ($upload->sideload($url)) {
             return ['success' => true, 'path' => $upload->getWebFilepath(), 'duration' => $upload->getDuration()];
         }
@@ -289,9 +279,7 @@ class ContentController extends BaseController
     protected function findModel($id)
     {
         if (($model = Content::findOne($id)) !== null) {
-            $class = Content::fromType($model->type);
-
-            return $class === Content::class ? $model : $class::findOne($id);
+            return $model;
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');
         }
