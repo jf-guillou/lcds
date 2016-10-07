@@ -21,7 +21,9 @@
         "kartik-v/yii2-widget-datetimepicker": "*",
         "norkunas/youtube-dl-php": "^0.3.0",
         "yiisoft/yii2-jui": "^2.0",
-        "mhor/php-mediainfo": "^2.2"
+        "mhor/php-mediainfo": "^2.2",
+        "edvlerblog/yii2-adldap-module": "^1.1",
+        "johngrogg/ics-parser": "dev-master"
     },
     "require-dev": {
         "yiisoft/yii2-codeception": "*",
