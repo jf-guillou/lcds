@@ -20,6 +20,7 @@ class HostedVideo extends Video
     public static $css = '%field% > * { height: 100%; width: 100%; }';
     public static $appendParams = '_win=%x1%,%y1%,%x2%,%y2%;_aspect-mode=letterbox';
     public static $kind = 'file';
+    public static $usable = true;
 
     public function getDuration()
     {

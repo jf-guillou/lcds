@@ -11,4 +11,6 @@ class Video extends Media
 {
     const TYPE = 'video';
     const TYPE_PATH = 'videos/';
+
+    public static $usable = false;
 }

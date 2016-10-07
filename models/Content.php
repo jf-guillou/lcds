@@ -34,6 +34,7 @@ class Content extends \yii\db\ActiveRecord
     public static $appendParams = null;
     public static $selfUpdate = false;
     public static $kind = null;
+    public static $usable = false;
 
     /**
      * {@inheritdoc}

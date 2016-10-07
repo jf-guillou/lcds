@@ -19,6 +19,7 @@ class Media extends Content
     const IS_FILE = true;
     const BASE_PATH = 'uploads/';
     const BASE_URI = '@web/';
+    public static $usable = false;
 
     protected $tmp;
 

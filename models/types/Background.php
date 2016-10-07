@@ -14,6 +14,7 @@ class Background extends Image
     const TYPE_PATH = 'background/';
 
     public static $typeName = 'Background';
+    public static $usable = false;
 
     public static function getAllWithPath()
     {

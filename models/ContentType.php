@@ -22,6 +22,7 @@ class ContentType extends \yii\db\ActiveRecord
     public $appendParams;
     public $selfUpdate;
     public $kind;
+    public $usable;
     public static $typeAttributes = [
         'typeName' => '_name',
         'typeDescription' => '_description',
@@ -31,6 +32,7 @@ class ContentType extends \yii\db\ActiveRecord
         'appendParams' => 'appendParams',
         'selfUpdate' => 'selfUpdate',
         'kind' => 'kind',
+        'usable' => 'usable',
     ];
 
     const KINDS = [
@@ -83,18 +85,18 @@ class ContentType extends \yii\db\ActiveRecord
         return $t;
     }
 
-    public static function getAll($selfUpdate = null)
+    public static function getAll($selfUpdate = null, $usableOnly = true)
     {
         $types = self::find()->all();
 
-        return array_filter($types, function ($t) use ($selfUpdate) {
-            return $selfUpdate === null || $t->selfUpdate == $selfUpdate;
+        return array_filter($types, function ($t) use ($selfUpdate, $usableOnly) {
+            return ($selfUpdate === null || $t->selfUpdate == $selfUpdate) && (!$usableOnly || $t->usable);
         });
     }
 
-    public static function getAllList($selfUpdate = null)
+    public static function getAllList($selfUpdate = null, $usableOnly = true)
     {
-        $types = self::getAll($selfUpdate);
+        $types = self::getAll($selfUpdate, $usableOnly);
 
         $list = [];
 

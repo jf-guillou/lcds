@@ -13,4 +13,5 @@ class Ticker extends Text
     public static $typeDescription = 'Short text content, usually under 50 characters with a short duration.';
     public static $html = '<span class="ticker">%data%</span>';
     public static $css = '%field% { text-align: center; vertical-align: middle; }';
+    public static $usable = true;
 }

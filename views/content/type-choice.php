@@ -1,7 +1,6 @@
 <?php
 
 use yii\helpers\Html;
-use yii\grid\GridView;
 
 /* @var $this yii\web\View */
 /* @var $types[] app\models\ContentTypes */
@@ -14,30 +13,20 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <h1><?= Html::encode($this->title) ?></h1>
 
-    <?= GridView::widget([
-        'dataProvider' => $dataProvider,
-        'columns' => [
-            [
-                'attribute' => 'name',
-                'value' => function ($model, $key, $index, $column) {
-                    return Yii::t('app', $model->name);
-                },
-            ],
-            [
-                'attribute' => 'description',
-                'value' => function ($model, $key, $index, $column) {
-                    return Yii::t('app', $model->description);
-                },
-            ],
-            [
-                'label' => Yii::t('app', 'Action'),
-                'format' => 'html',
-                'value' => function ($model, $key, $index, $column) use ($flow) {
-                    return Html::a(Yii::t('app', 'Use'), ['', 'flowId' => $flow, 'type' => $model->id], ['class' => 'btn btn-success']);
-                },
-            ],
+    <?php
+    foreach ($types as $i => $t) : ?>
 
-        ],
-    ]); ?>
+    <div class="col-lg-3">
+        <h3><?= $t->name ?></h3>
+        <p>
+            <?= $t->description ?>
+        </p>
+        <p class="text-center">
+            <?= Html::a(Yii::t('app', 'Use'), ['', 'flowId' => $flow, 'type' => $t->id], ['class' => 'btn btn-success']) ?>
+        </p>
+    </div>
+
+    <?php
+    endforeach; ?>
 
 </div>

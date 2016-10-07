@@ -15,6 +15,7 @@ class Text extends Content
     public static $html = '<span class="text">%data%</span>';
     public static $css = '%field% { text-align: center; vertical-align: middle; }';
     public static $kind = 'text';
+    public static $usable = true;
 
     public static function processData($data)
     {

@@ -108,7 +108,7 @@ class ContentController extends BaseController
 
             return $this->render('create', [
                 'model' => $model,
-                'contentTypes' => ContentType::getAllList(false),
+                'contentTypes' => ContentType::getAllList(false, true),
             ]);
         }
     }
@@ -126,16 +126,14 @@ class ContentController extends BaseController
 
         $contentType = ContentType::findOne($type);
         if ($contentType === null) {
-            $dataProvider = new ActiveDataProvider([
-                'query' => ContentType::getQuery(false),
-            ]);
+            $types = ContentType::getAll(false, true);
 
             return $this->render('type-choice', [
-                'dataProvider' => $dataProvider,
+                'types' => $types,
                 'flow' => $flowId,
             ]);
         } else {
-            $model = Content::newFromType($contentType);
+            $model = Content::newFromType($contentType->id);
             if ($model->load(Yii::$app->request->post())) {
                 $model->flow_id = $flow->id;
                 $model->type_id = $contentType->id;
@@ -143,6 +141,7 @@ class ContentController extends BaseController
                     return $this->redirect(['flow/view', 'id' => $flow->id]);
                 }
             }
+
             switch ($contentType->kind) {
                 case ContentType::KINDS['FILE']:
                     // FILE implies content upload (images/videos)
@@ -225,7 +224,7 @@ class ContentController extends BaseController
         } else {
             return $this->render('update', [
                 'model' => $model,
-                'contentTypes' => ContentType::getAllList(false),
+                'contentTypes' => ContentType::getAllList(false, true),
             ]);
         }
     }
