@@ -12,6 +12,8 @@ class Agenda extends RSS
     public static $typeName = 'Agenda';
     public static $typeDescription = 'Display an agenda from an RSS feed.';
     public static $html = '<div class="agenda" data-url="%data%"></div>';
+    public static $input = 'url';
+    public static $output = 'url';
     public static $usable = true;
 
     protected static function downloadFeed($url)
@@ -35,7 +37,6 @@ class Agenda extends RSS
         $content = self::downloadFeed($data);
 
         $ical = new ICal();
-        $ical->defaultWeekStart = 'MO';
         $ical->initString($content);
 
         $events = $ical->eventsFromRange('last monday', 'next friday');
@@ -43,15 +44,14 @@ class Agenda extends RSS
             return;
         }
 
-        var_dump($events[0]);
-        exit;
-
         foreach ($events as $e) {
-            $e['summary']; // name
-            $e['dtstart'];
-            $e['dtend'];
-            $e['description'];
-            $e['location'];
+            // $e->summary // Name
+            // $e->dtstart_array[2] // start timestamp
+            // $e->dtend_array[2] // end timestamp
+            // $e->description // group\teacher\export date
+            // $e->location // room
+
+            echo $e->summary.' '.$e->dtstart_array[2].' '.$e->dtend_array[2].' '.$e->description.' '.$e->location.'<br />';
         }
         exit;
 

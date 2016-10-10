@@ -21,7 +21,8 @@ class ContentType extends \yii\db\ActiveRecord
     public $js;
     public $appendParams;
     public $selfUpdate;
-    public $kind;
+    public $input;
+    public $output;
     public $usable;
     public static $typeAttributes = [
         'typeName' => '_name',
@@ -31,11 +32,13 @@ class ContentType extends \yii\db\ActiveRecord
         'js' => 'js',
         'appendParams' => 'appendParams',
         'selfUpdate' => 'selfUpdate',
-        'kind' => 'kind',
+        'input' => 'input',
+        'output' => 'output',
         'usable' => 'usable',
     ];
 
     const KINDS = [
+        'NONE' => 'none',
         'RAW' => 'raw',
         'URL' => 'url',
         'FILE' => 'file',
@@ -112,7 +115,7 @@ class ContentType extends \yii\db\ActiveRecord
         $types = self::find()->all();
 
         return array_filter(array_map($types, function ($t) {
-            return $t->kind == self::KINDS['FILE'] ? $t->id : null;
+            return $t->input == self::KINDS['FILE'] ? $t->id : null;
         }));
     }
 

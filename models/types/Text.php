@@ -14,7 +14,8 @@ class Text extends Content
     public static $typeDescription = 'Textual content, will be adjusted to be displayed as big as possible.';
     public static $html = '<span class="text">%data%</span>';
     public static $css = '%field% { text-align: center; vertical-align: middle; }';
-    public static $kind = 'text';
+    public static $input = 'text';
+    public static $output = 'text';
     public static $usable = true;
 
     public static function processData($data)

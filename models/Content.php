@@ -33,7 +33,8 @@ class Content extends \yii\db\ActiveRecord
     public static $js = null;
     public static $appendParams = null;
     public static $selfUpdate = false;
-    public static $kind = null;
+    public static $input = null;
+    public static $output = null;
     public static $usable = false;
 
     /**

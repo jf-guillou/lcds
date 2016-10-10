@@ -142,7 +142,7 @@ class ContentController extends BaseController
                 }
             }
 
-            switch ($contentType->kind) {
+            switch ($contentType->input) {
                 case ContentType::KINDS['FILE']:
                     // FILE implies content upload (images/videos)
                 case ContentType::KINDS['URL']:
@@ -152,7 +152,7 @@ class ContentController extends BaseController
                     // Same as URL, text doesn't require processing
                     $model->loadDefaultValues();
 
-                    return $this->render('type/'.$contentType->kind, [
+                    return $this->render('type/'.$contentType->input, [
                             'type' => $contentType,
                             'model' => $model,
                             'uploadUrl' => Url::to(['content/upload', 'type' => $type]),
@@ -160,6 +160,7 @@ class ContentController extends BaseController
                         ]);
                     break;
 
+                case ContentType::KINDS['NONE']:
                 case ContentType::KINDS['RAW']:
                     // RAW ContentType doesn't support Content
                     // Everything should be handled by ContentType alone

@@ -16,6 +16,7 @@ class Image extends Media
     public static $typeDescription = 'Direct link to an image on an internet website. Hosted image is usually more appropriate.';
     public static $html = '<img src="%data%" class="image" />';
     public static $css = '%field% { text-align: center; vertical-align: middle; } %field% img { max-height: 100%; max-width: 100%; }';
-    public static $kind = 'url';
+    public static $input = 'url';
+    public static $output = 'url';
     public static $usable = true;
 }

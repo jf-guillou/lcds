@@ -13,7 +13,8 @@ class DateTime extends Content
     public static $selfUpdate = true;
     public static $html = '<span class="datetime"></span>';
     public static $css = '%field% { text-align: center; vertical-align: middle; }';
-    public static $kind = 'raw';
+    public static $input = 'none';
+    public static $output = 'raw';
     public static $usable = true;
     public static $js = <<<'EOT'
 {
