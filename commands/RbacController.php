@@ -44,10 +44,6 @@ class RbacController extends Controller
         $setContent->description = 'Manage all content';
         $auth->add($setContent);
 
-        $setContentTypes = $auth->createPermission('setContentTypes');
-        $setContentTypes->description = 'Manage content types';
-        $auth->add($setContentTypes);
-
         $upload = $auth->createPermission('upload');
         $upload->description = 'Upload content';
         $auth->add($upload);
@@ -78,7 +74,6 @@ class RbacController extends Controller
         $auth->add($admin);
         $auth->addChild($admin, $administration);
         $auth->addChild($admin, $setContent);
-        $auth->addChild($admin, $setContentTypes);
         $auth->addChild($admin, $screenManager);
 
         $auth->assign($admin, 'admin');
