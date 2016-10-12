@@ -104,4 +104,14 @@ class FrontendController extends BaseController
 
         return ['success' => true, 'next' => $next];
     }
+
+    public function actionGet($typeId, $data)
+    {
+        $contentType = ContentType::findOne($typeId);
+        if ($contentType !== null) {
+            $model = Content::newFromType($contentType->id);
+
+            return $model->get($data);
+        }
+    }
 }
