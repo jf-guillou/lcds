@@ -77,4 +77,12 @@ return [
     'Display an agenda from an RSS feed.' => 'Affiche un agenda basé sur un flux RSS',
 
     'Are you sure you want to delete this item?' => 'Êtes-vous sur de vouloir supprimer cet objet ?',
+
+    'Monday' => 'Lundi',
+    'Tuesday' => 'Mardi',
+    'Wednesday' => 'Mercredi',
+    'Thursday' => 'Jeudi',
+    'Friday' => 'Vendredi',
+    'Saturday' => 'Samedi',
+    'Sunday' => 'Dimanche',
 ];

@@ -51,6 +51,9 @@ $config = [
         'authManager' => [
             'class' => 'yii\rbac\DbManager',
         ],
+        'cache' => [
+            'class' => 'yii\caching\FileCache',
+        ],
         'db' => require(__DIR__.'/db.php'),
     ],
     'params' => $params,
