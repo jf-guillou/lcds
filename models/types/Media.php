@@ -214,7 +214,7 @@ class Media extends Content
         parent::afterDelete();
     }
 
-    public static function processData($data)
+    public function processData($data)
     {
         return Url::to($data);
     }

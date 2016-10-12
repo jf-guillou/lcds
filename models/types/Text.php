@@ -18,7 +18,7 @@ class Text extends Content
     public static $output = 'text';
     public static $usable = true;
 
-    public static function processData($data)
+    public function processData($data)
     {
         return nl2br(Html::encode($data));
     }

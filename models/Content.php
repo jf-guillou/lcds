@@ -155,9 +155,14 @@ class Content extends \yii\db\ActiveRecord
         return false;
     }
 
-    public static function processData($data)
+    public function processData($data)
     {
         return $data;
+    }
+
+    public function get($data)
+    {
+        return;
     }
 
     public function getData()
@@ -167,7 +172,7 @@ class Content extends \yii\db\ActiveRecord
             $data .= (strpos($data, '?') === false ? '?' : '&').$this::$appendParams;
         }
 
-        $data = static::processData($data);
+        $data = $this->processData($data);
 
         if ($this::$html) {
             return str_replace('%data%', $data, $this::$html);
