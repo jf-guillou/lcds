@@ -7,6 +7,7 @@ use app\models\Flow;
 use app\models\Content;
 use yii\data\ActiveDataProvider;
 use yii\web\NotFoundHttpException;
+use yii\helpers\ArrayHelper;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
 
@@ -96,8 +97,11 @@ class FlowController extends BaseController
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);
         } else {
+            $flows = ArrayHelper::map(Flow::find()->all(), 'id', 'name');
+
             return $this->render('create', [
                 'model' => $model,
+                'flows' => ['' => Yii::t('app', '(none)')] + $flows,
             ]);
         }
     }
@@ -117,8 +121,11 @@ class FlowController extends BaseController
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);
         } else {
+            $flows = ArrayHelper::map(Flow::find()->all(), 'id', 'name');
+
             return $this->render('update', [
                 'model' => $model,
+                'flows' => ['' => Yii::t('app', '(none)')] + $flows,
             ]);
         }
     }

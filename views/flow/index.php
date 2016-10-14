@@ -24,7 +24,11 @@ $this->params['breadcrumbs'][] = $this->title;
             //'id',
             'name',
             'description',
-            'parent.name',
+            [
+                'attribute' => 'parent',
+                //'label' => Yii::t('app', 'Template'),
+                'value' => 'parent.name',
+            ],
 
             [
                 'class' => 'yii\grid\ActionColumn',

@@ -36,7 +36,7 @@ class Flow extends \yii\db\ActiveRecord
     {
         return [
             [['name'], 'required'],
-            [['parent_id'], 'integer'],
+            [['parent_id', 'id'], 'integer'],
             [['name'], 'string', 'max' => 64],
             [['description'], 'string', 'max' => 1024],
             [['parent_id'], 'exist', 'skipOnError' => true, 'targetClass' => self::className(), 'targetAttribute' => ['parent_id' => 'id']],
@@ -53,6 +53,7 @@ class Flow extends \yii\db\ActiveRecord
             'name' => Yii::t('app', 'Name'),
             'description' => Yii::t('app', 'Description'),
             'parent_id' => Yii::t('app', 'Parent'),
+            'parent' => Yii::t('app', 'Parent flow'),
         ];
     }
 

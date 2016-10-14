@@ -10,6 +10,7 @@ return [
     'Create {type} content' => 'Création contenu {type}',
     'Screen' => 'Ecran',
     'Screens' => 'Ecrans',
+    'Create Screen' => 'Créer un écran',
     'Flow' => 'Flux',
     'Flows' => 'Flux',
     'Content type' => 'Type de contenu',
@@ -60,6 +61,7 @@ return [
     'End on' => 'Fin le',
     'Added at' => 'Ajouté le',
     'Enabled' => 'Actif',
+    '(none)' => '(aucun)',
 
     'Date&Time' => 'Horodatage',
     'Image' => 'Image',
