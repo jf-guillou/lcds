@@ -90,6 +90,8 @@ class ContentController extends BaseController
      * Creates a new Content model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      *
+     * @param int $flowId
+     *
      * @return mixed
      */
     public function actionCreate($flowId)
@@ -113,6 +115,14 @@ class ContentController extends BaseController
         }
     }
 
+    /**
+     * Creates a new Content model with type choice assistance.
+     *
+     * @param int    $flowId
+     * @param string $type   content type
+     *
+     * @return mixed
+     */
     public function actionGenerate($flowId, $type = null)
     {
         $flow = Flow::findOne($flowId);
@@ -172,6 +182,15 @@ class ContentController extends BaseController
         return $this->redirect(['flows/view', 'id' => $flowId]);
     }
 
+    /**
+     * Receives an uploaded file and responds with filepath.
+     *
+     * @api
+     *
+     * @param string $type content type
+     *
+     * @return string json status
+     */
     public function actionUpload($type)
     {
         Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
@@ -188,6 +207,16 @@ class ContentController extends BaseController
         return ['success' => false, 'message' => $upload->getLoadError()];
     }
 
+    /**
+     * Receives an url to download on server -- sideloading.
+     *
+     * @api
+     *
+     * @param string $type content type
+     * @param string $url
+     *
+     * @return string json status
+     */
     public function actionSideload($type, $url)
     {
         Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
@@ -251,6 +280,13 @@ class ContentController extends BaseController
         return $this->redirect(['index']);
     }
 
+    /**
+     * Enables or disable a specific content.
+     *
+     * @param int $id content id
+     *
+     * @return mixed
+     */
     public function actionToggle($id)
     {
         $model = $this->findModel($id);

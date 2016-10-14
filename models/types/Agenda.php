@@ -7,7 +7,7 @@ use app\models\Content;
 use yii\helpers\Url;
 
 /**
- * This is the model class for content uploads.
+ * This is the model class for Agenda content type.
  */
 class Agenda extends Content
 {

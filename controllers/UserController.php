@@ -100,6 +100,11 @@ class UserController extends Controller
         ]);
     }
 
+    /**
+     * Import user from LDAP and save it.
+     *
+     * @return mixed
+     */
     public function actionImport()
     {
         $model = new UserLogin();
@@ -138,6 +143,13 @@ class UserController extends Controller
         return $this->redirect(['index']);
     }
 
+    /**
+     * Set roles and flows for a specific user.
+     *
+     * @param string $id user id
+     *
+     * @return mixed
+     */
     public function actionSetRoles($id)
     {
         $model = $this->findModel($id);

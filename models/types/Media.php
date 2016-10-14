@@ -12,7 +12,7 @@ use app\models\ContentType;
 use app\models\TempFile;
 
 /**
- * This is the model class for content uploads.
+ * This is the model class for Media content type.
  */
 class Media extends Content
 {

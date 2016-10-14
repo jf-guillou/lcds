@@ -2,8 +2,14 @@
 
 namespace app\controllers;
 
+/**
+ * MainController implements homepage actions.
+ */
 class MainController extends BaseController
 {
+    /**
+     * {@inheritdoc}
+     */
     public function actions()
     {
         return [
@@ -13,6 +19,11 @@ class MainController extends BaseController
         ];
     }
 
+    /**
+     * Display homepage.
+     *
+     * @return mixed
+     */
     public function actionIndex()
     {
         return $this->render('index');

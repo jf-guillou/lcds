@@ -6,7 +6,7 @@ use yii\helpers\FileHelper;
 use app\models\Content;
 
 /**
- * This is the model class for content uploads.
+ * This is the model class for Background content type.
  */
 class Background extends Image
 {
@@ -16,6 +16,11 @@ class Background extends Image
     public static $typeName = 'Background';
     public static $usable = false;
 
+    /**
+     * Find all backgrounds and return as an array.
+     *
+     * @return array backgrounds list
+     */
     public static function getAllWithPath()
     {
         $files = FileHelper::findFiles(self::BASE_PATH.self::TYPE_PATH);
@@ -28,6 +33,9 @@ class Background extends Image
         return $contents;
     }
 
+    /**
+     * Destroy temp model on background apply.
+     */
     public function backgroundSet()
     {
         if ($this->tmp) {

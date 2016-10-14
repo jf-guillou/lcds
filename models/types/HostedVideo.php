@@ -10,7 +10,7 @@ use yii\helpers\FileHelper;
 use YoutubeDl\YoutubeDl;
 
 /**
- * This is the model class for content uploads.
+ * This is the model class for HostedVideo content type.
  */
 class HostedVideo extends Video
 {
@@ -23,6 +23,11 @@ class HostedVideo extends Video
     public static $output = 'url';
     public static $usable = true;
 
+    /**
+     * Use mediainfo to parse video duration.
+     *
+     * @return int video duration
+     */
     public function getDuration()
     {
         $mediainfo = $this->getMediaInfo();
@@ -34,6 +39,9 @@ class HostedVideo extends Video
         }
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function sideload($url)
     {
         if (!self::validateUrl($url)) {

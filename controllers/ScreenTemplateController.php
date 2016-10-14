@@ -78,6 +78,15 @@ class ScreenTemplateController extends BaseController
         ]);
     }
 
+    /**
+     * Create a field and save it.
+     *
+     * @api
+     *
+     * @param int $templateId
+     *
+     * @return string json status
+     */
     public function actionAddField($templateId)
     {
         Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
@@ -97,11 +106,28 @@ class ScreenTemplateController extends BaseController
         }
     }
 
+    /**
+     * Custom min/max float rand.
+     *
+     * @param float $min
+     * @param float $max
+     *
+     * @return float random float
+     */
     public static function randf($min = 0.0, $max = 1.0)
     {
         return mt_rand($min * mt_getrandmax(), $max * mt_getrandmax()) / mt_getrandmax();
     }
 
+    /**
+     * Retrieve a field spec.
+     *
+     * @api
+     *
+     * @param int $id field id
+     *
+     * @return string json field
+     */
     public function actionGetField($id)
     {
         Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
@@ -115,6 +141,13 @@ class ScreenTemplateController extends BaseController
         }
     }
 
+    /**
+     * Read POST data and update field, or display AJAX popup form.
+     *
+     * @param int $id field id
+     *
+     * @return mixed
+     */
     public function actionEditField($id)
     {
         $field = Field::find()->where(['id' => $id])->with('contentTypes')->one();
@@ -168,6 +201,15 @@ class ScreenTemplateController extends BaseController
         ]);
     }
 
+    /**
+     * Update field position.
+     *
+     * @api
+     *
+     * @param int $id field id
+     *
+     * @return string json status
+     */
     public function actionSetFieldPos($id = null)
     {
         Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
@@ -190,6 +232,15 @@ class ScreenTemplateController extends BaseController
         return ['success' => false, 'message' => $field->errors];
     }
 
+    /**
+     * Delete a field.
+     *
+     * @api
+     *
+     * @param int $id field id
+     *
+     * @return string json status
+     */
     public function actionDeleteField($id)
     {
         Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
@@ -268,6 +319,11 @@ class ScreenTemplateController extends BaseController
         ]);
     }
 
+    /**
+     * Generate background list with preview.
+     *
+     * @return array
+     */
     public static function getBackgroundRadios()
     {
         $backgrounds = Background::getAllWithPath();

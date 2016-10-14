@@ -12,16 +12,31 @@ use app\models\Flow;
 use app\models\Content;
 use app\models\ContentType;
 
+/**
+ * FrontendController implements the actions used by screens.
+ */
 class FrontendController extends BaseController
 {
     public $layout = 'frontend';
     public $defaultScreen = 1;
 
+    /**
+     * Index redirects to default screen.
+     *
+     * @return mixed
+     */
     public function actionIndex()
     {
         return $this->redirect(['screen', 'id' => $this->defaultScreen]);
     }
 
+    /**
+     * Initializes screen content html structure.
+     *
+     * @param int $id screen id
+     *
+     * @return mixed
+     */
     public function actionScreen($id)
     {
         $screen = Screen::find()->where([Screen::tableName().'.id' => $id])->joinWith(['template', 'template.fields', 'template.fields.contentTypes'])->one();
@@ -42,6 +57,15 @@ class FrontendController extends BaseController
         return $this->render('default', $content);
     }
 
+    /**
+     * Sends last screen update timestamp, indicating if refresh is needed.
+     *
+     * @api
+     *
+     * @param int $id screen id
+     *
+     * @return string json last update
+     */
     public function actionUpdate($id)
     {
         Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
@@ -54,6 +78,14 @@ class FrontendController extends BaseController
         return ['success' => true, 'data' => $screen->last_changes];
     }
 
+    /**
+     * Sends all available content for a specific field.
+     *
+     * @param int $id      screen id
+     * @param int $fieldid field id
+     *
+     * @return string json array
+     */
     public function actionNext($id, $fieldid)
     {
         Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
@@ -105,6 +137,14 @@ class FrontendController extends BaseController
         return ['success' => true, 'next' => $next];
     }
 
+    /**
+     * Dynamic content fetcher based on content type and field data.
+     *
+     * @param string $typeId content type
+     * @param string $data   content data
+     *
+     * @return mixed content
+     */
     public function actionGet($typeId, $data)
     {
         $contentType = ContentType::findOne($typeId);
