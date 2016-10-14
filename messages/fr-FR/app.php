@@ -25,6 +25,8 @@ return [
     'Update' => 'Mettre à jour',
     'Delete' => 'Supprimer',
     'Use' => 'Utiliser',
+    'Link' => 'Lier',
+    'Preview' => 'Prévisualiser',
 
     'User' => 'Utilisateur',
     'Users' => 'Utilisateurs',
@@ -42,6 +44,8 @@ return [
     'Role' => 'Rôle',
     'Set roles for {username}' => 'Sélection des rôles pour {username}',
     'Set Roles' => 'Définir les rôles',
+    'Add flow' => 'Ajouter un flux',
+    'Create Flow' => 'Créer un flux',
     'User creation failed' => 'Echec de la création de l\'utilisateur',
     'This user doesn\'t exist in LDAP' => 'Cet utilisateur n\'existe pas dans la base LDAP',
     'This user is already registered' => 'Cet utilisateur est déjà enregistré',

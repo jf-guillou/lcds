@@ -5,6 +5,7 @@ namespace app\controllers;
 use Yii;
 use app\models\Screen;
 use app\models\ScreenTemplate;
+use app\models\Flow;
 use yii\data\ActiveDataProvider;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -29,9 +30,9 @@ class ScreenController extends BaseController
             ],
             'access' => [
                 'class' => AccessControl::className(),
-                'only' => ['index', 'view', 'create', 'update', 'delete'],
+                'only' => ['index', 'view', 'create', 'update', 'delete', 'link', 'unlink'],
                 'rules' => [
-                    ['allow' => true, 'actions' => ['index', 'view', 'create', 'update', 'delete'], 'roles' => ['setScreens']],
+                    ['allow' => true, 'actions' => ['index', 'view', 'create', 'update', 'delete', 'link', 'unlink'], 'roles' => ['setScreens']],
                 ],
             ],
         ];
@@ -72,8 +73,13 @@ class ScreenController extends BaseController
             throw new NotFoundHttpException('The requested page does not exist.');
         }
 
+        $dataProvider = new ActiveDataProvider([
+            'query' => $model->getFlows(),
+        ]);
+
         return $this->render('view', [
             'model' => $model,
+            'dataProvider' => $dataProvider,
         ]);
     }
 
@@ -146,6 +152,35 @@ class ScreenController extends BaseController
         $this->findModel($id)->delete();
 
         return $this->redirect(['index']);
+    }
+
+    public function actionLink($id, $flowId = null)
+    {
+        $model = $this->findModel($id);
+
+        if ($flowId === null) {
+            $dataProvider = new ActiveDataProvider([
+                'query' => Flow::find(),
+            ]);
+
+            return $this->render('link', [
+                'model' => $model,
+                'dataProvider' => $dataProvider,
+            ]);
+        } else {
+            $model->link('flows', Flow::findOne($flowId));
+
+            return $this->redirect(['view', 'id' => $id]);
+        }
+    }
+
+    public function actionUnlink($id, $flowId)
+    {
+        $model = $this->findModel($id);
+
+        $model->unlink('flows', Flow::findOne($flowId), true);
+
+        return $this->redirect(['view', 'id' => $id]);
     }
 
     /**

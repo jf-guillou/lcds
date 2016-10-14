@@ -1,7 +1,9 @@
 <?php
 
+use yii\helpers\Url;
 use yii\helpers\Html;
 use yii\widgets\DetailView;
+use yii\grid\GridView;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\Screen */
@@ -37,5 +39,28 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
         ],
     ]) ?>
+
+    <p>
+        <?= Html::a(Yii::t('app', 'Add flow'), ['link', 'id' => $model->id], ['class' => 'btn btn-success']) ?>
+    </p>
+
+    <?= GridView::widget([
+        'dataProvider' => $dataProvider,
+        'columns' => [
+            'name',
+            'description',
+
+            [
+                'class' => 'yii\grid\ActionColumn',
+                'controller' => 'flow',
+                'template' => '{view} {update} {unlink}',
+                'buttons' => [
+                    'unlink' => function ($url, $_model, $key) use ($model) {
+                        return Html::a('<span class="glyphicon glyphicon-remove"></span>', Url::to(['unlink', 'id' => $model->id, 'flowId' => $_model->id]));
+                    },
+                ],
+            ],
+        ],
+    ]); ?>
 
 </div>
