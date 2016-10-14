@@ -6,6 +6,7 @@ use Yii;
 use app\models\Screen;
 use app\models\ScreenTemplate;
 use app\models\Flow;
+use yii\helpers\ArrayHelper;
 use yii\data\ActiveDataProvider;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -154,13 +155,21 @@ class ScreenController extends BaseController
         return $this->redirect(['index']);
     }
 
+    /**
+     * Adds a flow to this screen or render link view.
+     *
+     * @param int $id
+     * @param int $flowId
+     *
+     * @return mixed
+     */
     public function actionLink($id, $flowId = null)
     {
         $model = $this->findModel($id);
 
         if ($flowId === null) {
             $dataProvider = new ActiveDataProvider([
-                'query' => Flow::find(),
+                'query' => Flow::find()->where(['not', ['id' => ArrayHelper::getColumn($model->flows, 'id')]]),
             ]);
 
             return $this->render('link', [
@@ -168,17 +177,29 @@ class ScreenController extends BaseController
                 'dataProvider' => $dataProvider,
             ]);
         } else {
-            $model->link('flows', Flow::findOne($flowId));
+            if (!$model->getFlows()->where(['id' => $flowId])->exists()) {
+                $model->link('flows', Flow::findOne($flowId));
+            }
 
             return $this->redirect(['view', 'id' => $id]);
         }
     }
 
+    /**
+     * Remove a flow from a screen.
+     *
+     * @param int $id
+     * @param int $flowId
+     *
+     * @return mixed
+     */
     public function actionUnlink($id, $flowId)
     {
         $model = $this->findModel($id);
 
-        $model->unlink('flows', Flow::findOne($flowId), true);
+        if ($model->getFlows()->where(['id' => $flowId])->exists()) {
+            $model->unlink('flows', Flow::findOne($flowId), true);
+        }
 
         return $this->redirect(['view', 'id' => $id]);
     }
