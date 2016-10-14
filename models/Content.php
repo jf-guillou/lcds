@@ -23,6 +23,7 @@ use Yii;
  */
 class Content extends \yii\db\ActiveRecord
 {
+    const BASE_CACHE_TIME = 3600;
     const IS_FILE = false;
     const SUB_PATH = 'app\\models\\types\\';
 
@@ -179,5 +180,21 @@ class Content extends \yii\db\ActiveRecord
         }
 
         return $data;
+    }
+
+    public function fromCache($key)
+    {
+        $cache = \Yii::$app->cache;
+        $cacheKey = static::$typeName.$key;
+        if ($cache->exists($cacheKey)) {
+            return $cache->get($cacheKey);
+        }
+    }
+
+    public function toCache($key, $content)
+    {
+        $cache = \Yii::$app->cache;
+        $cacheKey = static::$typeName.$key;
+        $cache->set($cacheKey, $content, static::BASE_CACHE_TIME);
     }
 }

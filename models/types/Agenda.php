@@ -3,12 +3,13 @@
 namespace app\models\types;
 
 use ICal\ICal;
+use app\models\Content;
 use yii\helpers\Url;
 
 /**
  * This is the model class for content uploads.
  */
-class Agenda extends RSS
+class Agenda extends Content
 {
     const BASE_CACHE_TIME = 7200; // 1 hour
     const WIDTH = 1260;
@@ -16,10 +17,10 @@ class Agenda extends RSS
     const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
     const HOURS = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18];
     const CALENDAR_TZ = 'UTC';
-    //const DISPLAY_TZ = ini_get('date.timezone');
+    const DISP_TEACHERS = false;
 
     public static $typeName = 'Agenda';
-    public static $typeDescription = 'Display an agenda from an RSS feed.';
+    public static $typeDescription = 'Display an agenda from an ICal feed.';
     public static $html = '<img class="agenda" src="%data%" />';
     public static $css = '%field% { text-align: center; vertical-align: middle; } %field% img { height: 100%; width: 100%; object-fit: contain; }';
     public static $input = 'url';
@@ -38,6 +39,13 @@ class Agenda extends RSS
     private $headerHeight;
     private $leftBlockWidth;
 
+    /**
+     * Downloads feed from URL through proxy if necessary.
+     *
+     * @param string $url
+     *
+     * @return string feed content
+     */
     protected static function downloadFeed($url)
     {
         if (\Yii::$app->params['proxy']) {
@@ -54,44 +62,56 @@ class Agenda extends RSS
         }
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function processData($data)
     {
         return Url::to(['frontend/get', 'typeId' => self::$typeName, 'data' => urlencode($data)]);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function get($data)
     {
-        $cache = \Yii::$app->cache;
-        $cacheKey = self::$typeName.$data;
-        if ($cache->exists($cacheKey)) {
-            $content = $cache->get($cacheKey);
-        } else {
+        // Fetch content from cache if possible
+        $content = self::fromCache($data);
+        if (!$content) {
             $content = self::downloadFeed($data);
-            $cache->set($cacheKey, $content, self::BASE_CACHE_TIME);
+            self::toCache($data, $content, self::BASE_CACHE_TIME);
         }
 
+        // Init ICal parser
         $ical = new ICal();
         $ical->initString($content);
 
+        // Retrieve event for this week only
         $events = $ical->eventsFromRange(self::DAYS[0].' this week', self::DAYS[count(self::DAYS) - 1].' this week 23:59');
         if (!is_array($events) || !count($events)) {
             return;
         }
 
+        // Draw base calendar structure
         $this->initCalendar();
 
+        // Init timezone converter
         $utcTz = new \DateTimeZone(self::CALENDAR_TZ);
         $localTz = new \DateTimeZone(ini_get('date.timezone'));
         $firstDay = new \DateTime(self::DAYS[0]);
+        $hasMultipleLocations = false;
 
         $blocks = [];
-        // Build blocks
+        $prevLocation = null;
+        // Build event blocks array
         foreach ($events as $e) {
+            // Convert timezones
             $start = new \DateTime('@'.$e->dtstart_array[2], $utcTz);
             $start->setTimeZone($localTz);
             $end = new \DateTime('@'.$e->dtend_array[2], $utcTz);
             $end->setTimeZone($localTz);
 
+            // Event info
             $dow = $start->format('w') - 1;
             $startHour = $start->format('G') + ($start->format('i') / 60.0) - self::HOURS[0];
             $endHour = $end->format('G') + ($end->format('i') / 60.0) - self::HOURS[0];
@@ -99,21 +119,29 @@ class Agenda extends RSS
             $name = self::filter(html_entity_decode($e->summary, ENT_QUOTES), 'name');
             $location = self::filter(html_entity_decode($e->location, ENT_QUOTES), 'location');
             $desc = array_values(array_filter(array_map('self::filter', explode('\n', html_entity_decode($e->description, ENT_QUOTES)))));
-            $teacher = array_pop($desc);
-            if (strlen($teacher) < 8 && strpos($teacher, '.') === false) {
-                $desc[] = $teacher;
-                $teacher = null;
+            $teachers = [];
+            $groups = [];
+
+            // Guess groups and teachers names from description
+            foreach ($desc as $l) {
+                if ((strlen($l) >= 8 || strpos($l, '.') !== false) && preg_match('/\d|LP/', $l) == 0) {
+                    $teachers[] = $l;
+                } elseif (strlen($l) < 20 || preg_match('/LP/', $l) == 1) {
+                    $groups[] = $l;
+                }
             }
-            sort($desc);
-            $group = implode(', ', $desc);
+            sort($groups);
+            $group = implode(', ', $groups);
 
             $text = [
                 $name,
                 $location,
                 $group,
-                $teacher,
+                count($teachers) && self::DISP_TEACHERS ? implode(', ', $teachers) : null,
             ];
 
+            // Create colors based on group name
+            // %160 + 95 make colors brighter
             if (!array_key_exists($group, $this->color)) {
                 $groupHash = md5($group);
                 $this->color[$group] = imagecolorallocate(
@@ -124,6 +152,13 @@ class Agenda extends RSS
                 );
             }
 
+            // Sets global multiple locations, to enable width divisers
+            // A single location cannot be used by multiple groups at the same time
+            if ($prevLocation != null && $location != $prevLocation) {
+                $hasMultipleLocations = true;
+            }
+            $prevLocation = $location;
+
             // Init event block
             $blocks[] = [
                 'uid' => $e->uid,
@@ -133,7 +168,7 @@ class Agenda extends RSS
                 'duration' => $duration,
                 'text' => $text,
                 'group' => $group,
-                'groups' => $desc,
+                'groups' => $groups,
                 'bgColor' => $group,
                 'borderColor' => 'black',
                 'textColor' => 'black',
@@ -153,20 +188,26 @@ class Agenda extends RSS
             return $a['group'] > $b['group'] ? 1 : -1;
         });
 
-        // Lookup overlap by group and assign them weights used for block width division
+        // Lookup groups and assign them weights used for block width division
         $diviserWeight = [];
         foreach ($blocks as $b) {
             foreach ($b['groups'] as $g) {
                 $w = 1;
-                if (preg_match('/\s[a-d]\ss?\d-s?\d$/i', $g)) {
-                    $w = 2;//strlen($g) * 4;
-                } elseif (preg_match('/s?\d-s?\d$/i', $g)) {
-                    $w = 1;//strlen($g);
-                } elseif (preg_match('/[\s\d][a-d]$/i', $g)) {
-                    $w = 2;//strlen($g) * 4;
-                } elseif (preg_match('/\d$/i', $g)) {
-                    $w = 4;//strlen($g) * 8;
-                }
+                if (preg_match('/\s[a-d]\ss?\d-s?\d$/i', $g)) { // Groupe A S1-S2
+                    $w = 2;
+                } elseif (preg_match('/s?\d-s?\d$/i', $g)) { // S1-S2
+                    $w = 1;
+                } elseif (preg_match('/[\s\d][a-d]$/i', $g)) { // Groupe A
+                    $w = 2;
+                } elseif (preg_match('/^\d{2}$/i', $g)) { // 12
+                    $w = 2;
+                } elseif (preg_match('/groupe?\s\d$/i', $g)) { // Groupe 1
+                    $w = 2;
+                } elseif (preg_match('/\d$/i', $g)) { // 123
+                    $w = 3;
+                }/* elseif (preg_match('/\s\d{3}$/i', $g)) {
+                    $w = 3;
+                }*/
                 if (!array_key_exists($w, $diviserWeight)) {
                     $diviserWeight[$w] = [];
                 }
@@ -176,50 +217,126 @@ class Agenda extends RSS
                 }
             }
         }
-        // exit(var_dump($diviserWeight));
 
-        $divisers = [];
-        $positions = [];
-        foreach ($diviserWeight as $weight => $groups) {
-            $weightPos = 0;
-            foreach ($groups as $group) {
-                $divisers[$group] = $weight;
-                $positions[$weight][$group] = $weightPos;
-                ++$weightPos;
-                if ($weightPos % $weight === 0) {
-                    $weightPos = 0;
+        // Weights 2nd filter pass
+        // Uses names to guess group children
+        while (true) {
+            $hasMoved = false;
+            // Check weights
+            foreach ($diviserWeight as $weight => $groups) {
+                $shortestName = min($groups);
+                $thisHasMoved = false;
+                foreach ($groups as $i => $g) {
+                    if ($shortestName != $g && preg_match('/'.$shortestName.'/', $g)) {
+                        unset($diviserWeight[$weight][$i]);
+                        $diviserWeight[$weight + 1][] = $g;
+                        $hasMoved = true;
+                        $thisHasMoved = true;
+                    }
+                }
+                if ($thisHasMoved) {
+                    break;
                 }
             }
+            if (!$hasMoved) {
+                break;
+            }
         }
-        // exit(var_dump($divisers, $positions));
 
-        // Draw event blocks
-        foreach ($blocks as $b) {
-            $baseDiviser = null;
-            $diviser = 0;
-            $position = 0;
-            foreach ($b['groups'] as $g) {
-                if (array_key_exists($g, $divisers)) {
-                    $diviser += 1 / $divisers[$g];
-                    if (!$baseDiviser) {
-                        $baseDiviser = $divisers[$g];
+        ksort($diviserWeight);
+
+        // exit(var_dump($diviserWeight));
+
+        // Check if room planning (never overlaps) to allow full width on different groups
+        if (($forceSingleDiv = !$hasMultipleLocations)) {
+            foreach ($blocks as $i => $b) {
+                for ($j = $i + 1; $j < count($blocks); ++$j) {
+                    if (self::overlap($b, $blocks[$j])) {
+                        $forceSingleDiv = false;
+                        break 2;
                     }
                 }
             }
-            if (!$baseDiviser) {
-                $baseDiviser = 1;
-            }
-            if (array_key_exists($baseDiviser, $positions) && array_key_exists($b['groups'][0], $positions[$baseDiviser])) {
-                $position = $positions[$baseDiviser][$b['groups'][0]];
-            }
-            if (!$diviser) {
-                $diviser = 1;
+        }
+
+        // Set block width diviser and position based on weights
+        $divisers = [];
+        $positions = [];
+        $parentDiv = null;
+        foreach ($diviserWeight as $weight => $groups) {
+            $weightPos = 0;
+            if ($forceSingleDiv) {
+                // Room planning, always full width
+                $div = 1;
             } else {
-                $diviser = 1 / $diviser;
+                // Divide width by count of groups using this weight
+                $div = count($groups);
+                if ($parentDiv != null && $div < $parentDiv * 2) {
+                    // Subgroups should always have at least half the parent group width
+                    $div = $parentDiv * 2;
+                }
             }
-            if ($baseDiviser != $diviser) {
-                $position *= $diviser / $baseDiviser;
+
+            // Assign divisers and positions
+            foreach ($groups as $group) {
+                $divisers[$group] = $div;
+
+                // Position catchup mecanic
+                // Assume last char is pos identifier on known group string paterns
+                if (preg_match('/([1-4]{2,3}|[\sa-d][1-4]|[\s1-4][a-d])$/i', $group)) {
+                    $lChar = substr($group, -1);
+                    if ((int) $lChar) {
+                        $lChar = (int) $lChar - 1;
+                    } else {
+                        $lChar = ord(strtolower($lChar)) - 97; // ord('a') = 97
+                    }
+
+                    // Make sure we don't go full ham
+                    if ($lChar > $weightPos && $lChar < $div) {
+                        $weightPos = $lChar;
+                    }
+                }
+
+                $positions[$group] = $weightPos;
+                ++$weightPos;
+                // Reset pos if overflowing diviser
+                // Can happen on full width blocks
+                if ($weightPos % $div === 0) {
+                    $weightPos = 0;
+                }
             }
+            $parentDiv = $div;
+        }
+
+        // exit(var_dump($divisers, $positions));
+
+        // Draw event blocks on image
+        foreach ($blocks as $b) {
+            $diviser = 0;
+            $position = 0;
+
+            // Addup divisers
+            foreach ($b['groups'] as $g) {
+                if (array_key_exists($g, $divisers)) {
+                    $diviser += 1 / $divisers[$g];
+                }
+            }
+
+            // Invert divisers after addition
+            $diviser = $diviser ? 1 / $diviser : 1;
+
+            // Get position from first group and adjust based on group count
+            if (count($b['groups'])) {
+                $defaultGroup = $b['groups'][0];
+                if (array_key_exists($defaultGroup, $positions)) {
+                    $position = $positions[$defaultGroup];
+                }
+                if (count($b['groups']) > 1) {
+                    $position /= count($b['groups']);
+                }
+            }
+
+            // Real draw
             $this->drawEvent(
                 $b['day'],
                 $b['startHour'],
@@ -240,6 +357,9 @@ class Agenda extends RSS
         imagedestroy($this->img);
     }
 
+    /**
+     * Creates calendar base structure (hours & days lines).
+     */
     private function initCalendar()
     {
         $this->img = imagecreate(self::WIDTH, self::HEIGHT);
@@ -304,34 +424,56 @@ class Agenda extends RSS
         }
     }
 
+    /**
+     * Draws an event block on calendar image.
+     *
+     * @param int    $day         day index
+     * @param int    $hour        hour index
+     * @param int    $duration    duration in hours
+     * @param string $text        event content text
+     * @param string $bgColor     background color
+     * @param string $borderColor border color
+     * @param string $textColor   text color
+     * @param int    $diviser     event width diviser
+     * @param int    $position    position inside day column
+     */
     private function drawEvent($day = 0, $hour = 0, $duration = 1, $text = 'Derp', $bgColor = 'white', $borderColor = 'black', $textColor = 'black', $diviser = 1, $position = 0)
     {
+        // Setup x, y, width and height
         $x1 = $this->leftBlockWidth + $this->dayStep * $day + ($this->dayStep / $diviser * $position);
         $x2 = $x1 + ($this->dayStep / $diviser);
         $y1 = $this->headerHeight + $this->hourStep * $hour;
         $y2 = $y1 + $this->hourStep * $duration;
+        // Fill rectangle with border color
         imagefilledrectangle($this->img, $x1, $y1, $x2, $y2, $this->color[$borderColor]);
+        // Then fill 1px smaller rectangle with background color
         imagefilledrectangle($this->img, $x1 + 1, $y1 + 1, $x2 - 1, $y2 - 1, $this->color[$bgColor]);
 
+        // Prepare text content for imagestring()
         $text = self::trimArray($text);
 
+        // Setup text position
         $xCenter = ($x1 + ($x2 - $x1) / 2);
         $yCenter = ($y1 + ($y2 - $y1) / 2);
         $availChars = floor(($x2 - $x1) / $this->strW);
         $availLines = floor(($y2 - $y1) / $this->strH);
         $overLines = $availLines - count($text);
+
+        // Remove text going over block height
         while (count($text) > $availLines) {
             array_pop($text);
         }
 
         $dispText = [];
         foreach ($text as $i => $t) {
+            // Try to cut too long lines
             if (strlen($t) > $availChars) {
                 $dispText[] = trim(substr($t, 0, $availChars));
-                while ($i === 0 && $overLines > 0) {
+                // Wrap the rest on line bellow if possible
+                while ($overLines > 0) {
                     --$overLines;
                     $t = substr($t, $availChars);
-                    if (strlen($t) > 1) {
+                    if (strlen($t) > 1) { // Cut single char alone on a line
                         $dispText[] = trim(substr($t, 0, $availChars));
                     } else {
                         break;
@@ -340,11 +482,13 @@ class Agenda extends RSS
             } else {
                 $dispText[] = trim($t);
             }
+            // Add a blank line under title if possible
             if ($i === 0 && $overLines > 0) {
                 $dispText[] = '';
             }
         }
 
+        // Draw text
         foreach ($dispText as $i => $t) {
             imagestring(
                 $this->img,
@@ -354,20 +498,17 @@ class Agenda extends RSS
                 $t,
                 $this->color[$textColor]
             );
-
-            // imagettftext(
-            //     $this->img,
-            //     $this->fontSize,
-            //     0,
-            //     $xCenter - (strlen($t) * $this->strW) / 2,
-            //     $yCenter - (count($dispText) * $this->strH) / 2 + ($this->strH * $i),
-            //     $this->color[$textColor],
-            //     $this->fontFile,
-            //     $t
-            // );
         }
     }
 
+    /**
+     * Checks for event overlap.
+     *
+     * @param array $a first event
+     * @param array $b second event
+     *
+     * @return bool overlaps
+     */
     private static function overlap($a, $b)
     {
         return $a['day'] == $b['day'] && $a != $b && (
@@ -376,17 +517,27 @@ class Agenda extends RSS
             );
     }
 
+    /**
+     * Filter string from feed.
+     *
+     * @param string $str  input string
+     * @param string $type string type
+     *
+     * @return string filtered string
+     */
     private static function filter($str, $type = 'desc')
     {
         $str = preg_replace([
             '/\s{2,}/',
             '/\s*\\\,\s*/',
             '/ï/',
+            '/è/',
             '/\s*\([^\)]*\)/',
         ], [
             ' ',
             ', ',
             'i',
+            'e',
             '',
         ], trim($str));
         switch ($type) {
@@ -403,10 +554,10 @@ class Agenda extends RSS
                     '/(\d) (\d{3})/',
                 ], [
                     '\\1-\\2',
-                ], $str);
+                ], trim(explode(',', $str)[0]));
             case 'desc':
                 return preg_replace([
-                    '/.{22,}/',
+                    '/(modif).*/',
                 ], [
                     '',
                 ], $str);
@@ -415,6 +566,13 @@ class Agenda extends RSS
         }
     }
 
+    /**
+     * Trim and decode array content.
+     *
+     * @param array $arr input array
+     *
+     * @return array trimed array
+     */
     private static function trimArray($arr)
     {
         $res = [];

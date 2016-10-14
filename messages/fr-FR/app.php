@@ -74,7 +74,7 @@ return [
     'Upload an image to servers.' => 'Envoyer une image sur les serveurs.',
     'Upload a video to servers.' => 'Envoyer une video sur les serveurs.',
     'Display an RSS feed inline.' => 'Affiche un flux RSS',
-    'Display an agenda from an RSS feed.' => 'Affiche un agenda basé sur un flux RSS',
+    'Display an agenda from an ICal feed.' => 'Affiche un agenda basé sur un flux ICal',
 
     'Are you sure you want to delete this item?' => 'Êtes-vous sur de vouloir supprimer cet objet ?',
 

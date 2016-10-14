@@ -14,5 +14,5 @@ class RSS extends Content
     public static $html = '<div class="rss" data-url="%data%"></div>';
     public static $input = 'url';
     public static $output = null;
-    public static $usable = true;
+    public static $usable = false;
 }
