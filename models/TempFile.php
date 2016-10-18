@@ -54,6 +54,13 @@ class TempFile extends \yii\db\ActiveRecord
         ];
     }
 
+    /**
+     * Custom file validation based on mediainfo description.
+     *
+     * @param string $realPath filesystem path
+     *
+     * @return bool is file valid
+     */
     public function validateFile($realPath)
     {
         $mediainfo = null;
@@ -70,6 +77,14 @@ class TempFile extends \yii\db\ActiveRecord
         return false;
     }
 
+    /**
+     * Header parsing method used to get size & filename.
+     *
+     * @param mixed  $curl   curl handler
+     * @param string $header
+     *
+     * @return int header length
+     */
     public function readHeaderFilename($curl, $header)
     {
         if (strpos($header, 'Content-Length:') === 0) {

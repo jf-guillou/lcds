@@ -21,8 +21,16 @@ class Media extends Content
     const BASE_URI = '@web/';
     public static $usable = false;
 
+    // Temp file instance
     protected $tmp;
 
+    /**
+     * Take a file instance and upload it to FS, also save in DB.
+     *
+     * @param \FileInstance $fileInstance
+     *
+     * @return bool success
+     */
     public function upload($fileInstance)
     {
         if ($fileInstance === null) {
@@ -47,11 +55,25 @@ class Media extends Content
         return false;
     }
 
+    /**
+     * Validate an url based on PHP filter_var.
+     *
+     * @param string $url
+     *
+     * @return bool valid
+     */
     public static function validateUrl($url)
     {
         return $url && filter_var($url, FILTER_VALIDATE_URL);
     }
 
+    /**
+     * Take an url and download it, also save it in DB.
+     *
+     * @param string $url
+     *
+     * @return bool success
+     */
     public function sideload($url)
     {
         if (!self::validateUrl($url)) {
@@ -119,6 +141,11 @@ class Media extends Content
         return false;
     }
 
+    /**
+     * Custom error getter for upload/sideload temp file.
+     *
+     * @return string error
+     */
     public function getLoadError()
     {
         $type = static::TYPE;
@@ -136,36 +163,69 @@ class Media extends Content
         return Yii::t('app', 'Incorrect file');
     }
 
+    /**
+     * Get filepath from web root.
+     *
+     * @return string filepath
+     */
     public function getFilepath()
     {
         return str_replace(self::BASE_URI, '', $this->getWebFilepath());
     }
 
+    /**
+     * Get Yii aliased filepath.
+     *
+     * @return string filepath
+     */
     public function getWebFilepath()
     {
         return $this->data ?: self::getWebPath().$this->tmp->name;
     }
 
+    /**
+     * Get filesystem filepath.
+     *
+     * @return string filepath
+     */
     public function getRealFilepath()
     {
         return \Yii::getAlias('@app/').'web/'.$this->getFilepath();
     }
 
+    /**
+     * Get storage path from web root.
+     *
+     * @return string path
+     */
     public static function getPath()
     {
         return self::BASE_PATH.static::TYPE_PATH;
     }
 
+    /**
+     * Get Yii aliased storage path.
+     *
+     * @return string path
+     */
     public static function getWebPath()
     {
         return self::BASE_URI.self::getPath();
     }
 
+    /**
+     * Get filesystem storage path.
+     *
+     * @return string path
+     */
     public static function getRealPath()
     {
         return \Yii::getAlias('@app/').'web/'.self::getPath();
     }
 
+    /**
+     * {@inheritdoc}
+     */
     protected function shouldDeleteFile()
     {
         if (static::IS_FILE) {
@@ -179,6 +239,11 @@ class Media extends Content
         return false;
     }
 
+    /**
+     * Try to get media info for this media.
+     *
+     * @return \MediaInfo|null media info
+     */
     protected function getMediaInfo()
     {
         try {
@@ -188,11 +253,25 @@ class Media extends Content
         }
     }
 
+    /**
+     * Get media duration.
+     *
+     * @return int duration
+     */
     public function getDuration()
     {
         return;
     }
 
+    /**
+     * After save event
+     * Try to delete tempfile model for this file.
+     *
+     * @param bool  $insert            is model inserted
+     * @param array $changedAttributes
+     *
+     * @return bool success
+     */
     public function afterSave($insert, $changedAttributes)
     {
         if (parent::afterSave($insert, $changedAttributes)) {
@@ -206,6 +285,12 @@ class Media extends Content
         return false;
     }
 
+    /**
+     * After delete event
+     * Try to delete file if necessary.
+     *
+     * @return bool success
+     */
     public function afterDelete()
     {
         if ($this->shouldDeleteFile()) {
@@ -214,6 +299,9 @@ class Media extends Content
         parent::afterDelete();
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function processData($data)
     {
         return Url::to($data);

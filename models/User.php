@@ -96,6 +96,14 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
         return $this->authkey;
     }
 
+    /**
+     * Create a used with specified username and password.
+     *
+     * @param string $username
+     * @param string $password
+     *
+     * @return \User|null created user
+     */
     public static function create($username, $password)
     {
         $user = new self();
@@ -105,6 +113,13 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
         return $user->save() ? $user : null;
     }
 
+    /**
+     * Authenticate user with password on LDAP is possible or in DB.
+     *
+     * @param string $password
+     *
+     * @return bool is authenticated
+     */
     public function authenticate($password)
     {
         $this->password = $password;
@@ -117,6 +132,13 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
         return $this->validatePassword($password);
     }
 
+    /**
+     * Look for a user ID in LDAP.
+     *
+     * @param string $id user ID
+     *
+     * @return \User|null found user
+     */
     public static function findInLdap($id)
     {
         if (Yii::$app->params['useLdap']) {
@@ -155,6 +177,10 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
         return Yii::$app->security->validatePassword($password, $this->hash);
     }
 
+    /**
+     * After find event
+     * Update user to indicated LDAP or DB source.
+     */
     public function afterFind()
     {
         parent::afterFind();
@@ -163,6 +189,15 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
         }
     }
 
+    /**
+     * Before save event
+     * Create authkey and access token is newly created
+     * Also hash password if not comming from LDAP.
+     *
+     * @param bool $insert is model inserted
+     *
+     * @return bool success
+     */
     public function beforeSave($insert)
     {
         if (parent::beforeSave($insert)) {
@@ -181,6 +216,12 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
         return false;
     }
 
+    /**
+     * After login event
+     * Update last_login_at field to indicate login timestamp.
+     *
+     * @param mixed $event user event
+     */
     public static function afterLogin($event)
     {
         $event->identity->last_login_at = new Expression('NOW()');
@@ -204,6 +245,12 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
         return $this->hasMany(Flow::className(), ['id' => 'flow_id'])->viaTable('user_has_flow', ['user_username' => 'username']);
     }
 
+    /**
+     * Update usable flows for user from form
+     * Link and unlink based on new & old flow id arrays.
+     *
+     * @param array $flows flows ids
+     */
     public function setFlows($flows)
     {
         if ($flows === '' || count($flows) === 0) {
@@ -234,6 +281,11 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
         return true;
     }
 
+    /**
+     * Retrieve user role from authmanager.
+     *
+     * @return string|null first role
+     */
     public function getRole()
     {
         $roles = Yii::$app->authManager->getRolesByUser($this->getId());
@@ -242,6 +294,13 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
         return count($roleNames) ? $roleNames[0] : null;
     }
 
+    /**
+     * Set user role in authmanager.
+     *
+     * @param string $role role name
+     *
+     * @return bool success
+     */
     public function setRole($role)
     {
         $auth = Yii::$app->authManager;

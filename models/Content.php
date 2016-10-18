@@ -101,6 +101,13 @@ class Content extends \yii\db\ActiveRecord
         return $this->hasOne(ContentType::className(), ['id' => 'type_id']);
     }
 
+    /**
+     * Get class from content type ID.
+     *
+     * @param string $typeId content type id
+     *
+     * @return string class name
+     */
     public static function fromType($typeId)
     {
         $className = self::SUB_PATH.$typeId;
@@ -111,6 +118,13 @@ class Content extends \yii\db\ActiveRecord
         return $className;
     }
 
+    /**
+     * Instanciate a class from content type ID.
+     *
+     * @param string $typeId content type id
+     *
+     * @return mixed class instance
+     */
     public static function newFromType($typeId)
     {
         $className = self::fromType($typeId);
@@ -118,6 +132,14 @@ class Content extends \yii\db\ActiveRecord
         return new $className();
     }
 
+    /**
+     * Overloading default instanciate model.
+     * Initialize a children class based on type_id column of $row.
+     *
+     * @param array $row
+     *
+     * @return mixed class instance
+     */
     public static function instantiate($row)
     {
         $typeId = $row['type_id'];
@@ -130,11 +152,23 @@ class Content extends \yii\db\ActiveRecord
         return new $class();
     }
 
+    /**
+     * Decide if content file should be deleted by checking usage in DB.
+     *
+     * @return bool deletable
+     */
     protected function shouldDeleteFile()
     {
         return false;
     }
 
+    /**
+     * Build a query for a specific user, allowing to see only authorized contents.
+     *
+     * @param \User $user
+     *
+     * @return \yii\db\ActiveQuery
+     */
     public static function availableQuery($user)
     {
         if ($user->can('setFlowContent')) {
@@ -144,6 +178,13 @@ class Content extends \yii\db\ActiveRecord
         }
     }
 
+    /**
+     * Check if a specific user is allowed to see this content.
+     *
+     * @param \User $user
+     *
+     * @return bool can see
+     */
     public function canView($user)
     {
         if ($user->can('setFlowContent')) {
@@ -156,16 +197,37 @@ class Content extends \yii\db\ActiveRecord
         return false;
     }
 
+    /**
+     * Get raw data and transform it to content type specific needs.
+     *
+     * @param string $data
+     *
+     * @return string transformed data
+     */
     public function processData($data)
     {
         return $data;
     }
 
+    /**
+     * Get data directly from content
+     * Used in view to preview/show data.
+     *
+     * @param string $data
+     *
+     * @return string preview data
+     */
     public function get($data)
     {
         return;
     }
 
+    /**
+     * Retrieve data for content
+     * Transforming it if necessary (mostly urls).
+     *
+     * @return string usable data
+     */
     public function getData()
     {
         $data = $this->data;
@@ -182,6 +244,13 @@ class Content extends \yii\db\ActiveRecord
         return $data;
     }
 
+    /**
+     * Get from cache.
+     *
+     * @param string $key cache key
+     *
+     * @return string cached data
+     */
     public function fromCache($key)
     {
         $cache = \Yii::$app->cache;
@@ -191,6 +260,12 @@ class Content extends \yii\db\ActiveRecord
         }
     }
 
+    /**
+     * Store to cache.
+     *
+     * @param string $key     cache key
+     * @param string $content cache data
+     */
     public function toCache($key, $content)
     {
         $cache = \Yii::$app->cache;

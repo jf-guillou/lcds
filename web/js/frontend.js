@@ -1,8 +1,8 @@
+// Update field contents by retrieving field data from backend
 function updateContents(f) {
   if (!f.canUpdate) {
     return;
   }
-  //console.log('Fetch updated contents', f);
   $.get(f.url, function(j) {
     if (j.success) {
       setContents(f, j.next);
@@ -12,23 +12,23 @@ function updateContents(f) {
   });
 }
 
+// Update screen and reload if necessary
 var updateScreenUrl;
 var lastChanges = null;
 var pleaseDie = false;
 function updateScreen() {
   $.get(updateScreenUrl, function(j) {
     if (j.success) {
-      //console.log(j.data);
       if (lastChanges == null) {
         lastChanges = j.data;
       } else if (lastChanges != j.data) {
         end();
-        //window.location.reload();
       }
     }
   });
 }
 
+// Kill current screen and reload after fields timeouts
 var remaining = 0;
 function end() {
   if (pleaseDie) {
@@ -40,12 +40,13 @@ function end() {
       remaining++;
     }
   }
-  //console.log('STOP : wait ' + remaining);
 }
 
+// jQuery load
+// Initialize frontend handlers
+// Create fields and setup content updates timers & screen update timer
 function onLoad() {
   // Init
-  //console.log('onLoad');
   $('.field').each(function() {
     var $f = $(this);
     var f = {
@@ -75,14 +76,16 @@ function onLoad() {
   updateScreen();
 }
 
+// Assign content to field and force next occurrence if necessary
 function setContents(f, contents) {
   f.contents = contents;
-  //console.log('Set updated contents for', f);
   if (!f.timeout && contents.length) {
     next(f);
   }
 }
 
+// Find next content to display for field
+// Take a random content from field contents
 function next(f) {
   if (pleaseDie) {
     if (--remaining <= 0) {
@@ -129,6 +132,8 @@ function next(f) {
   updateFieldContent(f);
 }
 
+// Update field displayed content
+// Setup next timeout based on content duration
 function updateFieldContent(f) {
   if (f.next && f.next.duration > 0) {
     //console.log('Display new stuff', f);

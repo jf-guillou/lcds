@@ -28,6 +28,9 @@ class UserLogin extends \yii\base\Model
         ];
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function attributeLabels()
     {
         return [
@@ -37,6 +40,12 @@ class UserLogin extends \yii\base\Model
         ];
     }
 
+    /**
+     * Override action to disable default save
+     * This model has no true support table and is only used for display and validation purposes.
+     *
+     * @return bool success
+     */
     public function save()
     {
         return false;

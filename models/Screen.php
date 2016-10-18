@@ -56,6 +56,11 @@ class Screen extends \yii\db\ActiveRecord
         ];
     }
 
+    /**
+     * Loop through parent flows to build a flows tree.
+     *
+     * @return array flows with all parents
+     */
     public function allFlows()
     {
         $ret = [];
@@ -82,6 +87,9 @@ class Screen extends \yii\db\ActiveRecord
         return $ret;
     }
 
+    /**
+     * Update last_modified field to force screen reload.
+     */
     public function setModified()
     {
         $this->last_changes = new Expression('NOW()');
@@ -96,6 +104,11 @@ class Screen extends \yii\db\ActiveRecord
         return $this->hasOne(ScreenTemplate::className(), ['id' => 'template_id']);
     }
 
+    /**
+     * Update template_id field.
+     *
+     * @param string $templateId template ID
+     */
     public function setTemplate($templateId)
     {
         $this->template_id = $templateId;

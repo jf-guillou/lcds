@@ -61,6 +61,13 @@ class Field extends \yii\db\ActiveRecord
         ];
     }
 
+    /**
+     * After save event
+     * Set screen last_modified field on changes to force screen reload.
+     *
+     * @param bool  $insert            is model inserted
+     * @param array $changedAttributes
+     */
     public function afterSave($insert, $changedAttributes)
     {
         parent::afterSave($insert, $changedAttributes);
@@ -93,6 +100,13 @@ class Field extends \yii\db\ActiveRecord
         return $this->hasMany(ContentType::className(), ['id' => 'content_type_id'])->viaTable('field_has_content_type', ['field_id' => 'id']);
     }
 
+    /**
+     * Merge data from content type with field data.
+     *
+     * @param string $data content type data
+     *
+     * @return string transformed data
+     */
     public function mergeData($data)
     {
         return str_replace([

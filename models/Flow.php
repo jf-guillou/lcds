@@ -113,6 +113,13 @@ class Flow extends \yii\db\ActiveRecord
         return $this->hasMany(User::className(), ['username' => 'user_username'])->viaTable('user_has_flow', ['flow_id' => 'id']);
     }
 
+    /**
+     * Build a query for a specific user, allowing to see only authorized flows.
+     *
+     * @param \User $user
+     *
+     * @return \yii\db\ActiveQuery
+     */
     public static function availableQuery($user)
     {
         if ($user->can('setFlowContent')) {
@@ -122,6 +129,13 @@ class Flow extends \yii\db\ActiveRecord
         }
     }
 
+    /**
+     * Check if a specific user is allowed to see this flow.
+     *
+     * @param \User $user
+     *
+     * @return bool can see
+     */
     public function canView($user)
     {
         if ($user->can('setFlowContent')) {

@@ -1,3 +1,5 @@
+// Raphael handler for draw init action
+// Draws fields
 function preDraw() {
   paper = this;
   for (var f in fields) {
@@ -5,6 +7,7 @@ function preDraw() {
   }
 }
 
+// Draw single field with associated text and assign handlers
 function createField(field) {
   var r = paper.rect(
       Math.round(pW * field.x1),
@@ -28,6 +31,7 @@ function createField(field) {
     .click(editField);
 }
 
+// Create a new field and store it
 function addField($btn) {
   $.ajax({
     url: $btn.attr('href'),
@@ -43,6 +47,7 @@ function addField($btn) {
   });
 }
 
+// Show field modification popover
 function editField() {
   if (!this.moved) {
     $("#field-modal").html();
@@ -53,6 +58,7 @@ function editField() {
   }
 }
 
+// Send field updates to backend
 function updateField(id) {
   $.ajax({
     url: 'get-field',
@@ -73,6 +79,7 @@ function updateField(id) {
   })
 }
 
+// Find field based on ID in paper
 function getField(id, cb) {
   paper.forEach(function(e) {
     if (e.type == 'rect' && e.field.id * 1 === id) {
@@ -82,6 +89,7 @@ function getField(id, cb) {
   });
 }
 
+// Remove a field based on ID
 function removeField(id) {
   getField(id, function(e) {
     e.text.remove();
@@ -89,6 +97,7 @@ function removeField(id) {
   });
 }
 
+// Field move handler
 var resizeMin = 20;
 function handleMove(dx, dy, x, y, e) {
   var oX = this.ox;
@@ -151,6 +160,7 @@ function handleMove(dx, dy, x, y, e) {
   this.attr(pos).text.attr({x: oX + 6, y: oY + 8});
 }
 
+// Field move start handler
 var resizeTreshold = 6;
 function handleMoveStart(x, y, e) {
   this.toFront();
@@ -177,6 +187,7 @@ function handleMoveStart(x, y, e) {
   }
 }
 
+// Field move end handler
 function handleMoveEnd(e) {
   if (!this.moved) {
     return;
@@ -191,6 +202,7 @@ function handleMoveEnd(e) {
   $.post(setFieldPosUrl + o.id, {Field: o});
 }
 
+// Field creation on button click
 $(document).on('click', '.field-add', function() {
     addField($(this));
     return false;
@@ -202,6 +214,8 @@ var pX;
 var pY;
 var paper = null;
 
+// jQuery load
+// Setup screen size and init Raphael
 function load() {
   var $b = $('.background-edit');
   pW = $b.width();
@@ -212,8 +226,11 @@ function load() {
   Raphael('design', pW, pH, preDraw);
 }
 
+// jQuery on load
 $(load);
 
+// Popover submit action
+// Send data over ajax POST
 $(document).on('beforeSubmit', '#screen-template-field-form', function() {
   var $form = $(this);
   if ($form.find('.has-error').length) {
@@ -236,6 +253,8 @@ $(document).on('beforeSubmit', '#screen-template-field-form', function() {
   })
   return false;
 });
+
+// Field delete handler
 $(document).on('click', '.field-delete', function() {
   var $btn = $(this);
   console.log($btn);
@@ -254,7 +273,7 @@ $(document).on('click', '.field-delete', function() {
   return false;
 });
 
-
+// Disable content type incompatible choices
 $(document).on('change', '#field-contenttypes input', function() {
   var $chk = $(this);
   if (selfContentIds.indexOf($chk.val()*1) != -1) {

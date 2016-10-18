@@ -6,7 +6,7 @@ use app\models\Content;
 use yii\helpers\Html;
 
 /**
- * This is the model class for content uploads.
+ * This is the model class for Text content type.
  */
 class Text extends Content
 {
@@ -18,6 +18,9 @@ class Text extends Content
     public static $output = 'text';
     public static $usable = true;
 
+    /**
+     * {@inheritdoc}
+     */
     public function processData($data)
     {
         return nl2br(Html::encode($data));

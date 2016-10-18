@@ -50,6 +50,13 @@ class ScreenTemplate extends \yii\db\ActiveRecord
         ];
     }
 
+    /**
+     * After save event
+     * Set screen last_modified field on changes to force screen reload.
+     *
+     * @param bool  $insert            is model inserted
+     * @param array $changedAttributes
+     */
     public function afterSave($insert, $changedAttributes)
     {
         parent::afterSave($insert, $changedAttributes);

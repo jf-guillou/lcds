@@ -75,6 +75,13 @@ class ContentType extends \yii\db\ActiveRecord
         ];
     }
 
+    /**
+     * Overload default instantiate to fill attributes from specific content type.
+     *
+     * @param array $row
+     *
+     * @return array transformed row
+     */
     public static function instantiate($row)
     {
         $t = new static();
@@ -88,6 +95,14 @@ class ContentType extends \yii\db\ActiveRecord
         return $t;
     }
 
+    /**
+     * Get all filtered content types.
+     *
+     * @param bool $selfUpdate does content type manages itself
+     * @param bool $usableOnly show only usable content types
+     *
+     * @return array content types
+     */
     public static function getAll($selfUpdate = null, $usableOnly = true)
     {
         $types = self::find()->all();
@@ -97,6 +112,14 @@ class ContentType extends \yii\db\ActiveRecord
         });
     }
 
+    /**
+     * Get all filterd content types in array.
+     *
+     * @param bool $selfUpdate does content type manages itself
+     * @param bool $usableOnly show only usable content types
+     *
+     * @return array content types
+     */
     public static function getAllList($selfUpdate = null, $usableOnly = true)
     {
         $types = self::getAll($selfUpdate, $usableOnly);
@@ -110,6 +133,11 @@ class ContentType extends \yii\db\ActiveRecord
         return $list;
     }
 
+    /**
+     * Get all file based content types.
+     *
+     * @return array content types
+     */
     public function getAllFileTypeIds()
     {
         $types = self::find()->all();
@@ -143,11 +171,21 @@ class ContentType extends \yii\db\ActiveRecord
         return $this->hasMany(Field::className(), ['id' => 'field_id'])->viaTable('field_has_content_type', ['content_type_id' => 'id']);
     }
 
+    /**
+     * Get translated content type name.
+     *
+     * @return string name
+     */
     public function getName()
     {
         return \Yii::t('app', $this->_name);
     }
 
+    /**
+     * Get translated content type description.
+     *
+     * @return string description
+     */
     public function getDescription()
     {
         return \Yii::t('app', $this->_description);
