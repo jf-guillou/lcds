@@ -13,4 +13,28 @@ class Video extends Media
     const TYPE_PATH = 'videos/';
 
     public static $usable = false;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function rules()
+    {
+        return array_merge(parent::rules(), [
+            [['upload'], 'file', 'skipOnEmpty' => true, 'extensions' => 'avi, mp4, mkv'],
+        ]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function validateFile($realFilepath)
+    {
+        $mediainfo = self::getMediaInfo($realFilepath);
+
+        if ($mediainfo && count($mediainfo->getVideos())) {
+            return true;
+        }
+
+        return false;
+    }
 }

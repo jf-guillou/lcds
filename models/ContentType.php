@@ -138,13 +138,13 @@ class ContentType extends \yii\db\ActiveRecord
      *
      * @return array content types
      */
-    public function getAllFileTypeIds()
+    public static function getAllFileTypeIds()
     {
         $types = self::find()->all();
 
-        return array_filter(array_map($types, function ($t) {
+        return array_filter(array_map(function ($t) {
             return $t->input == self::KINDS['FILE'] ? $t->id : null;
-        }));
+        }, $types));
     }
 
     /**

@@ -9,7 +9,6 @@ use yii\helpers\Url;
 use yii\web\UploadedFile;
 use app\models\Content;
 use app\models\ContentType;
-use app\models\TempFile;
 
 /**
  * This is the model class for Media content type.
@@ -21,8 +20,29 @@ class Media extends Content
     const BASE_URI = '@web/';
     public static $usable = false;
 
-    // Temp file instance
-    protected $tmp;
+    public $upload;
+    public $size;
+    public $filename;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function rules()
+    {
+        return array_merge(parent::rules(), [
+            [['filename'], 'string', 'min' => 1, 'max' => 128],
+        ]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function attributeLabels()
+    {
+        return parent::attributeLabels() + [
+            'upload' => Yii::t('app', 'Upload'),
+        ];
+    }
 
     /**
      * Take a file instance and upload it to FS, also save in DB.
@@ -34,24 +54,43 @@ class Media extends Content
     public function upload($fileInstance)
     {
         if ($fileInstance === null) {
+            $this->addError('upload', Yii::t('app', 'There\'s no file'));
+
             return false;
         }
 
-        $this->tmp = new TempFile();
-        $type = static::TYPE;
-        $this->tmp->$type = $fileInstance;
-        $this->tmp->name = $fileInstance->baseName.'.'.$fileInstance->extension;
-        $this->tmp->file = self::getWebPath().$this->tmp->name;
+        $this->upload = $fileInstance;
 
-        if ($this->tmp->validate() && $this->tmp->save()) {
-            if ($this->tmp->$type->saveAs(self::getPath().$this->tmp->name)) {
-                if ($this->tmp->validateFile(self::getRealPath().$this->tmp->name)) {
-                    return true;
+        if ($this->validate(['upload'])) {
+            $this->filename = $this->upload->baseName.'.'.$this->upload->extension;
+            $tmpFilepath = tempnam(sys_get_temp_dir(), 'LCDS_');
+
+            if ($this->upload->saveAs($tmpFilepath)) {
+                if (static::validateFile($tmpFilepath)) {
+                    return ['filename' => $this->filename, 'tmppath' => $tmpFilepath, 'duration' => static::getDuration($tmpFilepath)];
+                } else {
+                    $this->addError('upload', Yii::t('app', 'Invalid file'));
                 }
-                $this->tmp->delete();
+                unlink($tmpFilepath);
+            } else {
+                $this->addError('upload', Yii::t('app', 'Cannot save file'));
             }
+        } else {
+            //$this->addError('upload', Yii::t('app', 'Unable to validate file'));
         }
 
+        return false;
+    }
+
+    /**
+     * Custom file validation based on mediainfo description.
+     *
+     * @param string $realFilepath filesystem path
+     *
+     * @return bool is file valid
+     */
+    public static function validateFile($realFilepath)
+    {
         return false;
     }
 
@@ -82,63 +121,73 @@ class Media extends Content
             return false;
         }
 
-        $this->tmp = new TempFile();
-        $type = static::TYPE;
-
         $curl = curl_init($url);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($curl, CURLOPT_PROXY, Yii::$app->params['proxy']);
         curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
-        curl_setopt($curl, CURLOPT_HEADERFUNCTION, [&$this->tmp, 'readHeaderFilename']);
+        curl_setopt($curl, CURLOPT_HEADERFUNCTION, [&$this, 'readHeaderFilename']);
         $fileContent = curl_exec($curl);
         $error = curl_error($curl);
         curl_close($curl);
 
         if ($error) {
-            $this->addError(static::TYPE, Yii::t('app', $error));
+            $this->addError('upload', Yii::t('app', $error));
 
             return false;
         }
 
-        if (!$this->tmp->name) {
+        if (!$this->filename) {
             $urlSplit = explode('/', $url);
-            $this->tmp->name = $urlSplit[count($urlSplit) - 1];
+            $this->filename = $urlSplit[count($urlSplit) - 1];
         }
 
-        $destination = self::getRealPath().$this->tmp->name;
-        $i = 0;
-        while (file_exists($destination)) {
-            $destination = self::getRealPath().++$i.$this->tmp->name;
-        }
-        if ($i > 0) {
-            $this->tmp->name = $i.$this->tmp->name;
-        }
+        $tmpFilepath = tempnam(sys_get_temp_dir(), 'LCDS_');
 
-        $this->tmp->file = self::getWebPath().$this->tmp->name;
-
-        $file = fopen($destination, 'w+');
+        $file = fopen($tmpFilepath, 'w+');
         fputs($file, $fileContent);
         fclose($file);
 
         $fileInstance = new UploadedFile();
-        $fileInstance->name = $this->tmp->name;
-        $fileInstance->tempName = self::getRealPath().$fileInstance->name;
+        $fileInstance->name = $this->filename;
+        $fileInstance->tempName = $tmpFilepath;
         $fileInstance->type = FileHelper::getMimeType($fileInstance->tempName);
-        $fileInstance->size = $this->tmp->size;
-        $this->tmp->$type = $fileInstance;
+        $fileInstance->size = $this->size;
+        $this->upload = $fileInstance;
 
-        if ($this->tmp->validate() && $this->tmp->save()) {
-            if ($this->tmp->validateFile($fileInstance->tempName)) {
-                return true;
+        if ($this->validate(['upload'])) {
+            if (static::validateFile($fileInstance->tempName)) {
+                return ['filename' => $this->filename, 'tmppath' => $tmpFilepath, 'duration' => static::getDuration($tmpFilepath)];
             }
-            $this->addError(static::TYPE, Yii::t('app', 'Invalid file'));
-            $this->tmp->delete();
+            $this->addError('upload', Yii::t('app', 'Invalid file'));
         } else {
-            $this->addError(static::TYPE, Yii::t('app', 'Cannot save file'));
+            //$this->addError('upload', Yii::t('app', 'Unable to validate file'));
         }
-        unlink($fileInstance->tempName);
+        //unlink($fileInstance->tempName);
 
         return false;
+    }
+
+    /**
+     * Header parsing method used to get size & filename.
+     *
+     * @param mixed  $curl   curl handler
+     * @param string $header
+     *
+     * @return int header length
+     */
+    public function readHeaderFilename($curl, $header)
+    {
+        if (strpos($header, 'Content-Length:') === 0) {
+            if (preg_match('/(\d+)/', $header, $matches)) {
+                $this->size = trim($matches[1]);
+            }
+        } elseif (strpos($header, 'Content-Disposition:') === 0) {
+            if (preg_match('/filename=(.*)$/', $header, $matches)) {
+                $this->filename = trim(str_replace('"', '', $matches[1]));
+            }
+        }
+
+        return strlen($header);
     }
 
     /**
@@ -148,16 +197,9 @@ class Media extends Content
      */
     public function getLoadError()
     {
-        $type = static::TYPE;
-        if ($this->tmp) {
-            $errors = $this->tmp->getErrors();
-            if (count($errors[$type])) {
-                return implode(' - ', $errors[$type]);
-            }
-        }
         $errors = $this->getErrors();
-        if (count($errors[$type])) {
-            return implode(' - ', $errors[$type]);
+        if (array_key_exists('upload', $errors) && count($errors['upload'])) {
+            return implode(' - ', $errors['upload']);
         }
 
         return Yii::t('app', 'Incorrect file');
@@ -244,45 +286,81 @@ class Media extends Content
      *
      * @return \MediaInfo|null media info
      */
-    protected function getMediaInfo()
+    protected static function getMediaInfo($realFilepath)
     {
         try {
-            return (new MediaInfo())->getInfo($this->getRealFilepath());
+            return (new MediaInfo())->getInfo($realFilepath);
         } catch (\RuntimeException $e) {
             return;
         }
     }
 
     /**
-     * Get media duration.
+     * Use mediainfo to parse media duration.
      *
-     * @return int duration
+     * @return int media duration
      */
-    public function getDuration()
+    public static function getDuration($realFilepath)
     {
-        return;
+        $mediainfo = static::getMediaInfo($realFilepath);
+        if ($mediainfo) {
+            $general = $mediainfo->getGeneral();
+            if ($general && $general->get('duration')) {
+                return ceil($general->get('duration')->getMilliseconds() / 1000);
+            }
+        }
     }
 
-    /**
-     * After save event
-     * Try to delete tempfile model for this file.
-     *
-     * @param bool  $insert            is model inserted
-     * @param array $changedAttributes
-     *
-     * @return bool success
-     */
-    public function afterSave($insert, $changedAttributes)
+    public function beforeSave($insert)
     {
-        if (parent::afterSave($insert, $changedAttributes)) {
+        if (parent::beforeSave($insert)) {
             if ($insert) {
-                TempFile::find()->where(['file' => $this->data])->delete();
-            }
+                $tmppath = FileHelper::normalizePath($this->data);
 
-            return true;
+                $parts = explode(DIRECTORY_SEPARATOR, $tmppath);
+                $tmpname = array_pop($parts);
+                if (implode(DIRECTORY_SEPARATOR, $parts) == sys_get_temp_dir() && strpos($tmpname, 'LCDS_') === 0 && strpos(DIRECTORY_SEPARATOR, $this->filename) === false) {
+                    if (file_exists($tmppath)) {
+                        $this->filename = static::getUniqFilename(static::getRealPath(), $this->filename);
+                        $this->data = static::getWebPath().$this->filename;
+                        $realFilepath = static::getRealPath().$this->filename;
+
+                        return rename($tmppath, $realFilepath);
+                    } else {
+                        return false;
+                    }
+                } else {
+                    return false;
+                }
+            } else {
+                return true;
+            }
         }
 
         return false;
+    }
+
+    protected static function getUniqFilename($path, $filename)
+    {
+        if (!file_exists($path.$filename)) {
+            return $filename;
+        }
+
+        $parts = explode('.', $filename);
+        if (count($parts) > 1) {
+            $ext = array_pop($parts);
+        } else {
+            $ext = null;
+        }
+        $name = implode('.', $parts);
+
+        $i = 1;
+        $filename = $name.$i.($ext ? '.'.$ext : '');
+        while (file_exists($path.$filename)) {
+            ++$i;
+        }
+
+        return $filename;
     }
 
     /**

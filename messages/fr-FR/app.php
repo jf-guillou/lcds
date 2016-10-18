@@ -75,6 +75,7 @@ return [
     'Background' => 'Image de fond',
     'Filepath' => 'Chemin',
     '(none)' => '(aucun)',
+    'Paste or drag&drop the file or url to upload' => 'Coller ou faire glisser le fichier ou l\'url à envoyer',
 
     'Date&Time' => 'Horodatage',
     'Image' => 'Image',

@@ -4,7 +4,6 @@ namespace app\models\types;
 
 use Yii;
 use app\models\Content;
-use app\models\TempFile;
 use yii\web\UploadedFile;
 use yii\helpers\FileHelper;
 use YoutubeDl\YoutubeDl;
@@ -24,22 +23,6 @@ class HostedVideo extends Video
     public static $usable = true;
 
     /**
-     * Use mediainfo to parse video duration.
-     *
-     * @return int video duration
-     */
-    public function getDuration()
-    {
-        $mediainfo = $this->getMediaInfo();
-        if ($mediainfo) {
-            $general = $mediainfo->getGeneral();
-            if ($general) {
-                return ceil($general->get('duration')->getMilliseconds() / 1000);
-            }
-        }
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function sideload($url)
@@ -54,7 +37,7 @@ class HostedVideo extends Video
             'proxy' => Yii::$app->params['proxy'],
             'format' => 'best[ext=mp4]/best[ext=flv]',
         ]);
-        $dl->setDownloadPath(self::getRealPath());
+        $dl->setDownloadPath(sys_get_temp_dir());
 
         try {
             $video = $dl->download($url);
@@ -74,24 +57,21 @@ class HostedVideo extends Video
         // $this->size = $video->getFile()->getSize();
         // $this->duration = $video->getDuration();
 
-        $type = static::TYPE;
-        $this->tmp = new TempFile();
-        $this->tmp->name = $video->getFilename();
-        $this->tmp->file = self::getWebPath().$this->tmp->name;
+        $this->filename = $video->getFilename();
+        $tmpFilepath = sys_get_temp_dir().$this->filename;
 
         $fileInstance = new UploadedFile();
-        $fileInstance->name = $this->tmp->name;
-        $fileInstance->tempName = self::getRealPath().$fileInstance->name;
+        $fileInstance->name = $this->filename;
+        $fileInstance->tempName = $tmpFilepath;
         $fileInstance->type = FileHelper::getMimeType($fileInstance->tempName);
-        $fileInstance->size = $this->tmp->size;
-        $this->tmp->$type = $fileInstance;
+        $fileInstance->size = $video->getFile()->getSize();
+        $this->upload = $fileInstance;
 
-        if ($this->tmp->validate() && $this->tmp->save()) {
-            if ($this->tmp->validateFile($fileInstance->tempName)) {
-                return true;
+        if ($this->validate(['upload'])) {
+            if (static::validateFile($fileInstance->tempName)) {
+                return ['filename' => $filename, 'tmppath' => $tmpFilepath, 'duration' => static::getDuration($tmpFilepath)];
             }
             $this->addError(static::TYPE, Yii::t('app', 'Invalid file'));
-            $this->tmp->delete();
         } else {
             $this->addError(static::TYPE, Yii::t('app', 'Cannot save file'));
         }

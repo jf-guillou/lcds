@@ -150,6 +150,8 @@ class ContentController extends BaseController
                 if ($model->save()) {
                     return $this->redirect(['flow/view', 'id' => $flow->id]);
                 }
+            } else {
+                $model->loadDefaultValues();
             }
 
             switch ($contentType->input) {
@@ -160,8 +162,6 @@ class ContentController extends BaseController
                     // There's not much to process, simply input url in data
                 case ContentType::KINDS['TEXT']:
                     // Same as URL, text doesn't require processing
-                    $model->loadDefaultValues();
-
                     return $this->render('type/'.$contentType->input, [
                             'type' => $contentType,
                             'model' => $model,
@@ -200,8 +200,8 @@ class ContentController extends BaseController
         }
 
         $upload = Content::newFromType($type);
-        if ($upload->upload(UploadedFile::getInstanceByName('content'))) {
-            return ['success' => true, 'path' => $upload->getWebFilepath(), 'duration' => $upload->getDuration()];
+        if (($res = $upload->upload(UploadedFile::getInstanceByName('content'))) !== false) {
+            return ['success' => true, 'filepath' => $res['tmppath'], 'duration' => $res['duration'], 'filename' => $res['filename']];
         }
 
         return ['success' => false, 'message' => $upload->getLoadError()];
@@ -226,8 +226,8 @@ class ContentController extends BaseController
         }
 
         $upload = Content::newFromType($type);
-        if ($upload->sideload($url)) {
-            return ['success' => true, 'path' => $upload->getWebFilepath(), 'duration' => $upload->getDuration()];
+        if (($res = $upload->sideload($url)) !== false) {
+            return ['success' => true, 'filepath' => $res['tmppath'], 'duration' => $res['duration'], 'filename' => $res['filename']];
         }
 
         return ['success' => false, 'message' => $upload->getLoadError()];

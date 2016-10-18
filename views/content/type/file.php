@@ -47,6 +47,7 @@ $this->params['breadcrumbs'][] = $this->title;
             </div>
         </div>
 
+        <?= $form->field($model, 'filename')->hiddenInput(['id' => 'content-filename'])->label(false) ?>
         <?= $form->field($model, 'data')->hiddenInput(['id' => 'content-data'])->label(false) ?>
 
         <div class="row">
@@ -98,7 +99,7 @@ window.jqReady.push(function() {
             console.log('done', e, data);
             uploading = false;
             if (data.result.success) {
-                nextStep(data.result.path)
+                nextStep(data.result.filepath, data.result.filename, data.result.duration)
             } else {
                 setError(data.result.message);
             }
@@ -109,13 +110,17 @@ window.jqReady.push(function() {
         }
     });
 
-    function nextStep(path)
+    function nextStep(filepath, filename, fileduration)
     {
         uploaded = true;
-        $('#content-data').val(path);
+        $('#content-data').val(filepath);
+        $('#content-filename').val(filename);
         $('#content-upload').slideUp();
         $('#content-form').slideDown();
-        $('#content-description').val(path.split('/').pop());
+        $('#content-description').val(filename);
+        if (fileduration) {
+            $('#content-duration').val(fileduration + 1);
+        }
     }
 
     function setProgress(progress) {
@@ -162,11 +167,8 @@ window.jqReady.push(function() {
             success: function(data) {
                 uploading = false;
                 if (data.success) {
-                    if (data.duration) {
-                        $('#content-duration').val(data.duration + 1);
-                    }
                     setProgress(100);
-                    nextStep(data.path);
+                    nextStep(data.filepath, data.filename, data.duration);
                 } else {
                     setError(data.message);
                 }

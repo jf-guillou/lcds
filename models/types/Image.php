@@ -19,4 +19,30 @@ class Image extends Media
     public static $input = 'url';
     public static $output = 'url';
     public static $usable = true;
+
+    public $upload;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function rules()
+    {
+        return array_merge(parent::rules(), [
+            [['upload'], 'image', 'skipOnEmpty' => true, 'extensions' => 'png, jpg, gif'],
+        ]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function validateFile($realFilepath)
+    {
+        $mediainfo = self::getMediaInfo($realFilepath);
+
+        if (count($mediainfo->getImages())) {
+            return true;
+        }
+
+        return false;
+    }
 }
