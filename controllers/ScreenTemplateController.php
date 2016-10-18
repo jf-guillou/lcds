@@ -5,13 +5,12 @@ namespace app\controllers;
 use Yii;
 use app\models\ContentType;
 use app\models\ScreenTemplate;
-use app\models\types\Background;
 use app\models\Field;
+use app\models\TemplateBackground;
 use yii\data\ActiveDataProvider;
 use yii\helpers\Url;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
-use yii\web\UploadedFile;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
 
@@ -71,7 +70,7 @@ class ScreenTemplateController extends BaseController
 
         return $this->render('view', [
             'model' => $screenTemplate,
-            'background' => Url::to($screenTemplate->background),
+            'background' => $screenTemplate->background ? $screenTemplate->background->uri : null,
             'fields' => $screenTemplate->fieldsArray,
             'setFieldPosUrl' => Url::to([Yii::$app->controller->id.'/set-field-pos', 'id' => '']),
             'editFieldUrl' => Url::to([Yii::$app->controller->id.'/edit-field', 'id' => '']),
@@ -262,26 +261,14 @@ class ScreenTemplateController extends BaseController
     public function actionCreate()
     {
         $model = new ScreenTemplate();
-        $image = new Background();
 
-        if ($model->load(Yii::$app->request->post())) {
-            if ($image->upload(UploadedFile::getInstance($image, 'data'))) {
-                $model->background = Url::to($image->getWebFilepath());
-            }
-
-            if ($model->save()) {
-                $image->backgroundSet();
-
-                return $this->redirect(['view', 'id' => $model->id]);
-            }
+        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            return $this->redirect(['view', 'id' => $model->id]);
         }
-
-        $backgrounds = self::getBackgroundRadios();
 
         return $this->render('create', [
             'model' => $model,
-            'image' => $image,
-            'backgrounds' => $backgrounds,
+            'backgrounds' => self::backgroundsArray(),
         ]);
     }
 
@@ -296,44 +283,32 @@ class ScreenTemplateController extends BaseController
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
-        $image = new Background();
 
-        if ($model->load(Yii::$app->request->post())) {
-            if ($image->upload(UploadedFile::getInstance($image, 'data'))) {
-                $model->background = Url::to($image->getWebFilepath());
-            }
-
-            if ($model->save()) {
-                $image->backgroundSet();
-
-                return $this->redirect(['view', 'id' => $model->id]);
-            }
+        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            return $this->redirect(['view', 'id' => $model->id]);
         }
-
-        $backgrounds = self::getBackgroundRadios();
 
         return $this->render('update', [
             'model' => $model,
-            'image' => $image,
-            'backgrounds' => $backgrounds,
+            'backgrounds' => self::backgroundsArray(),
         ]);
     }
 
-    /**
-     * Generate background list with preview.
-     *
-     * @return array
-     */
-    public static function getBackgroundRadios()
+    public static function backgroundsArray()
     {
-        $backgrounds = Background::getAllWithPath();
+        $bgs = TemplateBackground::find()->all();
 
-        $radio = [];
-        foreach ($backgrounds as $name => $path) {
-            $radio[$path] = '<img src="'.Url::to($path).'" alt="'.$name.'" class="img-preview"/><br />'.$name;
+        $array = [];
+        foreach ($bgs as $bg) {
+            $parts = explode('/', $bg->webpath);
+            $array[$bg->id] = [
+                'id' => $bg->id,
+                'name' => $bg->name,
+                'uri' => $bg->uri,
+            ];
         }
 
-        return $radio;
+        return $array;
     }
 
     /**

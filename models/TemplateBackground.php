@@ -1,0 +1,67 @@
+<?php
+
+namespace app\models;
+
+use Yii;
+use yii\helpers\Url;
+
+/**
+ * This is the model class for table "template_background".
+ *
+ * @property int $id
+ * @property string $webpath
+ * @property ScreenTemplate[] $screenTemplates
+ */
+class TemplateBackground extends \yii\db\ActiveRecord
+{
+    /**
+     * {@inheritdoc}
+     */
+    public static function tableName()
+    {
+        return 'template_background';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function rules()
+    {
+        return [
+            [['webpath'], 'required'],
+            [['webpath'], 'string', 'max' => 256],
+        ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function attributeLabels()
+    {
+        return [
+            'id' => Yii::t('app', 'ID'),
+            'webpath' => Yii::t('app', 'Filepath'),
+            'name' => Yii::t('app', 'Background'),
+        ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getScreenTemplates()
+    {
+        return $this->hasMany(ScreenTemplate::className(), ['background_id' => 'id']);
+    }
+
+    public function getUri()
+    {
+        return Url::to($this->webpath);
+    }
+
+    public function getName()
+    {
+        $parts = explode('/', $this->webpath);
+
+        return $parts[count($parts) - 1];
+    }
+}
