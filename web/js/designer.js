@@ -24,7 +24,7 @@ function createField(field) {
   var t = paper.text(
       Math.round(pW * field.x1 + 6),
       Math.round(pH * field.y1 + 8),
-      field.contentTypes ? field.contentTypes.map(function(c) { return c.name; }).join(' - ') : ''
+      field.contentTypes ? field.contentTypes.map(function(c) { return c.id; }).join(' - ') : ''
     );
   r.text = t.attr('text-anchor', 'start');
   r.drag(handleMove, handleMoveStart, handleMoveEnd)
@@ -72,7 +72,7 @@ function updateField(id) {
           e.attr('y', Math.round(pH * field.y1));
           e.attr('width', Math.round(pW * (field.x2 - field.x1)));
           e.attr('height', Math.round(pH * (field.y2 - field.y1)));
-          e.text.attr('text', field.contentTypes ? field.contentTypes.map(function(c) { return c.name; }).join(' - ') : '');
+          e.text.attr('text', field.contentTypes ? field.contentTypes.map(function(c) { return c.id; }).join(' - ') : '');
         });
       }
     }
