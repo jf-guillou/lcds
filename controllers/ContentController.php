@@ -277,7 +277,7 @@ class ContentController extends BaseController
 
         $model->delete();
 
-        return $this->redirect(['index']);
+        return $this->smartGoBack();
     }
 
     /**
@@ -299,7 +299,7 @@ class ContentController extends BaseController
 
         $model->save();
 
-        return $this->goBack((!empty(Yii::$app->request->referrer) ? Yii::$app->request->referrer : null));
+        return $this->smartGoBack();
     }
 
     /**
