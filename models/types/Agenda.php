@@ -26,6 +26,7 @@ class Agenda extends Content
     public static $input = 'url';
     public static $output = 'url';
     public static $usable = true;
+    public static $preview = '@web/images/agenda.preview.jpg';
 
     private $img;
     private $font = 3;

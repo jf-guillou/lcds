@@ -17,6 +17,7 @@ class Text extends Content
     public static $input = 'text';
     public static $output = 'text';
     public static $usable = true;
+    public static $preview = '@web/images/text.preview.jpg';
 
     /**
      * {@inheritdoc}

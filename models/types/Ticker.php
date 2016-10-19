@@ -14,4 +14,5 @@ class Ticker extends Text
     public static $html = '<span class="ticker">%data%</span>';
     public static $css = '%field% { text-align: center; vertical-align: middle; }';
     public static $usable = true;
+    public static $preview = '@web/images/ticker.preview.jpg';
 }

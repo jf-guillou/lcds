@@ -13,6 +13,7 @@ class Video extends Media
     const TYPE_PATH = 'videos/';
 
     public static $usable = false;
+    public static $preview = '@web/images/video.preview.jpg';
 
     /**
      * {@inheritdoc}

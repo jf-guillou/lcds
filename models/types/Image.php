@@ -19,6 +19,7 @@ class Image extends Media
     public static $input = 'url';
     public static $output = 'url';
     public static $usable = true;
+    public static $preview = '@web/images/image.preview.jpg';
 
     public $upload;
 

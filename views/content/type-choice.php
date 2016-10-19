@@ -1,6 +1,7 @@
 <?php
 
 use yii\helpers\Html;
+use yii\helpers\Url;
 
 /* @var $this yii\web\View */
 /* @var $types[] app\models\ContentTypes */
@@ -13,20 +14,28 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <h1><?= Html::encode($this->title) ?></h1>
 
-    <?php
-    foreach ($types as $i => $t) : ?>
+    <div class="row">
+        <?php
+        foreach ($types as $i => $t) : ?>
 
-    <div class="col-lg-3">
-        <h3><?= $t->name ?></h3>
-        <p>
-            <?= $t->description ?>
-        </p>
-        <p class="text-center">
-            <?= Html::a(Yii::t('app', 'Use'), ['', 'flowId' => $flow, 'type' => $t->id], ['class' => 'btn btn-success']) ?>
-        </p>
+        <div class="col-lg-3">
+            <h3><?= $t->name ?></h3>
+            <p>
+                <?php
+                if ($t->preview) : ?>
+                <img src="<?= Url::to($t->preview) ?>" alt="<?= $t->name ?>" class="img-full" />
+                <?php
+                endif; ?>
+            </p>
+            <p>
+                <?= $t->description ?>
+            </p>
+            <p class="text-center">
+                <?= Html::a(Yii::t('app', 'Use'), ['', 'flowId' => $flow, 'type' => $t->id], ['class' => 'btn btn-success']) ?>
+            </p>
+        </div>
+
+        <?php
+        endforeach; ?>
     </div>
-
-    <?php
-    endforeach; ?>
-
 </div>

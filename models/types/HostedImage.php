@@ -10,6 +10,7 @@ use app\models\Content;
 class HostedImage extends Image
 {
     public static $typeName = 'Hosted image';
+    public static $typeDescription = 'Upload an image to servers.';
     public static $css = '%field% { text-align: center; vertical-align: middle; } %field% img { max-height: 100%; max-width: 100%; }';
     public static $input = 'file';
     public static $output = 'url';
