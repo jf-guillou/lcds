@@ -311,6 +311,15 @@ class Media extends Content
         }
     }
 
+    /**
+     * Before save event
+     * Handles file movement from tmp directory to proper media storage
+     * Makes sure there is no overwrite by appending to filename.
+     *
+     * @param bool $insert is inserted
+     *
+     * @return bool success
+     */
     public function beforeSave($insert)
     {
         if (parent::beforeSave($insert)) {
@@ -340,6 +349,14 @@ class Media extends Content
         return false;
     }
 
+    /**
+     * Create unique filename by checking for existence and appending to filename.
+     *
+     * @param string $path     filepath
+     * @param string $filename
+     *
+     * @return string unique filename
+     */
     protected static function getUniqFilename($path, $filename)
     {
         if (!file_exists($path.$filename)) {

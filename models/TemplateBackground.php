@@ -53,11 +53,21 @@ class TemplateBackground extends \yii\db\ActiveRecord
         return $this->hasMany(ScreenTemplate::className(), ['background_id' => 'id']);
     }
 
+    /**
+     * Returns Yii usable URL for this background.
+     *
+     * @return string url
+     */
     public function getUri()
     {
         return Url::to($this->webpath);
     }
 
+    /**
+     * Search background name in file webpath.
+     *
+     * @return string name
+     */
     public function getName()
     {
         $parts = explode('/', $this->webpath);

@@ -87,14 +87,12 @@ function setContents(f, contents) {
 // Find next content to display for field
 // Take a random content from field contents
 function next(f) {
-  if (pleaseDie) {
+  if (pleaseDie) { // Stoping screen
     if (--remaining <= 0) {
       return window.location.reload();
     }
-    //console.log('Going to die in ' + remaining);
     return;
   }
-  //console.log('Find what to display for', f);
   f.previous = f.current;
   f.current = null;
   var pData = f.previous && f.previous.data;
@@ -103,20 +101,16 @@ function next(f) {
   while (true) {
     var c = f.contents[Math.floor(Math.random() * f.contents.length)];
     if (c.data == pData) {
-      // repeat : skip if possible
-      //console.log('Repeat, skip if possible');
+      // Will repeat, avoid if enough content
       if (f.contents.length < 2) {
-        //console.log('Cannot dodge repeat, not enough content');
         f.next = c;
         break;
       }
     } else if (fields.filter(function(field) {
         return field.current && field.current.data == c.data;
       }).length) {
-      // same content : skip if possible
-      //console.log('Same content in other field, skip if possible');
+      // Same content already displayed on other field, avoid if enough content
       if (f.contents.length < 3) {
-        //console.log('Cannot dodge duplicate, not enough content');
         f.next = c;
         break;
       }
@@ -136,7 +130,6 @@ function next(f) {
 // Setup next timeout based on content duration
 function updateFieldContent(f) {
   if (f.next && f.next.duration > 0) {
-    //console.log('Display new stuff', f);
     f.current = f.next
     f.next = null;
     f.$field.html(f.current.data);

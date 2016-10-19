@@ -294,6 +294,11 @@ class ScreenTemplateController extends BaseController
         ]);
     }
 
+    /**
+     * Builds an array of backgrounds usable in view.
+     *
+     * @return array backgrounds
+     */
     public static function backgroundsArray()
     {
         $bgs = TemplateBackground::find()->all();
