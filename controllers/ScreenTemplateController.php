@@ -179,24 +179,10 @@ class ScreenTemplateController extends BaseController
             }
         }
 
-        $allContentTypes = ContentType::find()->all();
-        $contentTypesArray = array_reduce($allContentTypes, function ($a, $c) {
-            $a[$c->id] = $c->name;
-
-            return $a;
-        }, []);
-        $selfCTypes = array_reduce($allContentTypes, function ($a, $c) {
-            if ($c->selfUpdate) {
-                $a[] = $c->id;
-            }
-
-            return $a;
-        }, []);
-
         return $this->renderAjax('editfield', [
             'field' => $field,
-            'contentTypesArray' => $contentTypesArray,
-            'selfContentIds' => $selfCTypes,
+            'contentTypesArray' => ContentType::getAllList(),
+            'selfContentIds' => ContentType::getAllList(true),
         ]);
     }
 

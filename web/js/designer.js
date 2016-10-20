@@ -276,9 +276,11 @@ $(document).on('click', '.field-delete', function() {
 // Disable content type incompatible choices
 $(document).on('change', '#field-contenttypes input', function() {
   var $chk = $(this);
-  if (selfContentIds.indexOf($chk.val()*1) != -1) {
+  if ($chk.val() in selfContentIds) {
       $('#field-contenttypes input').not($chk).prop('checked', false);
   } else {
-      $('#field-contenttypes input').filter(function() { return selfContentIds.indexOf($(this).val()*1) != -1 }).prop('checked', false);
+      $('#field-contenttypes input').filter(function() {
+        return $(this).val() in selfContentIds;
+      }).prop('checked', false);
   }
 });
