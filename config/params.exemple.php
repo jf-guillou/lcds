@@ -15,7 +15,11 @@ return [
         'base_dn' => 'dc=local',
         'admin_username' => 'admin',
         'admin_password' => 'password',
+        'use_ssl' => true,
+        'use_tls' => true,
+        'use_sso' => true,
     ],
     'cookieDuration' => 60 * 60 * 24 * 7,
     'language' => 'en-US',
+    'weatherApiKey' => '', // https://darksky.net/dev
 ];

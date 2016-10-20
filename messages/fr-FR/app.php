@@ -105,4 +105,8 @@ return [
     'Friday' => 'Vendredi',
     'Saturday' => 'Samedi',
     'Sunday' => 'Dimanche',
+
+    /* Weather */
+    'Weather' => 'Météo',
+    '°F' => '°C',
 ];
