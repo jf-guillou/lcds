@@ -24,6 +24,8 @@ class Weather extends Content
     public static $usable = true;
     public static $preview = '@web/images/weather.preview.jpg';
 
+    private $opts;
+
     const ICONS = [
         'clear-day' => 'wi-day-sunny',
         'clear-night' => 'wi-night-clear',
@@ -87,16 +89,18 @@ class Weather extends Content
      */
     public function processData($data)
     {
+        $this->opts = Yii::$app->params['weather'];
+
         $url = str_replace([
             '%apikey%',
             '%data%',
             '%lang%',
             '%units%',
         ], [
-            Yii::$app->params['weather']['apikey'],
+            $this->opts['apikey'],
             $data,
-            Yii::$app->params['weather']['language'],
-            Yii::$app->params['weather']['units'],
+            $this->opts['language'],
+            $this->opts['units'],
         ], self::URL);
 
         // Fetch content from cache if possible
@@ -115,13 +119,14 @@ class Weather extends Content
             return Yii::t('app', 'Weather unavailable');
         }
         $c = $w->currently;
+        $summary = $this->opts['withSummary'] ? $c->summary : '';
         $icon = array_key_exists($c->icon, self::ICONS) ? self::ICONS[$c->icon] : 'wi-na';
         $temp = round($c->temperature, 1);
         $tUnit = Yii::t('app', '°F');
 
         return <<<EOD
 <span class="weather-content">
-    <span class="weather-summary">{$c->summary}</span>
+    <span class="weather-summary">{$summary}</span>
     <span class="wi $icon" />
     <span class="weather-temp">{$temp}{$tUnit}</span>
 </span>

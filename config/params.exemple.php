@@ -33,5 +33,6 @@ return [
         'language' => 'en',
         'units' => 'us',
         'apikey' => '',
+        'withSummary' => false,
     ],
 ];
