@@ -5,6 +5,7 @@ return [
     'cookieValidationKey' => 'DMod58d6E6qs0cqpOdqecv38mnjgqIOc',
     'debugAllowedIPs' => null,
     'proxy' => false,
+    // Auth
     'useKerberos' => false,
     'kerberosPrincipalVar' => 'REDIRECT_REMOTE_USER',
     'useLdap' => false,
@@ -21,7 +22,14 @@ return [
     ],
     'cookieDuration' => 60 * 60 * 24 * 7,
     'language' => 'en-US',
-    'weather' => [// https://darksky.net/dev
+    // Content types
+    'agenda' => [
+        'width' => 1260,
+        'height' => 880,
+        'calendarTimezone' => 'UTC',
+        'displayTeachers' => false,
+    ],
+    'weather' => [ // https://darksky.net/dev
         'language' => 'en',
         'units' => 'us',
         'apikey' => '',

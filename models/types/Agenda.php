@@ -11,13 +11,9 @@ use yii\helpers\Url;
  */
 class Agenda extends Content
 {
-    const BASE_CACHE_TIME = 7200; // 1 hour
-    const WIDTH = 1260;
-    const HEIGHT = 880;
+    const BASE_CACHE_TIME = 7200; // 2 hours
     const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
     const HOURS = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18];
-    const CALENDAR_TZ = 'UTC';
-    const DISP_TEACHERS = false;
 
     public static $typeName = 'Agenda';
     public static $typeDescription = 'Display an agenda from an ICal feed.';
@@ -28,6 +24,7 @@ class Agenda extends Content
     public static $usable = true;
     public static $preview = '@web/images/agenda.preview.jpg';
 
+    private $opts;
     private $img;
     private $font = 3;
     private $fontSize = 20;
@@ -83,6 +80,8 @@ class Agenda extends Content
             self::toCache($data, $content, self::BASE_CACHE_TIME);
         }
 
+        $this->opts = \Yii::$app->params['agenda'];
+
         // Init ICal parser
         $ical = new ICal();
         $ical->initString($content);
@@ -97,9 +96,8 @@ class Agenda extends Content
         $this->initCalendar();
 
         // Init timezone converter
-        $utcTz = new \DateTimeZone(self::CALENDAR_TZ);
+        $utcTz = new \DateTimeZone($this->opts['calendarTimezone']);
         $localTz = new \DateTimeZone(ini_get('date.timezone'));
-        $firstDay = new \DateTime(self::DAYS[0]);
         $hasMultipleLocations = false;
 
         $blocks = [];
@@ -138,7 +136,7 @@ class Agenda extends Content
                 $name,
                 $location,
                 $group,
-                count($teachers) && self::DISP_TEACHERS ? implode(', ', $teachers) : null,
+                count($teachers) && $this->opts['displayTeachers'] ? implode(', ', $teachers) : null,
             ];
 
             // Create colors based on group name
@@ -363,7 +361,7 @@ class Agenda extends Content
      */
     private function initCalendar()
     {
-        $this->img = imagecreate(self::WIDTH, self::HEIGHT);
+        $this->img = imagecreate($this->opts['width'], $this->opts['height']);
 
         $this->color['white'] = imagecolorallocate($this->img, 255, 255, 255);
         $this->color['black'] = imagecolorallocate($this->img, 0, 0, 0);
@@ -383,20 +381,20 @@ class Agenda extends Content
         $this->leftBlockWidth = 2 + $this->strW * 2 + 2;
 
         // Draw hours
-        $this->hourStep = (self::HEIGHT - $this->headerHeight) / count(self::HOURS);
+        $this->hourStep = ($this->opts['height'] - $this->headerHeight) / count(self::HOURS);
         for ($i = 0; $i < count(self::HOURS); ++$i) {
             $offset = $this->headerHeight + $this->hourStep * $i;
-            imageline($this->img, 0, $offset, self::WIDTH - 1, $offset, $this->color['grey']);
+            imageline($this->img, 0, $offset, $this->opts['width'] - 1, $offset, $this->color['grey']);
 
             imagesetstyle($this->img, [$this->color['lightgrey'], $this->color['white'], $this->color['white'], $this->color['white']]);
 
-            imageline($this->img, $this->leftBlockWidth / 1.2, $offset + $this->hourStep / 4, self::WIDTH - 1, $offset + $this->hourStep / 4, IMG_COLOR_STYLED);
+            imageline($this->img, $this->leftBlockWidth / 1.2, $offset + $this->hourStep / 4, $this->opts['width'] - 1, $offset + $this->hourStep / 4, IMG_COLOR_STYLED);
 
-            imageline($this->img, $this->leftBlockWidth / 1.2, $offset + $this->hourStep / 1.3333, self::WIDTH - 1, $offset + $this->hourStep / 1.3333, IMG_COLOR_STYLED);
+            imageline($this->img, $this->leftBlockWidth / 1.2, $offset + $this->hourStep / 1.3333, $this->opts['width'] - 1, $offset + $this->hourStep / 1.3333, IMG_COLOR_STYLED);
 
             imagesetstyle($this->img, [$this->color['grey'], $this->color['white'], $this->color['white']]);
 
-            imageline($this->img, $this->leftBlockWidth / 1.6, $offset + $this->hourStep / 2, self::WIDTH - 1, $offset + $this->hourStep / 2, IMG_COLOR_STYLED);
+            imageline($this->img, $this->leftBlockWidth / 1.6, $offset + $this->hourStep / 2, $this->opts['width'] - 1, $offset + $this->hourStep / 2, IMG_COLOR_STYLED);
 
             imagestring(
                 $this->img,
@@ -409,7 +407,7 @@ class Agenda extends Content
         }
 
         // Draw days
-        $this->dayStep = (self::WIDTH - $this->leftBlockWidth) / count(self::DAYS);
+        $this->dayStep = ($this->opts['width'] - $this->leftBlockWidth) / count(self::DAYS);
         for ($i = 0; $i < count(self::DAYS); ++$i) {
             $offset = $this->leftBlockWidth + $this->dayStep * $i;
             imagestring(
@@ -421,7 +419,7 @@ class Agenda extends Content
                 $this->color['black']
             );
 
-            imageline($this->img, $offset, 0, $offset, self::HEIGHT - 1, $this->color['black']);
+            imageline($this->img, $offset, 0, $offset, $this->opts['height'] - 1, $this->color['black']);
         }
     }
 
