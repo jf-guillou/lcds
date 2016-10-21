@@ -42,19 +42,26 @@ class Agenda extends Content
      */
     public function processData($data)
     {
-        return Url::to(['frontend/get', 'typeId' => self::$typeName, 'data' => urlencode($data)]);
+        $filename = self::$typeName.md5($data).'.png';
+        if (self::hasCache($data)) {
+            return Url::to(Media::getWebPath().$filename);
+        }
+
+        $this->genImage($data, $filename);
+
+        return Url::to(Media::getWebPath().$filename);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function get($data)
+    public function genImage($url, $filename)
     {
         // Fetch content from cache if possible
-        $content = self::fromCache($data);
+        $content = self::fromCache($url);
         if (!$content) {
-            self::toCache($data, $content, self::BASE_CACHE_TIME);
             $content = self::downloadContent($url);
+            self::toCache($url, $content, self::BASE_CACHE_TIME);
         }
 
         $this->opts = \Yii::$app->params['agenda'];
@@ -326,10 +333,8 @@ class Agenda extends Content
             );
         }
 
-        // Send png
-        \Yii::$app->response->format = \yii\web\Response::FORMAT_RAW;
-        header('Content-type: image/png');
-        imagepng($this->img);
+        // Save .png
+        imagepng($this->img, Media::getRealPath().$filename, -1, PNG_NO_FILTER);
         imagedestroy($this->img);
     }
 
