@@ -17,6 +17,7 @@ class Media extends Content
 {
     const IS_FILE = true;
     const BASE_PATH = 'uploads/';
+    const TYPE_PATH = 'tmp/';
     const BASE_URI = '@web/';
     public static $usable = false;
     public static $canPreview = true;
@@ -223,7 +224,7 @@ class Media extends Content
      */
     public function getWebFilepath()
     {
-        return $this->data ?: self::getWebPath().$this->tmp->name;
+        return $this->data;
     }
 
     /**

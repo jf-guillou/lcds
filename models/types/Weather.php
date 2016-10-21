@@ -62,29 +62,6 @@ class Weather extends Content
     }
 
     /**
-     * Downloads feed from URL through proxy if necessary.
-     *
-     * @param string $url
-     *
-     * @return string feed content
-     */
-    protected static function downloadFeed($url)
-    {
-        if (\Yii::$app->params['proxy']) {
-            $ctx = [
-                'http' => [
-                    'proxy' => 'tcp://vdebian:8080',
-                    'request_fulluri' => true,
-                ],
-            ];
-
-            return file_get_contents(urldecode($url), false, stream_context_create($ctx));
-        } else {
-            return file_get_contents(urldecode($url));
-        }
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function processData($data)
@@ -106,7 +83,7 @@ class Weather extends Content
         // Fetch content from cache if possible
         $content = self::fromCache($url);
         if (!$content) {
-            $content = self::downloadFeed($url);
+            $content = self::downloadContent($url);
             self::toCache($url, $content, self::BASE_CACHE_TIME);
         }
 

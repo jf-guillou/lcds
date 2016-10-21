@@ -18,29 +18,6 @@ class RSS extends Content
     public static $preview = null;
 
     /**
-     * Downloads feed from URL through proxy if necessary.
-     *
-     * @param string $url
-     *
-     * @return string feed content
-     */
-    protected static function downloadFeed($url)
-    {
-        if (\Yii::$app->params['proxy']) {
-            $ctx = [
-                'http' => [
-                    'proxy' => 'tcp://vdebian:8080',
-                    'request_fulluri' => true,
-                ],
-            ];
-
-            return file_get_contents(urldecode($url), false, stream_context_create($ctx));
-        } else {
-            return file_get_contents(urldecode($url));
-        }
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function processData($data)
@@ -48,7 +25,7 @@ class RSS extends Content
         // Fetch content from cache if possible
         $content = self::fromCache($data);
         if (!$content) {
-            $content = self::downloadFeed($data);
+            $content = self::downloadContent($data);
             self::toCache($data, $content, self::BASE_CACHE_TIME);
         }
 

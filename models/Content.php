@@ -212,16 +212,26 @@ class Content extends \yii\db\ActiveRecord
     }
 
     /**
-     * Get data directly from content
-     * Used in view to preview/show data.
+     * Downloads content from URL through proxy if necessary.
      *
-     * @param string $data
+     * @param string $url
      *
-     * @return string preview data
+     * @return string content
      */
-    public function get($data)
+    public static function downloadContent($url)
     {
-        return;
+        if (\Yii::$app->params['proxy']) {
+            $ctx = [
+                'http' => [
+                    'proxy' => 'tcp://vdebian:8080',
+                    'request_fulluri' => true,
+                ],
+            ];
+
+            return file_get_contents($url, false, stream_context_create($ctx));
+        } else {
+            return file_get_contents($url);
+        }
     }
 
     /**
@@ -244,6 +254,18 @@ class Content extends \yii\db\ActiveRecord
         }
 
         return $data;
+    }
+
+    /**
+     * Check cache existence.
+     *
+     * @param string $key cache key
+     *
+     * @return bool has cached data
+     */
+    public function hasCache($key)
+    {
+        return \Yii::$app->cache->exists(static::$typeName.$key);
     }
 
     /**
