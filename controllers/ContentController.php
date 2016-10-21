@@ -160,6 +160,8 @@ class ContentController extends BaseController
                 case ContentType::KINDS['URL']:
                     // URL allows content hotlinks, like images
                     // There's not much to process, simply input url in data
+                case ContentType::KINDS['POS']:
+                    // Latitude & longitude
                 case ContentType::KINDS['TEXT']:
                     // Same as URL, text doesn't require processing
                     return $this->render('type/'.$contentType->input, [

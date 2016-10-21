@@ -49,7 +49,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <?= $form->field($model, 'filename')->hiddenInput(['id' => 'content-filename'])->label(false) ?>
         <?= $form->field($model, 'data')->hiddenInput(['id' => 'content-data'])->label(false) ?>
 
-        <?= $this->render('_base', [
+        <?= $this->render('_time', [
             'model' => $model,
             'form' => $form,
         ]) ?>

@@ -48,6 +48,7 @@ class ContentType extends \yii\db\ActiveRecord
         'URL' => 'url',
         'FILE' => 'file',
         'TEXT' => 'text',
+        'POS' => 'latlong',
     ];
 
     /**

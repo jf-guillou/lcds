@@ -27,7 +27,11 @@ $this->params['breadcrumbs'][] = $this->title;
             </div>
         </div>
 
-        <?= $form->field($model, 'data')->textarea(['rows' => 6]) ?>
+        <div class="row">
+            <div class="col-lg-12">
+                <?= $form->field($model, 'data')->textInput(['maxlength' => true, 'id' => 'content-data', 'placeholder' => '12.150,-6.320'])->label(Yii::t('app', 'Latitude & longitude')) ?>
+            </div>
+        </div>
 
         <?= $this->render('_time', [
             'model' => $model,
@@ -41,6 +45,5 @@ $this->params['breadcrumbs'][] = $this->title;
 </div>
 <script type="text/javascript">
 window.jqReady.push(function() {
-    
 });
 </script>

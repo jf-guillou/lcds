@@ -37,7 +37,7 @@ $this->params['breadcrumbs'][] = $this->title;
             </div>
         </div>
 
-        <?= $this->render('_base', [
+        <?= $this->render('_time', [
             'model' => $model,
             'form' => $form,
         ]) ?>

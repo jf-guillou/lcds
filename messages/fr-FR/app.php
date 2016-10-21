@@ -108,5 +108,6 @@ return [
 
     /* Weather */
     'Weather' => 'Météo',
+    'Display weather for given coordinates.' => 'Affiche la météo à partir de coordonnées.',
     '°F' => '°C',
 ];

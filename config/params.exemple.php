@@ -21,5 +21,9 @@ return [
     ],
     'cookieDuration' => 60 * 60 * 24 * 7,
     'language' => 'en-US',
-    'weatherApiKey' => '', // https://darksky.net/dev
+    'weather' => [// https://darksky.net/dev
+        'language' => 'en',
+        'units' => 'us',
+        'apikey' => '',
+    ],
 ];
