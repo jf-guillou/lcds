@@ -16,6 +16,7 @@ function updateContents(f) {
 var updateScreenUrl;
 var lastChanges = null;
 var pleaseDie = false;
+
 function updateScreen() {
   $.get(updateScreenUrl, function(j) {
     if (j.success) {
@@ -30,6 +31,7 @@ function updateScreen() {
 
 // Kill current screen and reload after fields timeouts
 var remaining = 0;
+
 function end() {
   if (pleaseDie) {
     return;

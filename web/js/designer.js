@@ -22,10 +22,12 @@ function createField(field) {
   r.field = field;
 
   var t = paper.text(
-      Math.round(pW * field.x1 + 6),
-      Math.round(pH * field.y1 + 8),
-      field.contentTypes ? field.contentTypes.map(function(c) { return c.id; }).join(' - ') : ''
-    );
+    Math.round(pW * field.x1 + 6),
+    Math.round(pH * field.y1 + 8),
+    field.contentTypes ? field.contentTypes.map(function(c) {
+      return c.id;
+    }).join(' - ') : ''
+  );
   r.text = t.attr('text-anchor', 'start');
   r.drag(handleMove, handleMoveStart, handleMoveEnd)
     .click(editField);
@@ -36,7 +38,9 @@ function addField($btn) {
   $.ajax({
     url: $btn.attr('href'),
     type: 'GET',
-    data: { templateId: templateId },
+    data: {
+      templateId: templateId
+    },
     success: function(res) {
       if (res.success) {
         createField(res.field);
@@ -63,7 +67,9 @@ function updateField(id) {
   $.ajax({
     url: 'get-field',
     type: 'GET',
-    data: { id: id },
+    data: {
+      id: id
+    },
     success: function(res) {
       if (res.success) {
         var field = res.field;
@@ -72,7 +78,9 @@ function updateField(id) {
           e.attr('y', Math.round(pH * field.y1));
           e.attr('width', Math.round(pW * (field.x2 - field.x1)));
           e.attr('height', Math.round(pH * (field.y2 - field.y1)));
-          e.text.attr('text', field.contentTypes ? field.contentTypes.map(function(c) { return c.id; }).join(' - ') : '');
+          e.text.attr('text', field.contentTypes ? field.contentTypes.map(function(c) {
+            return c.id;
+          }).join(' - ') : '');
         });
       }
     }
@@ -99,6 +107,7 @@ function removeField(id) {
 
 // Field move handler
 var resizeMin = 20;
+
 function handleMove(dx, dy, x, y, e) {
   var oX = this.ox;
   var oY = this.oy;
@@ -106,7 +115,7 @@ function handleMove(dx, dy, x, y, e) {
   var oW = this.ow;
   this.moved = true;
 
-  switch(this.resizing) {
+  switch (this.resizing) {
     case 'TOP':
       if (oH - dy < resizeMin) {
         dy = oH - resizeMin;
@@ -157,11 +166,15 @@ function handleMove(dx, dy, x, y, e) {
     width: oW,
     height: oH,
   };
-  this.attr(pos).text.attr({x: oX + 6, y: oY + 8});
+  this.attr(pos).text.attr({
+    x: oX + 6,
+    y: oY + 8
+  });
 }
 
 // Field move start handler
 var resizeTreshold = 6;
+
 function handleMoveStart(x, y, e) {
   this.toFront();
   this.text.toFront();
@@ -199,13 +212,15 @@ function handleMoveEnd(e) {
   o.x2 = (this.attr('x') + this.attr('width')) / pW;
   o.y2 = (this.attr('y') + this.attr('height')) / pH;
   //console.log(o);
-  $.post(setFieldPosUrl + o.id, {Field: o});
+  $.post(setFieldPosUrl + o.id, {
+    Field: o
+  });
 }
 
 // Field creation on button click
 $(document).on('click', '.field-add', function() {
-    addField($(this));
-    return false;
+  addField($(this));
+  return false;
 });
 
 var pW;
@@ -277,10 +292,10 @@ $(document).on('click', '.field-delete', function() {
 $(document).on('change', '#field-contenttypes input', function() {
   var $chk = $(this);
   if ($chk.val() in selfContentIds) {
-      $('#field-contenttypes input').not($chk).prop('checked', false);
+    $('#field-contenttypes input').not($chk).prop('checked', false);
   } else {
-      $('#field-contenttypes input').filter(function() {
-        return $(this).val() in selfContentIds;
-      }).prop('checked', false);
+    $('#field-contenttypes input').filter(function() {
+      return $(this).val() in selfContentIds;
+    }).prop('checked', false);
   }
 });
