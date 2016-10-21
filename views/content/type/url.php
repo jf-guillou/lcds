@@ -28,6 +28,8 @@ $this->params['breadcrumbs'][] = $this->title;
         </div>
 
         <div class="row">
+            <?php
+            if ($type->canPreview) : ?>
             <div class="col-lg-8">
                 <?= $form->field($model, 'data')->textInput(['maxlength' => true, 'id' => 'content-data'])->label(Yii::t('app', 'URL')) ?>
             </div>
@@ -35,6 +37,14 @@ $this->params['breadcrumbs'][] = $this->title;
                 <div id="content-preview">
                 </div>
             </div>
+            <?php
+            endif;
+            if (!$type->canPreview) : ?>
+            <div class="col-lg-12">
+                <?= $form->field($model, 'data')->textInput(['maxlength' => true, 'id' => 'content-data'])->label(Yii::t('app', 'URL')) ?>
+            </div>
+            <?php
+            endif; ?>
         </div>
 
         <?= $this->render('_time', [

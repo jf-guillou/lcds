@@ -11,15 +11,34 @@ use yii\helpers\Url;
  */
 class Weather extends Content
 {
+    const BASE_CACHE_TIME = 600;
+    const URL = 'https://api.darksky.net/forecast/%apikey%/%data%?lang=%lang%&units=%units%&exclude=hourly,daily,alerts';
+
     public static $typeName = 'Weather';
     public static $typeDescription = 'Display weather for given coordinates.';
     public static $html = '<div class="weather">%data%</div>';
+    public static $css = '%field% { text-align: center; } %field% .wi { font-size: 0.8em; }';
+    public static $js = '';
     public static $input = 'latlong';
     public static $output = 'text';
     public static $usable = true;
-    public static $preview = null;
+    public static $preview = '@web/images/weather.preview.jpg';
 
-    const URL = 'https://api.darksky.net/forecast/%apikey%/%data%?lang=%lang%&units=%units%&exclude=hourly,daily,alerts';
+    const ICONS = [
+        'clear-day' => 'wi-day-sunny',
+        'clear-night' => 'wi-night-clear',
+        'rain' => 'wi-rain',
+        'snow' => 'wi-snow',
+        'sleet' => 'wi-sleet',
+        'wind' => 'wi-strong-wind',
+        'fog' => 'wi-fog',
+        'cloudy' => 'wi-cloudy',
+        'partly-cloudy-day' => 'wi-day-cloudy',
+        'partly-cloudy-night' => 'wi-night-cloudy',
+        'hail' => 'wi-hail',
+        'thunderstorm' => 'wi-lightning',
+        'tornado' => 'wi-tornado',
+    ];
 
     /**
      * Power by DarkSky : https://darksky.net/poweredby/.
@@ -96,15 +115,16 @@ class Weather extends Content
             return Yii::t('app', 'Weather unavailable');
         }
         $c = $w->currently;
-        $icon = Url::to('@web/images/weather/'.$c->icon.'.svg');
+        $icon = array_key_exists($c->icon, self::ICONS) ? self::ICONS[$c->icon] : 'wi-na';
         $temp = round($c->temperature, 1);
         $tUnit = Yii::t('app', '°F');
 
         return <<<EOD
-<span class="weather-summary">{$c->summary}</span>
-<div class="weather-details">
-<img src="{$icon}" class="weather-icon" alt="{$c->summary}" />
-<span class="weather-temp">{$temp}{$tUnit}</span>
+<span class="weather-content">
+    <span class="weather-summary">{$c->summary}</span>
+    <span class="wi $icon" />
+    <span class="weather-temp">{$temp}{$tUnit}</span>
+</span>
 </div>
 EOD;
     }

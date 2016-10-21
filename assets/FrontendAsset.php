@@ -21,6 +21,7 @@ class FrontendAsset extends AssetBundle
     public $css = [
         'css/site.css',
         'css/frontend.css',
+        'css/weather-icons.min.css',
     ];
     public $js = [
         'js/frontend.js',
