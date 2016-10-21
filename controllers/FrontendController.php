@@ -17,8 +17,9 @@ use app\models\ContentType;
  */
 class FrontendController extends BaseController
 {
+    const ID = 'screen_id';
+    const EXP_YEARS = 20;
     public $layout = 'frontend';
-    public $defaultScreen = 1;
 
     /**
      * Index redirects to default screen.
@@ -27,7 +28,42 @@ class FrontendController extends BaseController
      */
     public function actionIndex()
     {
-        return $this->redirect(['screen', 'id' => $this->defaultScreen]);
+        // Check autorization based on cookie
+        // Redirect to /screen if possible
+        // Else display auth screen
+
+        if ($this->isClientAuth()) {
+            return $this->redirect(['screen', 'id' => $this->getClientId()]);
+        }
+
+        $screen = $this->getClientScreen();
+        if ($screen !== null && $screen->active) {
+            $this->setClientAuth($screen);
+
+            return $this->redirect(['screen', 'id' => $screen->id]);
+        }
+
+        if ($screen === null) {
+            $cookies = Yii::$app->response->cookies;
+
+            $screen = new Screen();
+            $screen->name = Yii::$app->request->getUserIP();
+            $screen->description = Yii::t('app', 'New unauthorized screen');
+            $screen->save();
+            $id = $screen->lastId;
+
+            $cookies->add(new \yii\web\Cookie([
+                'name' => self::ID,
+                'value' => $id,
+                'expire' => time() + (self::EXP_YEARS * 365 * 24 * 60 * 60),
+            ]));
+        } else {
+            $id = $screen->id;
+        }
+
+        return $this->render('authorize', [
+            'authorizeUrl' => Url::to(['screen/view', 'id' => $id], true),
+        ]);
     }
 
     /**
@@ -42,6 +78,12 @@ class FrontendController extends BaseController
         $screen = Screen::find()->where([Screen::tableName().'.id' => $id])->joinWith(['template', 'template.fields', 'template.fields.contentTypes'])->one();
         if ($screen === null) {
             throw new NotFoundHttpException('The requested page does not exist.');
+        }
+
+        if ($screen->template === null) {
+            return $this->render('missing-template', [
+                'templateUrl' => Url::to(['screen/update', 'id' => $screen->id], true),
+            ]);
         }
 
         $content = [
@@ -153,5 +195,42 @@ class FrontendController extends BaseController
 
             return $model->get($data);
         }
+    }
+
+    private function isClientAuth()
+    {
+        return Yii::$app->session->get(self::ID) !== null;
+    }
+
+    private function setClientAuth($screen)
+    {
+        Yii::$app->session->set(self::ID, $screen->id);
+        $screen->setAuthenticated();
+    }
+
+    private function getClientId()
+    {
+        $id = Yii::$app->session->get(self::ID);
+        if ($id !== null) {
+            return $id;
+        }
+
+        $cookies = Yii::$app->request->cookies;
+        $id = $cookies->getValue(self::ID);
+        if ($id !== null) {
+            return $id;
+        }
+
+        return;
+    }
+
+    private function getClientScreen()
+    {
+        $id = $this->getClientId();
+        if ($id === null) {
+            return;
+        }
+
+        return Screen::findOne($id);
     }
 }

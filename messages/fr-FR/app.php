@@ -1,6 +1,9 @@
 <?php
 
 return [
+    /* Screen */
+    'New unauthorized screen' => 'Nouvel écran non-autorisé',
+
     'Template' => 'Modèle',
     'Templates' => 'Modèles',
     'Content' => 'Contenu',
@@ -98,6 +101,7 @@ return [
 
     'Are you sure you want to delete this item?' => 'Êtes-vous sur de vouloir supprimer cet objet ?',
 
+    /* Agenda */
     'Monday' => 'Lundi',
     'Tuesday' => 'Mardi',
     'Wednesday' => 'Mercredi',

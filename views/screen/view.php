@@ -35,7 +35,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'description',
             [
                 'label' => \Yii::t('app', 'Template'),
-                'value' => $model->template->name,
+                'value' => $model->template ? $model->template->name : null,
             ],
         ],
     ]) ?>

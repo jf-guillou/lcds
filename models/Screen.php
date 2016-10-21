@@ -14,6 +14,8 @@ use yii\db\Expression;
  * @property int $template_id
  * @property string $last_changes
  * @property ScreenTemplate $template
+ * @property string $last_auth
+ * @property bool $active
  * @property ScreenHasFlow[] $screenHasFlows
  * @property Flow[] $flows
  */
@@ -33,9 +35,10 @@ class Screen extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['name', 'template_id'], 'required'],
+            [['name'], 'required'],
             [['template_id'], 'integer'],
-            [['last_changes', 'template'], 'safe'],
+            [['last_changes', 'last_auth', 'template'], 'safe'],
+            [['active'], 'boolean'],
             [['name'], 'string', 'max' => 64],
             [['description'], 'string', 'max' => 1024],
             [['template_id'], 'exist', 'skipOnError' => true, 'targetClass' => ScreenTemplate::className(), 'targetAttribute' => ['template_id' => 'id']],
@@ -53,6 +56,8 @@ class Screen extends \yii\db\ActiveRecord
             'description' => Yii::t('app', 'Description'),
             'template_id' => Yii::t('app', 'Template ID'),
             'last_changes' => Yii::t('app', 'Last Changes'),
+            'last_auth' => Yii::t('app', 'Last Auth'),
+            'active' => Yii::t('app', 'Active'),
         ];
     }
 
@@ -94,6 +99,20 @@ class Screen extends \yii\db\ActiveRecord
     {
         $this->last_changes = new Expression('NOW()');
         $this->save();
+    }
+
+    /**
+     * Update last_auth field to indicate screen last connexion.
+     */
+    public function setAuthenticated()
+    {
+        $this->last_auth = new Expression('NOW()');
+        $this->save();
+    }
+
+    public function getLastId()
+    {
+        return $this->getDb()->getLastInsertID();
     }
 
     /**
