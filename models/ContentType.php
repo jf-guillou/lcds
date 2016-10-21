@@ -25,6 +25,8 @@ class ContentType extends \yii\db\ActiveRecord
     public $output;
     public $usable;
     public $preview;
+    public $canPreview;
+
     public static $typeAttributes = [
         'typeName' => '_name',
         'typeDescription' => '_description',
@@ -37,6 +39,7 @@ class ContentType extends \yii\db\ActiveRecord
         'output' => 'output',
         'usable' => 'usable',
         'preview' => 'preview',
+        'canPreview' => 'canPreview',
     ];
 
     const KINDS = [

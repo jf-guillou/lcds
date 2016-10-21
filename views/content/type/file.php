@@ -2,7 +2,6 @@
 
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
-use kartik\datetime\DateTimePicker;
 use app\assets\UploadAsset;
 
 UploadAsset::register($this);
@@ -50,26 +49,10 @@ $this->params['breadcrumbs'][] = $this->title;
         <?= $form->field($model, 'filename')->hiddenInput(['id' => 'content-filename'])->label(false) ?>
         <?= $form->field($model, 'data')->hiddenInput(['id' => 'content-data'])->label(false) ?>
 
-        <div class="row">
-            <div class="col-lg-2">
-                <?= $form->field($model, 'duration')->textInput(['maxlength' => true, 'id' => 'content-duration']) ?>
-            </div>
-            <div class="col-lg-5">
-                <?= $form->field($model, 'start_ts')->widget(DateTimePicker::className(), [
-                        'pluginOptions' => ['format' => 'yyyy-mm-dd hh:mm:ss'],
-                    ]) ?>
-            </div>
-
-            <div class="col-lg-5">
-                <?= $form->field($model, 'end_ts')->widget(DateTimePicker::className(), [
-                        'pluginOptions' => ['format' => 'yyyy-mm-dd hh:mm:ss'],
-                    ]) ?>
-            </div>
-        </div>
-
-        <div class="form-group">
-            <?= Html::submitButton($model->isNewRecord ? Yii::t('app', 'Create') : Yii::t('app', 'Update'), ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
-        </div>
+        <?= $this->render('_base', [
+            'model' => $model,
+            'form' => $form,
+        ]) ?>
 
         <?php ActiveForm::end(); ?>
 

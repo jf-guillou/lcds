@@ -2,7 +2,6 @@
 
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
-use kartik\datetime\DateTimePicker;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\Content */
@@ -38,26 +37,10 @@ $this->params['breadcrumbs'][] = $this->title;
             </div>
         </div>
 
-        <div class="row">
-            <div class="col-lg-2">
-                <?= $form->field($model, 'duration')->textInput() ?>
-            </div>
-            <div class="col-lg-5">
-                <?= $form->field($model, 'start_ts')->widget(DateTimePicker::className(), [
-                        'pluginOptions' => ['format' => 'yyyy-mm-dd hh:mm:ss'],
-                    ]) ?>
-            </div>
-
-            <div class="col-lg-5">
-                <?= $form->field($model, 'end_ts')->widget(DateTimePicker::className(), [
-                        'pluginOptions' => ['format' => 'yyyy-mm-dd hh:mm:ss'],
-                    ]) ?>
-            </div>
-        </div>
-
-        <div class="form-group">
-            <?= Html::submitButton($model->isNewRecord ? Yii::t('app', 'Create') : Yii::t('app', 'Update'), ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
-        </div>
+        <?= $this->render('_base', [
+            'model' => $model,
+            'form' => $form,
+        ]) ?>
 
         <?php ActiveForm::end(); ?>
 
@@ -74,15 +57,17 @@ $this->params['breadcrumbs'][] = $this->title;
 </style>
 <script type="text/javascript">
 window.jqReady.push(function() {
-    var $preview = $('#content-preview');
-    var html = '<?= $type->html ?>';
-    $('#content-data').change(function() {
-        var c = $(this).val();
-        if (c != '') {
-            $preview.html(html.replace('%data%', c)).show();
-        } else {
-            $preview.hide().html('');
-        }
-    });
+    if (<?= $type->canPreview ? 'true' : 'false' ?>) {
+        var $preview = $('#content-preview');
+        var html = '<?= $type->html ?>';
+        $('#content-data').change(function() {
+            var c = $(this).val();
+            if (c != '') {
+                $preview.html(html.replace('%data%', c)).show();
+            } else {
+                $preview.hide().html('');
+            }
+        });
+    }
 });
 </script>

@@ -38,6 +38,7 @@ class Content extends \yii\db\ActiveRecord
     public static $output = null;
     public static $usable = false;
     public static $preview = null;
+    public static $canPreview = false;
 
     /**
      * {@inheritdoc}
