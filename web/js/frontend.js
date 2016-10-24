@@ -1,157 +1,192 @@
-// Update field contents by retrieving field data from backend
-function updateContents(f) {
-  if (!f.canUpdate) {
-    return;
-  }
-  $.get(f.url, function(j) {
-    if (j.success) {
-      setContents(f, j.next);
-    } else {
-      f.$field.text('error');
-    }
-  });
+/**
+ * Screen class constructor
+ * @param {string} updateScreenUrl global screen update checks url
+ */
+function Screen(updateScreenUrl) {
+  this.fields = [];
+  this.url = updateScreenUrl;
+  this.lastChanges = null;
+  this.remaining = 0;
 }
 
-// Update screen and reload if necessary
-var updateScreenUrl;
-var lastChanges = null;
-var pleaseDie = false;
-
-function updateScreen() {
-  $.get(updateScreenUrl, function(j) {
+/**
+ * Ajax GET on updateScreenUrl to check lastChanges timestamp and reload if necessary
+ */
+Screen.prototype.checkUpdates = function() {
+  var s = this;
+  $.get(this.url, function(j) {
     if (j.success) {
-      if (lastChanges == null) {
-        lastChanges = j.data;
-      } else if (lastChanges != j.data) {
-        end();
+      if (s.lastChanges == null) {
+        s.lastChanges = j.data;
+      } else if (s.lastChanges != j.data) {
+        s.reload();
       }
     }
   });
 }
 
-// Kill current screen and reload after fields timeouts
-var remaining = 0;
-
-function end() {
-  if (pleaseDie) {
+/**
+ * Start Screen reload procedure, checking for every field timeout
+ */
+Screen.prototype.reload = function() {
+  if (this.stopping) {
     return;
   }
-  pleaseDie = true;
-  for (var f in fields) {
-    if (fields[f].timeout) {
-      remaining++;
+
+  this.stopping = true;
+  for (var f in this.fields) {
+    if (this.fields[f].timeout) {
+      this.remaining++;
     }
   }
 }
 
-// jQuery load
-// Initialize frontend handlers
-// Create fields and setup content updates timers & screen update timer
-function onLoad() {
-  // Init
-  $('.field').each(function() {
-    var $f = $(this);
-    var f = {
-      $field: $f,
-      id: $f.attr('data-id'),
-      url: $f.attr('data-url'),
-      types: $f.attr('data-types').split(' '),
-      canUpdate: false,
-      previous: null,
-      current: null,
-      next: null,
-      timeout: null,
-    };
+/**
+ * Actual Screen reload action
+ */
+Screen.prototype.doReload = function() {
+  window.location.reload();
+}
 
-    f.canUpdate = f.url != null;
-    fields.push(f);
-    updateContents(f);
+/**
+ * Field class constructor
+ * @param {jQuery.Object} $f     field object
+ * @param {Screen} screen parent screen object
+ */
+function Field($f, screen) {
+  this.$field = $f;
+  this.id = $f.attr('data-id');
+  this.url = $f.attr('data-url');
+  this.types = $f.attr('data-types').split(' ');
+  this.canUpdate = this.url != null;
+  this.contents = [];
+  this.previous = null;
+  this.current = null;
+  this.next = null;
+  this.timeout = null;
+  this.screen = screen;
+}
+
+/**
+ * Retrieves contents from backend for this field
+ */
+Field.prototype.getContents = function() {
+  if (!this.canUpdate) {
+    return;
+  }
+
+  var f = this;
+  $.get(this.url, function(j) {
+    if (j.success) {
+      f.contents = j.next;
+      if (!f.timeout && f.contents.length) {
+        f.pickNext();
+      }
+    } else {
+      f.setError(j.message || 'Error');
+    }
   });
-
-  // Setup content updates loop
-  setInterval(function() {
-    for (var f in fields) {
-      updateContents(fields[f]);
-    }
-    updateScreen();
-  }, 60000);
-  updateScreen();
 }
 
-// Assign content to field and force next occurrence if necessary
-function setContents(f, contents) {
-  f.contents = contents;
-  if (!f.timeout && contents.length) {
-    next(f);
-  }
+/**
+ * Display error in field text
+ */
+Field.prototype.setError = function(err) {
+  this.$field.text(err);
 }
 
-// Find next content to display for field
-// Take a random content from field contents
-function next(f) {
-  if (pleaseDie) { // Stoping screen
-    if (--remaining <= 0) {
-      return window.location.reload();
+/**
+ * Loop through field contents to pick next displayable content
+ */
+Field.prototype.pickNext = function() {
+  if (this.screen.stopping) { // Stoping screen
+    if (--this.screen.remaining <= 0) {
+      return this.screen.doReload();
     }
     return;
   }
-  f.previous = f.current;
-  f.current = null;
-  var pData = f.previous && f.previous.data;
+  this.previous = this.current;
+  this.current = null;
+  var pData = this.previous && this.previous.data;
   // Avoid repeat & other field same content
-  //for (content in f.contents) {
   while (true) {
-    var c = f.contents[Math.floor(Math.random() * f.contents.length)];
+    var c = this.contents[Math.floor(Math.random() * this.contents.length)];
     if (c.data == pData) {
       // Will repeat, avoid if enough content
-      if (f.contents.length < 2) {
-        f.next = c;
+      if (this.contents.length < 2) {
+        this.next = c;
         break;
       }
-    } else if (fields.filter(function(field) {
+    } else if (this.screen.fields.filter(function(field) {
         return field.current && field.current.data == c.data;
       }).length) {
       // Same content already displayed on other field, avoid if enough content
-      if (f.contents.length < 3) {
-        f.next = c;
+      if (this.contents.length < 3) {
+        this.next = c;
         break;
       }
     } else {
-      f.next = c;
+      this.next = c;
       break;
     }
   }
 
-  if (!f.next && f.contents.length > 0) {
-    f.next = f.contents[0];
+  if (!this.next && this.contents.length > 0) {
+    this.next = this.contents[0];
   }
-  updateFieldContent(f);
+  this.display();
 }
 
-// Update field displayed content
-// Setup next timeout based on content duration
-function updateFieldContent(f) {
-  if (f.next && f.next.duration > 0) {
-    f.current = f.next
-    f.next = null;
-    f.$field.html(f.current.data);
-    f.$field.show();
-    if (f.$field.text() != '') {
-      f.$field.textfill({
+/**
+ * Display next content in field html
+ */
+Field.prototype.display = function() {
+  if (this.next && this.next.duration > 0) {
+    this.current = this.next
+    this.next = null;
+    this.$field.html(this.current.data);
+    this.$field.show();
+    if (this.$field.text() != '') {
+      this.$field.textfill({
         maxFontPixels: 0,
       });
     }
-    if (f.timeout) {
-      clearTimeout(f.timeout);
+    if (this.timeout) {
+      clearTimeout(this.timeout);
     }
-    f.timeout = setTimeout(function() {
-      next(f);
-    }, f.current.duration * 1000);
+    var f = this;
+    this.timeout = setTimeout(function() {
+      f.pickNext();
+    }, this.current.duration * 1000);
   } else {
-    f.timeout = null;
-    console.error('Cannot set content', f);
+    this.timeout = null;
+    console.error('Cannot set content', this);
   }
 }
 
-var fields = [];
+/**
+ * jQuery.load event
+ * Initialize Screen and Fields
+ * Setup updates interval timeouts
+ */
+function onLoad() {
+  var screen = new Screen(updateScreenUrl);
+  // Init
+  $('.field').each(function() {
+    var f = new Field($(this), screen);
+    f.getContents();
+    screen.fields.push(f);
+  });
+
+  // Setup content updates loop
+  setInterval(function() {
+    for (var f in screen.fields) {
+      screen.fields[f].getContents();
+    }
+    screen.checkUpdates();
+  }, 60000);
+  screen.checkUpdates();
+}
+
+// Run
 $(onLoad);
