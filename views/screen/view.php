@@ -26,6 +26,7 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
         ]) ?>
         <?= Html::a(Yii::t('app', 'Preview'), ['/frontend/screen', 'id' => $model->id], ['class' => 'btn btn-success']) ?>
+        <?= Html::a(Yii::t('app', $model->active ? 'Disable' : 'Enable'), ['toggle', 'id' => $model->id], ['class' => 'btn '.($model->active ? 'btn-danger' : 'btn-primary')]) ?>
     </p>
 
     <?= DetailView::widget([

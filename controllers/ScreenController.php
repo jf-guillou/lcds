@@ -205,6 +205,23 @@ class ScreenController extends BaseController
     }
 
     /**
+     * Enables or disables a screen.
+     *
+     * @param int $id screen id
+     *
+     * @return mixed
+     */
+    public function actionToggle($id)
+    {
+        $model = $this->findModel($id);
+
+        $model->active = !$model->active;
+        $model->save();
+
+        return $this->smartGoBack();
+    }
+
+    /**
      * Finds the Screen model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      *

@@ -31,7 +31,15 @@ $this->params['breadcrumbs'][] = $this->title;
                 'value' => 'template.name',
             ],
 
-            ['class' => 'yii\grid\ActionColumn'],
+            [
+                'class' => 'yii\grid\ActionColumn',
+                'template' => '{view} {update} {delete} {toggle}',
+                'buttons' => [
+                    'toggle' => function ($url, $model, $key) {
+                        return Html::a('<span class="glyphicon glyphicon-'.($model->active ? 'pause' : 'play').'"></span>', $url);
+                    },
+                ],
+            ],
         ],
     ]); ?>
 </div>

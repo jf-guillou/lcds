@@ -3,6 +3,8 @@
 return [
     /* Screen */
     'New unauthorized screen' => 'Nouvel écran non-autorisé',
+    'Enable' => 'Activer',
+    'Disable' => 'Désactiver',
 
     'Template' => 'Modèle',
     'Templates' => 'Modèles',

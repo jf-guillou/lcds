@@ -22,27 +22,29 @@ class FrontendController extends BaseController
     public $layout = 'frontend';
 
     /**
-     * Index redirects to default screen.
+     * Index redirects to associated screen ID.
+     * Checks authorization based on session & cookie
+     * Else create a new screen and display auth.
      *
      * @return mixed
      */
     public function actionIndex()
     {
-        // Check autorization based on cookie
-        // Redirect to /screen if possible
-        // Else display auth screen
-
+        // Session auth
         if ($this->isClientAuth()) {
             return $this->redirect(['screen', 'id' => $this->getClientId()]);
         }
 
+        // Get associated screen
         $screen = $this->getClientScreen();
         if ($screen !== null && $screen->active) {
             $this->setClientAuth($screen);
 
+            // Redirect to screen if auth & screen active
             return $this->redirect(['screen', 'id' => $screen->id]);
         }
 
+        // No screen association, create a new one
         if ($screen === null) {
             $cookies = Yii::$app->response->cookies;
 
@@ -61,7 +63,8 @@ class FrontendController extends BaseController
             $id = $screen->id;
         }
 
-        return $this->render('authorize', [
+        // Render authorize screen
+        return $this->render('err/authorize', [
             'authorizeUrl' => Url::to(['screen/view', 'id' => $id], true),
         ]);
     }
@@ -75,13 +78,18 @@ class FrontendController extends BaseController
      */
     public function actionScreen($id)
     {
+        // Session auth
+        if (!$this->isClientAuth()) {
+            return $this->redirect(['index']);
+        }
+
         $screen = Screen::find()->where([Screen::tableName().'.id' => $id])->joinWith(['template', 'template.fields', 'template.fields.contentTypes'])->one();
         if ($screen === null) {
             throw new NotFoundHttpException('The requested page does not exist.');
         }
 
         if ($screen->template === null) {
-            return $this->render('missing-template', [
+            return $this->render('err/missing-template', [
                 'templateUrl' => Url::to(['screen/update', 'id' => $screen->id], true),
             ]);
         }
@@ -111,6 +119,10 @@ class FrontendController extends BaseController
     public function actionUpdate($id)
     {
         Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        // Session auth
+        if (!$this->isClientAuth()) {
+            return ['success' => false, 'message' => 'Unauthorized'];
+        }
 
         $screen = Screen::find()->where([Screen::tableName().'.id' => $id])->one();
         if ($screen === null) {
@@ -131,6 +143,10 @@ class FrontendController extends BaseController
     public function actionNext($id, $fieldid)
     {
         Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        // Session auth
+        if (!$this->isClientAuth()) {
+            return ['success' => false, 'message' => 'Unauthorized'];
+        }
 
         // Get screen
         $screen = Screen::find()->where([Screen::tableName().'.id' => $id])->joinWith(['flows'])->one();
@@ -180,34 +196,31 @@ class FrontendController extends BaseController
     }
 
     /**
-     * Dynamic content fetcher based on content type and field data.
+     * Checks client session for screen ID.
      *
-     * @param string $typeId content type
-     * @param string $data   content data
-     *
-     * @return mixed content
+     * @return bool is authenticated
      */
-    public function actionGet($typeId, $data)
-    {
-        $contentType = ContentType::findOne($typeId);
-        if ($contentType !== null) {
-            $model = Content::newFromType($contentType->id);
-
-            return $model->get($data);
-        }
-    }
-
     private function isClientAuth()
     {
         return Yii::$app->session->get(self::ID) !== null;
     }
 
+    /**
+     * Set session with screen ID, also add to DB last auth timestamp.
+     *
+     * @param \app\models\Screen $screen
+     */
     private function setClientAuth($screen)
     {
         Yii::$app->session->set(self::ID, $screen->id);
         $screen->setAuthenticated();
     }
 
+    /**
+     * Look for client screen ID from session & cookie.
+     *
+     * @return int|null screen ID
+     */
     private function getClientId()
     {
         $id = Yii::$app->session->get(self::ID);
@@ -224,6 +237,11 @@ class FrontendController extends BaseController
         return;
     }
 
+    /**
+     * Get client screen based on session & cookie.
+     *
+     * @return \app\models\Screen|null screen
+     */
     private function getClientScreen()
     {
         $id = $this->getClientId();
