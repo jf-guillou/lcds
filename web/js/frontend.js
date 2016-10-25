@@ -6,7 +6,7 @@ function Screen(updateScreenUrl) {
   this.fields = [];
   this.url = updateScreenUrl;
   this.lastChanges = null;
-  this.remaining = 0;
+  this.endAt = null;
 }
 
 /**
@@ -34,10 +34,17 @@ Screen.prototype.reload = function() {
   }
 
   this.stopping = true;
-  for (var f in this.fields) {
-    if (this.fields[f].timeout) {
-      this.remaining++;
+  for (var i in this.fields) {
+    var f = this.fields[i];
+    if (f.timeout && (this.endAt == null || f.endAt > this.endAt)) {
+      this.endAt = f.endAt;
     }
+  }
+
+  if (this.endAt != null) {
+    console.log('Screen will reload in', this.endAt - Date.now(), 'ms');
+  } else {
+    this.doReload();
   }
 }
 
@@ -49,8 +56,20 @@ Screen.prototype.doReload = function() {
 }
 
 /**
+ * Content class constructor
+ * @param {array} c content attributes
+ */
+function Content(c) {
+  this.id = c.id;
+  this.data = c.data;
+  this.duration = c.duration * 1000;
+  this.type = c.type;
+  this.displayCount = 0;
+}
+
+/**
  * Field class constructor
- * @param {jQuery.Object} $f     field object
+ * @param {jQuery.Object} $f field object
  * @param {Screen} screen parent screen object
  */
 function Field($f, screen) {
@@ -64,6 +83,7 @@ function Field($f, screen) {
   this.current = null;
   this.next = null;
   this.timeout = null;
+  this.endAt = null;
   this.screen = screen;
 }
 
@@ -71,14 +91,16 @@ function Field($f, screen) {
  * Retrieves contents from backend for this field
  */
 Field.prototype.getContents = function() {
-  if (!this.canUpdate) {
+  if (!this.canUpdate || this.screen.stopping) {
     return;
   }
 
   var f = this;
   $.get(this.url, function(j) {
     if (j.success) {
-      f.contents = j.next;
+      f.contents = j.next.map(function(c) {
+        return new Content(c);
+      });
       if (!f.timeout && f.contents.length) {
         f.pickNext();
       }
@@ -96,21 +118,39 @@ Field.prototype.setError = function(err) {
 }
 
 /**
+ * Sort by displayCount and randomize order when equal displayCount
+ */
+Field.prototype.randomizeSortContents = function() {
+  this.contents = this.contents.sort(function(a, b) {
+    if (a.displayCount === b.displayCount) {
+      return Math.random() - 0.5;
+    }
+    return a.displayCount - b.displayCount;
+  });
+}
+
+/**
  * Loop through field contents to pick next displayable content
  */
 Field.prototype.pickNext = function() {
   if (this.screen.stopping) { // Stoping screen
-    if (--this.screen.remaining <= 0) {
+    if (this.screen.endAt < Date.now()) {
       return this.screen.doReload();
     }
-    return;
   }
+
   this.previous = this.current;
   this.current = null;
   var pData = this.previous && this.previous.data;
   // Avoid repeat & other field same content
-  while (true) {
-    var c = this.contents[Math.floor(Math.random() * this.contents.length)];
+  this.randomizeSortContents();
+  for (var i = 0; i < this.contents.length; i++) {
+    var c = this.contents[i];
+    // Skip too long content
+    if (this.screen.endAt != null && c.duration + Date.now() > this.screen.endAt) {
+      continue;
+    }
+
     if (c.data == pData) {
       // Will repeat, avoid if enough content
       if (this.contents.length < 2) {
@@ -131,9 +171,6 @@ Field.prototype.pickNext = function() {
     }
   }
 
-  if (!this.next && this.contents.length > 0) {
-    this.next = this.contents[0];
-  }
   this.display();
 }
 
@@ -143,6 +180,7 @@ Field.prototype.pickNext = function() {
 Field.prototype.display = function() {
   if (this.next && this.next.duration > 0) {
     this.current = this.next
+    this.current.displayCount++;
     this.next = null;
     this.$field.html(this.current.data);
     this.$field.show();
@@ -157,10 +195,11 @@ Field.prototype.display = function() {
     var f = this;
     this.timeout = setTimeout(function() {
       f.pickNext();
-    }, this.current.duration * 1000);
+    }, this.current.duration);
+    this.endAt = this.current.duration + Date.now()
   } else {
     this.timeout = null;
-    console.error('Cannot set content', this);
+    console.error('No content to display for', this);
   }
 }
 
