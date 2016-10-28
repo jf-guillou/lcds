@@ -2,6 +2,10 @@ html {
     overflow: hidden;
 }
 
+* {
+     cursor: none;
+}
+
 iframe {
     border: 0px;
 }
