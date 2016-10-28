@@ -205,6 +205,18 @@ class FrontendController extends BaseController
         return ['success' => true, 'next' => $next];
     }
 
+    public function actionForceReload($id)
+    {
+        if (Yii::$app->user->can('setScreens')) {
+            $screen = Screen::findOne($id);
+            if ($screen !== null) {
+                $screen->setModified();
+            }
+        }
+
+        return $this->smartGoBack();
+    }
+
     /**
      * Checks client session for device ID.
      *
