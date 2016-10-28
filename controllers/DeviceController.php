@@ -173,7 +173,7 @@ class DeviceController extends BaseController
         $model = $this->findModel($id);
 
         if ($model->getScreens()->where(['id' => $screenId])->exists()) {
-            $model->unlink('flows', Screen::findOne($screenId), true);
+            $model->unlink('screens', Screen::findOne($screenId), true);
         }
 
         return $this->redirect(['view', 'id' => $id]);
