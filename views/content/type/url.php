@@ -6,7 +6,7 @@ use yii\widgets\ActiveForm;
 /* @var $this yii\web\View */
 /* @var $model app\models\Content */
 
-$this->title = Yii::t('app', 'Create {type} content', ['type' => Yii::t('app', $type->name)]);
+$this->title = Yii::t('app', 'Create {type} content', ['type' => $type->name]);
 $this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Contents'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>

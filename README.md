@@ -1,4 +1,4 @@
-Light Centralized Display Signage
+Light Centralized Digital Signage
 =================================
 
 INSTALLATION
