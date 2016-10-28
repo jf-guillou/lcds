@@ -21,12 +21,13 @@ Screen.prototype.checkUpdates = function() {
       if (s.lastChanges == null) {
         s.lastChanges = j.data.lastChanges;
       } else if (s.lastChanges != j.data.lastChanges) {
+        console.log('Screen changes');
         s.reload();
         s.nextUrl = null;
         return;
       }
 
-      if (!j.data.duration > 0) {
+      if (j.data.duration > 0) {
         // Setup next screen
         s.reload(j.data.duration * 1000);
         s.nextUrl = j.data.nextScreenUrl;
@@ -54,7 +55,11 @@ Screen.prototype.reload = function(minDuration) {
   }
 
   if (this.endAt !== 0) {
-    console.log('Screen will reload in', this.endAt - Date.now(), 'ms');
+    if (this.nextUrl) {
+      console.log('Screen will change to', this.nextUrl, 'in', this.endAt - Date.now(), 'ms');
+    } else {
+      console.log('Screen will reload in', this.endAt - Date.now(), 'ms');
+    }
   } else {
     this.doReload();
   }

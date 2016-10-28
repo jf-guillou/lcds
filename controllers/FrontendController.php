@@ -86,7 +86,7 @@ class FrontendController extends BaseController
      *
      * @return mixed
      */
-    public function actionScreen($id)
+    public function actionScreen($id, $preview = false)
     {
         // Session auth
         if (!$this->isClientAuth() && !Yii::$app->user->can('previewScreen')) {
@@ -103,7 +103,7 @@ class FrontendController extends BaseController
             'screenCss' => $screen->template->css,
             'background' => $screen->template->background->uri,
             'fields' => $screen->template->fields,
-            'updateUrl' => Url::to(['frontend/update', 'id' => $id]),
+            'updateUrl' => $preview ? null : Url::to(['frontend/update', 'id' => $id]),
             'nextUrl' => Url::to(['frontend/next', 'id' => $id, 'fieldid' => '']),
             'types' => ContentType::getAll(),
         ];
@@ -134,7 +134,7 @@ class FrontendController extends BaseController
         }
 
         $device = $this->getClientDevice();
-        $nextScreen = $device->getNextScreen($screen->id);
+        $nextScreen = $device ? $device->getNextScreen($screen->id) : null;
 
         return ['success' => true, 'data' => [
             'lastChanges' => $screen->last_changes,
