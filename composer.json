@@ -23,7 +23,8 @@
         "norkunas/youtube-dl-php": "^0.3.0",
         "mhor/php-mediainfo": "^2.2",
         "edvlerblog/yii2-adldap-module": "^1.1",
-        "johngrogg/ics-parser": "dev-master"
+        "johngrogg/ics-parser": "dev-master",
+        "bower-asset/weather-icons": "^2.0"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "*",
