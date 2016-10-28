@@ -19,27 +19,15 @@ $this->params['breadcrumbs'][] = $this->title;
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
         'columns' => [
-            //['class' => 'yii\grid\SerialColumn'],
-
-            //'id',
             'name',
             'description',
-            //'template_id',
+            'duration',
             [
                 'attribute' => 'template',
                 'label' => Yii::t('app', 'Template'),
                 'value' => 'template.name',
             ],
-
-            [
-                'class' => 'yii\grid\ActionColumn',
-                'template' => '{view} {update} {delete} {toggle}',
-                'buttons' => [
-                    'toggle' => function ($url, $model, $key) {
-                        return Html::a('<span class="glyphicon glyphicon-'.($model->active ? 'pause' : 'play').'"></span>', $url);
-                    },
-                ],
-            ],
+            ['class' => 'yii\grid\ActionColumn'],
         ],
     ]); ?>
 </div>

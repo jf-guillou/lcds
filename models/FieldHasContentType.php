@@ -8,7 +8,7 @@ use Yii;
  * This is the model class for table "field_has_content_type".
  *
  * @property int $field_id
- * @property int $content_type_id
+ * @property string $content_type_id
  * @property Field $field
  * @property ContentType $contentType
  */
@@ -29,7 +29,8 @@ class FieldHasContentType extends \yii\db\ActiveRecord
     {
         return [
             [['field_id', 'content_type_id'], 'required'],
-            [['field_id', 'content_type_id'], 'integer'],
+            [['field_id'], 'integer'],
+            [['content_type_id'], 'string', 'max' => 45],
             [['field_id'], 'exist', 'skipOnError' => true, 'targetClass' => Field::className(), 'targetAttribute' => ['field_id' => 'id']],
             [['content_type_id'], 'exist', 'skipOnError' => true, 'targetClass' => ContentType::className(), 'targetAttribute' => ['content_type_id' => 'id']],
         ];

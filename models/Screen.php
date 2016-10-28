@@ -12,10 +12,11 @@ use yii\db\Expression;
  * @property string $name
  * @property string $description
  * @property int $template_id
+ * @property int $duration
  * @property string $last_changes
+ * @property DeviceHasScreen[] $deviceHasScreens
+ * @property Device[] $devices
  * @property ScreenTemplate $template
- * @property string $last_auth
- * @property bool $active
  * @property ScreenHasFlow[] $screenHasFlows
  * @property Flow[] $flows
  */
@@ -35,10 +36,9 @@ class Screen extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['name'], 'required'],
-            [['template_id'], 'integer'],
-            [['last_changes', 'last_auth', 'template'], 'safe'],
-            [['active'], 'boolean'],
+            [['name', 'template_id'], 'required'],
+            [['duration', 'template_id'], 'integer'],
+            [['last_changes', 'template'], 'safe'],
             [['name'], 'string', 'max' => 64],
             [['description'], 'string', 'max' => 1024],
             [['template_id'], 'exist', 'skipOnError' => true, 'targetClass' => ScreenTemplate::className(), 'targetAttribute' => ['template_id' => 'id']],
@@ -55,9 +55,8 @@ class Screen extends \yii\db\ActiveRecord
             'name' => Yii::t('app', 'Name'),
             'description' => Yii::t('app', 'Description'),
             'template_id' => Yii::t('app', 'Template ID'),
+            'duration' => Yii::t('app', 'Duration'),
             'last_changes' => Yii::t('app', 'Last Changes'),
-            'last_auth' => Yii::t('app', 'Last Auth'),
-            'active' => Yii::t('app', 'Active'),
         ];
     }
 
@@ -102,17 +101,19 @@ class Screen extends \yii\db\ActiveRecord
     }
 
     /**
-     * Update last_auth field to indicate screen last connexion.
+     * @return \yii\db\ActiveQuery
      */
-    public function setAuthenticated()
+    public function getDeviceHasScreens()
     {
-        $this->last_auth = new Expression('NOW()');
-        $this->save();
+        return $this->hasMany(DeviceHasScreen::className(), ['screen_id' => 'id']);
     }
 
-    public function getLastId()
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getDevices()
     {
-        return $this->getDb()->getLastInsertID();
+        return $this->hasMany(Device::className(), ['id' => 'device_id'])->viaTable('device_has_screen', ['screen_id' => 'id']);
     }
 
     /**

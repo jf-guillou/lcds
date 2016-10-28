@@ -36,6 +36,7 @@ AppAsset::register($this);
     echo Nav::widget([
         'options' => ['class' => 'navbar-nav navbar-right'],
         'items' => [
+            ['label' => Yii::t('app', 'Devices'), 'url' => ['/device'], 'visible' => Yii::$app->user->can('setDevices')],
             ['label' => Yii::t('app', 'Templates'), 'url' => ['/screen-template'], 'visible' => Yii::$app->user->can('setTemplates')],
             ['label' => Yii::t('app', 'Screens'), 'url' => ['/screen'], 'visible' => Yii::$app->user->can('setScreens')],
             ['label' => Yii::t('app', 'Flows'), 'url' => ['/flow'], 'visible' => Yii::$app->user->can('setOwnFlowContent')],

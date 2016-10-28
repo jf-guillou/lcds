@@ -6,13 +6,13 @@ use yii\widgets\DetailView;
 use yii\grid\GridView;
 
 /* @var $this yii\web\View */
-/* @var $model app\models\Screen */
+/* @var $model app\models\Device */
 
 $this->title = $model->name;
-$this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Screens'), 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Devices'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="screen-view">
+<div class="device-view">
 
     <h1><?= Html::encode($this->title) ?></h1>
 
@@ -25,7 +25,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'method' => 'post',
             ],
         ]) ?>
-        <?= Html::a(Yii::t('app', 'Preview'), ['/frontend/screen', 'id' => $model->id], ['class' => 'btn btn-success']) ?>
+        <?= Html::a(Yii::t('app', $model->enabled ? 'Disable' : 'Enable'), ['toggle', 'id' => $model->id], ['class' => 'btn '.($model->enabled ? 'btn-danger' : 'btn-primary')]) ?>
     </p>
 
     <?= DetailView::widget([
@@ -33,16 +33,13 @@ $this->params['breadcrumbs'][] = $this->title;
         'attributes' => [
             'name',
             'description',
-            'duration',
-            [
-                'label' => \Yii::t('app', 'Template'),
-                'value' => $model->template->name,
-            ],
+            'last_auth',
+            'enabled:boolean',
         ],
     ]) ?>
 
     <p>
-        <?= Html::a(Yii::t('app', 'Add flow'), ['link', 'id' => $model->id], ['class' => 'btn btn-success']) ?>
+        <?= Html::a(Yii::t('app', 'Add Screen'), ['link', 'id' => $model->id], ['class' => 'btn btn-success']) ?>
     </p>
 
     <?= GridView::widget([
@@ -50,14 +47,15 @@ $this->params['breadcrumbs'][] = $this->title;
         'columns' => [
             'name',
             'description',
+            'duration',
 
             [
                 'class' => 'yii\grid\ActionColumn',
-                'controller' => 'flow',
+                'controller' => 'screen',
                 'template' => '{view} {update} {unlink}',
                 'buttons' => [
                     'unlink' => function ($url, $_model, $key) use ($model) {
-                        return Html::a('<span class="glyphicon glyphicon-remove"></span>', Url::to(['unlink', 'id' => $model->id, 'flowId' => $_model->id]));
+                        return Html::a('<span class="glyphicon glyphicon-remove"></span>', Url::to(['unlink', 'id' => $model->id, 'screenId' => $_model->id]));
                     },
                 ],
             ],

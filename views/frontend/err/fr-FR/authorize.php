@@ -5,10 +5,10 @@ FrontendErrAsset::register($this);
 ?>
 
 <div class="gigantic text-center">
-    <p>CET ECRAN N'A PAS ENCORE ETE AUTORISE</p>
+    <p>CET DIFFUSEUR N'A PAS ENCORE ETE AUTORISE</p>
     <p>MERCI DE VOUS RENDRE SUR</p>
-    <p><a href="<?= $authorizeUrl ?>"><?= $authorizeUrl ?></a></p>
-    <p>ET ACTIVEZ CET ECRAN</p>
+    <p><a href="<?= $url ?>"><?= $url ?></a></p>
+    <p>ET ACTIVEZ CET DIFFUSEUR</p>
 </div>
 
 <div class="huge text-center">

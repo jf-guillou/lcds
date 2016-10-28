@@ -5,10 +5,10 @@ FrontendErrAsset::register($this);
 ?>
 
 <div class="gigantic text-center">
-    <p>THIS SCREEN HAS NO TEMPLATE YET</p>
+    <p>THIS DEVICE HAS NO SCREEN YET</p>
     <p>PLEASE GO TO</p>
-    <p><a href="<?= $templateUrl ?>"><?= $templateUrl ?></a></p>
-    <p>AND SETUP THIS SCREEN</p>
+    <p><a href="<?= $url ?>"><?= $url ?></a></p>
+    <p>AND SETUP THIS DEVICE</p>
 </div>
 
 <div class="huge text-center">

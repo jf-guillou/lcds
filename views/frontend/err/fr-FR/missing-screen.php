@@ -5,10 +5,10 @@ FrontendErrAsset::register($this);
 ?>
 
 <div class="gigantic text-center">
-    <p>CET ECRAN N'A PAS ENCORE DE MODÈLE</p>
+    <p>CE DIFFUSEUR N'A PAS ENCORE D'ECRAN</p>
     <p>MERCI DE VOUS RENDRE SUR</p>
-    <p><a href="<?= $templateUrl ?>"><?= $templateUrl ?></a></p>
-    <p>ET CONFIGUREZ CET ECRAN</p>
+    <p><a href="<?= $url ?>"><?= $url ?></a></p>
+    <p>ET CONFIGUREZ CE DIFFUSEUR</p>
 </div>
 
 <div class="huge text-center">

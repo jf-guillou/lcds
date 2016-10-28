@@ -3,9 +3,8 @@
 namespace app\controllers;
 
 use Yii;
+use app\models\Device;
 use app\models\Screen;
-use app\models\ScreenTemplate;
-use app\models\Flow;
 use yii\helpers\ArrayHelper;
 use yii\data\ActiveDataProvider;
 use yii\web\NotFoundHttpException;
@@ -13,9 +12,9 @@ use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
 
 /**
- * ScreenController implements the CRUD actions for Screen model.
+ * ScreenController implements the CRUD actions for Device model.
  */
-class ScreenController extends BaseController
+class DeviceController extends BaseController
 {
     /**
      * {@inheritdoc}
@@ -33,27 +32,22 @@ class ScreenController extends BaseController
                 'class' => AccessControl::className(),
                 'only' => ['index', 'view', 'create', 'update', 'delete', 'link', 'unlink'],
                 'rules' => [
-                    ['allow' => true, 'actions' => ['index', 'view', 'create', 'update', 'delete', 'link', 'unlink'], 'roles' => ['setScreens']],
+                    ['allow' => true, 'actions' => ['index', 'view', 'create', 'update', 'delete', 'link', 'unlink'], 'roles' => ['setDevices']],
                 ],
             ],
         ];
     }
 
     /**
-     * Lists all Screen models.
+     * Lists all Device models.
      *
      * @return mixed
      */
     public function actionIndex()
     {
         $dataProvider = new ActiveDataProvider([
-            'query' => Screen::find()->joinWith('template'),
+            'query' => Device::find(),
         ]);
-
-        $dataProvider->sort->attributes['template'] = [
-            'asc' => [ScreenTemplate::tableName().'.name' => SORT_ASC],
-            'desc' => [ScreenTemplate::tableName().'.name' => SORT_DESC],
-        ];
 
         return $this->render('index', [
             'dataProvider' => $dataProvider,
@@ -61,7 +55,7 @@ class ScreenController extends BaseController
     }
 
     /**
-     * Displays a single Screen model.
+     * Displays a single Device model.
      *
      * @param int $id
      *
@@ -69,13 +63,10 @@ class ScreenController extends BaseController
      */
     public function actionView($id)
     {
-        $model = Screen::find()->where([Screen::tableName().'.id' => $id])->joinWith('template')->one();
-        if ($model === null) {
-            throw new NotFoundHttpException('The requested page does not exist.');
-        }
+        $model = $this->findModel($id);
 
         $dataProvider = new ActiveDataProvider([
-            'query' => $model->getFlows(),
+            'query' => $model->getScreens(),
         ]);
 
         return $this->render('view', [
@@ -85,34 +76,26 @@ class ScreenController extends BaseController
     }
 
     /**
-     * Creates a new Screen model.
+     * Creates a new Device model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      *
      * @return mixed
      */
     public function actionCreate()
     {
-        $model = new Screen();
+        $model = new Device();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);
         } else {
-            $templates = ScreenTemplate::find()->all();
-            $templatesArray = array_reduce($templates, function ($a, $t) {
-                $a[$t->id] = $t->name;
-
-                return $a;
-            });
-
             return $this->render('create', [
                 'model' => $model,
-                'templates' => $templatesArray,
             ]);
         }
     }
 
     /**
-     * Updates an existing Screen model.
+     * Updates an existing Device model.
      * If update is successful, the browser will be redirected to the 'view' page.
      *
      * @param int $id
@@ -126,22 +109,14 @@ class ScreenController extends BaseController
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);
         } else {
-            $templates = ScreenTemplate::find()->all();
-            $templatesArray = array_reduce($templates, function ($a, $t) {
-                $a[$t->id] = $t->name;
-
-                return $a;
-            });
-
             return $this->render('update', [
                 'model' => $model,
-                'templates' => $templatesArray,
             ]);
         }
     }
 
     /**
-     * Deletes an existing Screen model.
+     * Deletes an existing Device model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
      *
      * @param int $id
@@ -156,20 +131,20 @@ class ScreenController extends BaseController
     }
 
     /**
-     * Adds a flow to this screen or render link view.
+     * Adds a Screen to this Device or render link view.
      *
      * @param int $id
-     * @param int $flowId
+     * @param int $screenId
      *
      * @return mixed
      */
-    public function actionLink($id, $flowId = null)
+    public function actionLink($id, $screenId = null)
     {
         $model = $this->findModel($id);
 
-        if ($flowId === null) {
+        if ($screenId === null) {
             $dataProvider = new ActiveDataProvider([
-                'query' => Flow::find()->where(['not', ['id' => ArrayHelper::getColumn($model->flows, 'id')]]),
+                'query' => Screen::find()->where(['not', ['id' => ArrayHelper::getColumn($model->screens, 'id')]]),
             ]);
 
             return $this->render('link', [
@@ -177,8 +152,8 @@ class ScreenController extends BaseController
                 'dataProvider' => $dataProvider,
             ]);
         } else {
-            if (!$model->getFlows()->where(['id' => $flowId])->exists()) {
-                $model->link('flows', Flow::findOne($flowId));
+            if (!$model->getScreens()->where(['id' => $screenId])->exists()) {
+                $model->link('screens', Screen::findOne($screenId));
             }
 
             return $this->redirect(['view', 'id' => $id]);
@@ -186,37 +161,54 @@ class ScreenController extends BaseController
     }
 
     /**
-     * Remove a flow from a screen.
+     * Remove a Screen from a Device.
      *
      * @param int $id
      * @param int $flowId
      *
      * @return mixed
      */
-    public function actionUnlink($id, $flowId)
+    public function actionUnlink($id, $screenId)
     {
         $model = $this->findModel($id);
 
-        if ($model->getFlows()->where(['id' => $flowId])->exists()) {
-            $model->unlink('flows', Flow::findOne($flowId), true);
+        if ($model->getScreens()->where(['id' => $screenId])->exists()) {
+            $model->unlink('flows', Screen::findOne($screenId), true);
         }
 
         return $this->redirect(['view', 'id' => $id]);
     }
 
     /**
-     * Finds the Screen model based on its primary key value.
+     * Enables or disables a Device.
+     *
+     * @param int $id screen id
+     *
+     * @return mixed
+     */
+    public function actionToggle($id)
+    {
+        $model = $this->findModel($id);
+
+        $model->enabled = !$model->enabled;
+        $model->save();
+
+        return $this->smartGoBack();
+    }
+
+    /**
+     * Finds the Device model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      *
      * @param int $id
      *
-     * @return Screen the loaded model
+     * @return Device the loaded model
      *
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($id)
     {
-        if (($model = Screen::findOne($id)) !== null) {
+        if (($model = Device::findOne($id)) !== null) {
             return $model;
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');

@@ -7,6 +7,8 @@ function Screen(updateScreenUrl) {
   this.url = updateScreenUrl;
   this.lastChanges = null;
   this.endAt = null;
+  this.nextUrl = null;
+  this.stopping = false;
 }
 
 /**
@@ -17,9 +19,16 @@ Screen.prototype.checkUpdates = function() {
   $.get(this.url, function(j) {
     if (j.success) {
       if (s.lastChanges == null) {
-        s.lastChanges = j.data;
-      } else if (s.lastChanges != j.data) {
+        s.lastChanges = j.data.lastChanges;
+      } else if (s.lastChanges != j.data.lastChanges) {
         s.reload();
+        return;
+      }
+
+      if (!j.data.duration > 0) {
+        // Setup next screen
+        s.reload(j.data.duration * 1000);
+        s.nextUrl = j.data.nextScreenUrl;
       }
     }
   });
@@ -28,20 +37,22 @@ Screen.prototype.checkUpdates = function() {
 /**
  * Start Screen reload procedure, checking for every field timeout
  */
-Screen.prototype.reload = function() {
-  if (this.stopping) {
+Screen.prototype.reload = function(minDuration) {
+  var endAt = Date.now() + (minDuration ?: 0);
+  if (this.stopping && this.endAt < endAt) {
     return;
   }
 
+  this.endAt = minDuration ? Date.now() + minDuration : 0;
   this.stopping = true;
   for (var i in this.fields) {
     var f = this.fields[i];
-    if (f.timeout && (this.endAt == null || f.endAt > this.endAt)) {
+    if (f.timeout && f.endAt > this.endAt) {
       this.endAt = f.endAt;
     }
   }
 
-  if (this.endAt != null) {
+  if (this.endAt !== 0) {
     console.log('Screen will reload in', this.endAt - Date.now(), 'ms');
   } else {
     this.doReload();
@@ -52,7 +63,11 @@ Screen.prototype.reload = function() {
  * Actual Screen reload action
  */
 Screen.prototype.doReload = function() {
-  window.location.reload();
+  if (this.nextUrl) {
+    window.location = this.nextUrl;
+  } else {
+    window.location.reload();
+  }
 }
 
 /**
@@ -91,7 +106,7 @@ function Field($f, screen) {
  * Retrieves contents from backend for this field
  */
 Field.prototype.getContents = function() {
-  if (!this.canUpdate || this.screen.stopping) {
+  if (!this.canUpdate) {
     return;
   }
 

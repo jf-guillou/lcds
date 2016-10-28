@@ -69,7 +69,9 @@ foreach ($fields as $field) :
     } ?>
 </div>
 <?php endforeach; ?>
-<script type="text/javascript">var updateScreenUrl = "<?= $updateUrl ?>"</script>
+<script type="text/javascript">
+var updateScreenUrl = "<?= $updateUrl ?>";
+</script>
 <?php
 $this->registerCSS(implode("\n", $css));
 $this->registerJS(implode("\n", $js));

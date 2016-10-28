@@ -5,10 +5,10 @@ FrontendErrAsset::register($this);
 ?>
 
 <div class="gigantic text-center">
-    <p>THIS SCREEN HAS NOT YET BEEN AUTHORIZED</p>
+    <p>THIS DEVICE HAS NOT YET BEEN AUTHORIZED</p>
     <p>PLEASE GO TO</p>
-    <p><a href="<?= $authorizeUrl ?>"><?= $authorizeUrl ?></a></p>
-    <p>AND ACTIVATE THIS SCREEN</p>
+    <p><a href="<?= $url ?>"><?= $url ?></a></p>
+    <p>AND ACTIVATE THIS DEVICE</p>
 </div>
 
 <div class="huge text-center">

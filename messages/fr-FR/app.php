@@ -1,10 +1,12 @@
 <?php
 
 return [
-    /* Screen */
-    'New unauthorized screen' => 'Nouvel écran non-autorisé',
+    /* Device */
+    'New unauthorized device' => 'Nouveau diffuseur non-autorisé',
     'Enable' => 'Activer',
     'Disable' => 'Désactiver',
+    'Last connection' => 'Dernière connexion',
+    'Add Screen' => 'Ajouter un écran',
 
     'Template' => 'Modèle',
     'Templates' => 'Modèles',
@@ -102,6 +104,11 @@ return [
     'Display an agenda from an ICal feed.' => 'Affiche un agenda basé sur un flux ICal',
 
     'Are you sure you want to delete this item?' => 'Êtes-vous sur de vouloir supprimer cet objet ?',
+
+    /* Device */
+    'Device' => 'Diffuseur',
+    'Devices' => 'Diffuseurs',
+    'Create Device' => 'Ajouter un diffuseur',
 
     /* Agenda */
     'Monday' => 'Lundi',
