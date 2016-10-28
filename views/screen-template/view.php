@@ -47,6 +47,7 @@ Modal::end();
 <script type="text/javascript">
 var templateId = <?= $model->id ?>;
 var fields = <?= json_encode($fields) ?>;
+var contentTypes = <?= json_encode($contentTypes) ?>;
 var setFieldPosUrl = '<?= $setFieldPosUrl ?>';
 var editFieldUrl = '<?= $editFieldUrl ?>';
 </script>

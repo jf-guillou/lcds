@@ -20,6 +20,8 @@ return [
     'Use' => 'Utiliser',
     'Link' => 'Lier',
     'Reload' => 'Rafraîchir',
+    'JS' => 'JS',
+    'CSS' => 'CSS',
     'The requested page does not exist.' => 'La page demandée n\'existe pas.',
     'Are you sure you want to delete this item?' => 'Êtes-vous sur de vouloir supprimer cet objet ?',
 

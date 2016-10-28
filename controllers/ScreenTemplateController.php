@@ -72,9 +72,86 @@ class ScreenTemplateController extends BaseController
             'model' => $screenTemplate,
             'background' => $screenTemplate->background ? $screenTemplate->background->uri : null,
             'fields' => $screenTemplate->fieldsArray,
+            'contentTypes' => ContentType::getAllList(),
             'setFieldPosUrl' => Url::to([Yii::$app->controller->id.'/set-field-pos', 'id' => '']),
             'editFieldUrl' => Url::to([Yii::$app->controller->id.'/edit-field', 'id' => '']),
         ]);
+    }
+
+    /**
+     * Creates a new ScreenTemplate model.
+     * If creation is successful, the browser will be redirected to the 'view' page.
+     *
+     * @return mixed
+     */
+    public function actionCreate()
+    {
+        $model = new ScreenTemplate();
+
+        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            return $this->redirect(['view', 'id' => $model->id]);
+        }
+
+        return $this->render('create', [
+            'model' => $model,
+            'backgrounds' => self::backgroundsArray(),
+        ]);
+    }
+
+    /**
+     * Updates an existing ScreenTemplate model.
+     * If update is successful, the browser will be redirected to the 'view' page.
+     *
+     * @param int $id
+     *
+     * @return mixed
+     */
+    public function actionUpdate($id)
+    {
+        $model = $this->findModel($id);
+
+        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            return $this->redirect(['view', 'id' => $model->id]);
+        }
+
+        return $this->render('update', [
+            'model' => $model,
+            'backgrounds' => self::backgroundsArray(),
+        ]);
+    }
+
+    /**
+     * Deletes an existing ScreenTemplate model.
+     * If deletion is successful, the browser will be redirected to the 'index' page.
+     *
+     * @param int $id
+     *
+     * @return mixed
+     */
+    public function actionDelete($id)
+    {
+        $this->findModel($id)->delete();
+
+        return $this->redirect(['index']);
+    }
+
+    /**
+     * Finds the ScreenTemplate model based on its primary key value.
+     * If the model is not found, a 404 HTTP exception will be thrown.
+     *
+     * @param int $id
+     *
+     * @return ScreenTemplate the loaded model
+     *
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    protected function findModel($id)
+    {
+        if (($model = ScreenTemplate::findOne($id)) !== null) {
+            return $model;
+        } else {
+            throw new NotFoundHttpException(Yii::t('app', 'The requested template does not exist.'));
+        }
     }
 
     /**
@@ -103,19 +180,6 @@ class ScreenTemplateController extends BaseController
         } else {
             return ['success' => false, 'message' => Yii::t('app', 'Failed to insert new field')];
         }
-    }
-
-    /**
-     * Custom min/max float rand.
-     *
-     * @param float $min
-     * @param float $max
-     *
-     * @return float random float
-     */
-    public static function randf($min = 0.0, $max = 1.0)
-    {
-        return mt_rand($min * mt_getrandmax(), $max * mt_getrandmax()) / mt_getrandmax();
     }
 
     /**
@@ -239,48 +303,6 @@ class ScreenTemplateController extends BaseController
     }
 
     /**
-     * Creates a new ScreenTemplate model.
-     * If creation is successful, the browser will be redirected to the 'view' page.
-     *
-     * @return mixed
-     */
-    public function actionCreate()
-    {
-        $model = new ScreenTemplate();
-
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
-        }
-
-        return $this->render('create', [
-            'model' => $model,
-            'backgrounds' => self::backgroundsArray(),
-        ]);
-    }
-
-    /**
-     * Updates an existing ScreenTemplate model.
-     * If update is successful, the browser will be redirected to the 'view' page.
-     *
-     * @param int $id
-     *
-     * @return mixed
-     */
-    public function actionUpdate($id)
-    {
-        $model = $this->findModel($id);
-
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
-        }
-
-        return $this->render('update', [
-            'model' => $model,
-            'backgrounds' => self::backgroundsArray(),
-        ]);
-    }
-
-    /**
      * Builds an array of backgrounds usable in view.
      *
      * @return array backgrounds
@@ -303,36 +325,15 @@ class ScreenTemplateController extends BaseController
     }
 
     /**
-     * Deletes an existing ScreenTemplate model.
-     * If deletion is successful, the browser will be redirected to the 'index' page.
+     * Custom min/max float rand.
      *
-     * @param int $id
+     * @param float $min
+     * @param float $max
      *
-     * @return mixed
+     * @return float random float
      */
-    public function actionDelete($id)
+    public static function randf($min = 0.0, $max = 1.0)
     {
-        $this->findModel($id)->delete();
-
-        return $this->redirect(['index']);
-    }
-
-    /**
-     * Finds the ScreenTemplate model based on its primary key value.
-     * If the model is not found, a 404 HTTP exception will be thrown.
-     *
-     * @param int $id
-     *
-     * @return ScreenTemplate the loaded model
-     *
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    protected function findModel($id)
-    {
-        if (($model = ScreenTemplate::findOne($id)) !== null) {
-            return $model;
-        } else {
-            throw new NotFoundHttpException(Yii::t('app', 'The requested template does not exist.'));
-        }
+        return mt_rand($min * mt_getrandmax(), $max * mt_getrandmax()) / mt_getrandmax();
     }
 }
