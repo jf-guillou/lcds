@@ -22,6 +22,7 @@ Screen.prototype.checkUpdates = function() {
         s.lastChanges = j.data.lastChanges;
       } else if (s.lastChanges != j.data.lastChanges) {
         s.reload();
+        s.nextUrl = null;
         return;
       }
 
@@ -38,7 +39,7 @@ Screen.prototype.checkUpdates = function() {
  * Start Screen reload procedure, checking for every field timeout
  */
 Screen.prototype.reload = function(minDuration) {
-  var endAt = Date.now() + (minDuration ?: 0);
+  var endAt = Date.now() + (minDuration ? minDuration : 0);
   if (this.stopping && this.endAt < endAt) {
     return;
   }
