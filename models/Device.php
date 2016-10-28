@@ -99,12 +99,13 @@ class Device extends \yii\db\ActiveRecord
             return;
         }
 
+        $firstScreen = $this->screens[0];
+        if ($currentScreenId === null) {
+            return $firstScreen;
+        }
+
         $foundCurrent = false;
         foreach ($this->screens as $s) {
-            if ($currentScreenId === null) {
-                return $s; // First screen if no current
-            }
-
             if ($foundCurrent) {
                 return $s;
             }
@@ -115,6 +116,6 @@ class Device extends \yii\db\ActiveRecord
         }
 
         // Return first screen if reached end of array
-        return $this->screens[0];
+        return $currentScreenId != $firstScreen->id ? $firstScreen : null;
     }
 }
