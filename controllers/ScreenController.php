@@ -8,9 +8,9 @@ use app\models\ScreenTemplate;
 use app\models\Flow;
 use yii\helpers\ArrayHelper;
 use yii\data\ActiveDataProvider;
-use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
+use yii\web\NotFoundHttpException;
 
 /**
  * ScreenController implements the CRUD actions for Screen model.
@@ -71,7 +71,7 @@ class ScreenController extends BaseController
     {
         $model = Screen::find()->where([Screen::tableName().'.id' => $id])->joinWith('template')->one();
         if ($model === null) {
-            throw new NotFoundHttpException('The requested page does not exist.');
+            throw new NotFoundHttpException(Yii::t('app', 'The requested screen does not exist.'));
         }
 
         $dataProvider = new ActiveDataProvider([
@@ -219,7 +219,7 @@ class ScreenController extends BaseController
         if (($model = Screen::findOne($id)) !== null) {
             return $model;
         } else {
-            throw new NotFoundHttpException('The requested page does not exist.');
+            throw new NotFoundHttpException(Yii::t('app', 'The requested screen does not exist.'));
         }
     }
 }

@@ -48,7 +48,7 @@ class FlowController extends BaseController
     {
         $query = Flow::availableQuery(Yii::$app->user);
         if ($query === null) {
-            throw new \yii\web\ForbiddenHttpException();
+            throw new \yii\web\ForbiddenHttpException(Yii::t('app', 'You do not have enough rights to view this flow.'));
         }
 
         $dataProvider = new ActiveDataProvider([
@@ -71,7 +71,7 @@ class FlowController extends BaseController
     {
         $model = $this->findModel($id);
         if (!$model->canView(Yii::$app->user)) {
-            throw new \yii\web\ForbiddenHttpException();
+            throw new \yii\web\ForbiddenHttpException(Yii::t('app', 'You do not have enough rights to view this flow.'));
         }
 
         $dataProvider = new ActiveDataProvider([
@@ -160,7 +160,7 @@ class FlowController extends BaseController
         if (($model = Flow::findOne($id)) !== null) {
             return $model;
         } else {
-            throw new NotFoundHttpException('The requested page does not exist.');
+            throw new NotFoundHttpException(Yii::t('app', 'The requested flow does not exist.'));
         }
     }
 }

@@ -1,11 +1,16 @@
 <?php
 
 return [
+    'LCDS' => 'LCDS',
+
     /* Misc */
     '(none)' => '(aucun)',
     'None' => 'Aucun',
     'Enabled' => 'Actif',
+    'ID' => 'ID',
     'Name' => 'Nom',
+    'Description' => 'Description',
+    'Type' => 'Type',
     'Create' => 'Créer',
     'Add' => 'Ajouter',
     'Update {modelClass}: ' => 'Modifier {modelClass} : ',
@@ -15,6 +20,7 @@ return [
     'Use' => 'Utiliser',
     'Link' => 'Lier',
     'Reload' => 'Rafraîchir',
+    'The requested page does not exist.' => 'La page demandée n\'existe pas.',
     'Are you sure you want to delete this item?' => 'Êtes-vous sur de vouloir supprimer cet objet ?',
 
     /* User */
@@ -40,6 +46,7 @@ return [
     'User creation failed' => 'Echec de la création de l\'utilisateur',
     'This user doesn\'t exist in LDAP' => 'Cet utilisateur n\'existe pas dans la base LDAP',
     'This user is already registered' => 'Cet utilisateur est déjà enregistré',
+    'The requested user does not exist.' => 'Cet utilisateur n\'existe pas.',
 
     /* Device */
     'Device' => 'Diffuseur',
@@ -50,6 +57,7 @@ return [
     'Disable' => 'Désactiver',
     'Last connection' => 'Dernière connexion',
     'Add Screen' => 'Ajouter un écran',
+    'The requested device does not exist.' => 'Ce diffuseur n\'existe pas.',
 
     /* Template */
     'Template' => 'Modèle',
@@ -65,6 +73,8 @@ return [
     'Add field' => 'Ajouter un champ',
     'Manage backgrounds' => 'Gérer les fonds',
     'Add a background' => 'Ajouter un fond',
+    'The requested template does not exist.' => 'Ce modèle n\'existe pas.',
+    'The requested template background does not exist.' => 'Cette images de fond n\'existe pas.',
 
     /* Screen */
     'Screen' => 'Ecran',
@@ -73,6 +83,7 @@ return [
     'Preview' => 'Prévisualiser',
     'Screen will reload' => 'L\'écran va être rafraîchi',
     'Failed to force Screen reload' => 'Impossible de forcer le rafraîchissement de l\'écran',
+    'The requested screen does not exist.' => 'Cet écran n\'existe pas.',
 
     /* Flow */
     'Flow' => 'Flux',
@@ -81,6 +92,8 @@ return [
     'Create Flow' => 'Créer un flux',
     'Parent flow' => 'Flux parent',
     'Append URL parameters' => 'Paramètres suffixe URL',
+    'You do not have enough rights to view this flow.' => 'Vous n\'avez pas assez de droits pour voir ce flux.',
+    'The requested flow does not exist.' => 'Ce flux n\'existe pas.',
 
     /* Content */
     'Content' => 'Contenu',
@@ -98,11 +111,16 @@ return [
     'Added at' => 'Ajouté le',
     'Filepath' => 'Chemin',
     'Paste or drag&drop the file or url to upload' => 'Coller ou faire glisser le fichier ou l\'url à envoyer',
+    'You do not have enough rights to view this content.' => 'Vous n\'avez pas assez de droits pour voir ce contenu.',
+    'The requested content does not exist.' => 'Ce contenu n\'existe pas.',
+    'The requested content has no content type.' => 'Ce contenu n\'a pas de type associé.',
 
     /* Content type */
     'Content type' => 'Type de contenu',
     'Content type choice' => 'Sélection du type de contenu',
     'Content types' => 'Types de contenu',
+    'The requested content type is not supported.' => 'Ce type de contenu n\'est pas supporté.',
+    'The requested content type has no class.' => 'Ce type de contenu n\'a pas de classe associée.',
 
     /*
      * CONTENT TYPES
@@ -134,6 +152,7 @@ return [
     'Upload a video to servers.' => 'Envoyer une video sur les serveurs.',
 
     /* Agenda */
+    'Agenda' => 'Agenda',
     'Display an agenda from an ICal feed.' => 'Affiche un agenda basé sur un flux ICal',
     'Monday' => 'Lundi',
     'Tuesday' => 'Mardi',

@@ -44,6 +44,14 @@ $config = [
                 ],
             ],
         ],
+        'i18n' => [
+            'translations' => [
+                'app' => [
+                    'class' => 'yii\i18n\PhpMessageSource',
+                    'on missingTranslation' => ['app\components\TranslationEventHandler', 'handleMissingTranslation'],
+                ],
+            ],
+        ],
         'ldap' => [
             'class' => 'Edvlerblog\Ldap',
             'options' => $params['ldapOptions'],

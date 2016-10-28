@@ -3,6 +3,7 @@
 namespace app\models;
 
 use Yii;
+use yii\web\ServerErrorHttpException;
 
 /**
  * This is the model class for table "content".
@@ -114,7 +115,7 @@ class Content extends \yii\db\ActiveRecord
     {
         $className = self::SUB_PATH.$typeId;
         if (!class_exists($className)) {
-            throw new \Exception(Yii::t('app', 'Content type class does not exist'));
+            throw new ServerErrorHttpException(Yii::t('app', 'The requested content type has no class.'));
         }
 
         return $className;
@@ -146,7 +147,7 @@ class Content extends \yii\db\ActiveRecord
     {
         $typeId = $row['type_id'];
         if (!$typeId) {
-            throw new Exception(Yii::t('app', 'Content type class not set'));
+            throw new ServerErrorHttpException(Yii::t('app', 'The requested content has no content type.'));
         }
 
         $class = self::fromType($typeId);

@@ -50,7 +50,7 @@ class ContentController extends BaseController
     {
         $query = Content::availableQuery(Yii::$app->user);
         if ($query === null) {
-            throw new \yii\web\ForbiddenHttpException();
+            throw new \yii\web\ForbiddenHttpException(Yii::t('app', 'You do not have enough rights to view this content.'));
         }
 
         $dataProvider = new ActiveDataProvider([
@@ -78,7 +78,7 @@ class ContentController extends BaseController
     {
         $model = $this->findModel($id);
         if (!$model->canView(Yii::$app->user)) {
-            throw new \yii\web\ForbiddenHttpException();
+            throw new \yii\web\ForbiddenHttpException(Yii::t('app', 'You do not have enough rights to view this content.'));
         }
 
         return $this->render('view', [
@@ -99,7 +99,7 @@ class ContentController extends BaseController
         $model = new Content();
         $flow = Flow::findOne($flowId);
         if ($flow === null) {
-            throw new NotFoundHttpException('The requested page does not exist.');
+            throw new NotFoundHttpException(Yii::t('app', 'The requested flow does not exist.'));
         }
         $model->flow_id = $flow->id;
 
@@ -127,11 +127,11 @@ class ContentController extends BaseController
     {
         $flow = Flow::findOne($flowId);
         if ($flow === null) {
-            throw new NotFoundHttpException(Yii::t('app', 'The requested page does not exist.'));
+            throw new NotFoundHttpException(Yii::t('app', 'The requested flow does not exist.'));
         }
 
         if (!$flow->canView(Yii::$app->user)) {
-            throw new \yii\web\ForbiddenHttpException();
+            throw new \yii\web\ForbiddenHttpException(Yii::t('app', 'You do not have enough rights to view this content.'));
         }
 
         $contentType = ContentType::findOne($type);
@@ -248,7 +248,7 @@ class ContentController extends BaseController
         $model = $this->findModel($id);
 
         if (!$model->canView(Yii::$app->user)) {
-            throw new \yii\web\ForbiddenHttpException();
+            throw new \yii\web\ForbiddenHttpException(Yii::t('app', 'You do not have enough rights to view this content.'));
         }
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
@@ -274,7 +274,7 @@ class ContentController extends BaseController
         $model = $this->findModel($id);
 
         if (!$model->canView(Yii::$app->user)) {
-            throw new \yii\web\ForbiddenHttpException();
+            throw new \yii\web\ForbiddenHttpException(Yii::t('app', 'You do not have enough rights to view this content.'));
         }
 
         $model->delete();
@@ -294,7 +294,7 @@ class ContentController extends BaseController
         $model = $this->findModel($id);
 
         if (!$model->canView(Yii::$app->user)) {
-            throw new \yii\web\ForbiddenHttpException();
+            throw new \yii\web\ForbiddenHttpException(Yii::t('app', 'You do not have enough rights to view this content.'));
         }
 
         $model->enabled = !$model->enabled;
@@ -319,7 +319,7 @@ class ContentController extends BaseController
         if (($model = Content::findOne($id)) !== null) {
             return $model;
         } else {
-            throw new NotFoundHttpException('The requested page does not exist.');
+            throw new NotFoundHttpException(Yii::t('app', 'The requested content does not exist.'));
         }
     }
 }

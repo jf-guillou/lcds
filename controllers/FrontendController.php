@@ -95,7 +95,7 @@ class FrontendController extends BaseController
 
         $screen = Screen::find()->where([Screen::tableName().'.id' => $id])->joinWith(['template', 'template.fields', 'template.fields.contentTypes'])->one();
         if ($screen === null) {
-            throw new NotFoundHttpException('The requested page does not exist.');
+            throw new NotFoundHttpException(Yii::t('app', 'The requested screen does not exist.'));
         }
 
         $content = [
