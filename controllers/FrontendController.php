@@ -6,6 +6,7 @@ use Yii;
 use yii\helpers\Url;
 use yii\web\NotFoundHttpException;
 use yii\db\Expression;
+use app\helpers\Alert;
 use app\models\Screen;
 use app\models\Device;
 use app\models\Field;
@@ -210,9 +211,14 @@ class FrontendController extends BaseController
         if (Yii::$app->user->can('setScreens')) {
             $screen = Screen::findOne($id);
             if ($screen !== null) {
+                Alert::add('Screen will reload', Alert::SUCCESS);
                 $screen->setModified();
+
+                return $this->smartGoBack();
             }
         }
+
+        Alert::add('Failed to force Screen reload', Alert::DANGER);
 
         return $this->smartGoBack();
     }

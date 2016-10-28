@@ -71,6 +71,8 @@ return [
     'Screens' => 'Ecrans',
     'Create Screen' => 'Créer un écran',
     'Preview' => 'Prévisualiser',
+    'Screen will reload' => 'L\'écran va être rafraîchi',
+    'Failed to force Screen reload' => 'Impossible de forcer le rafraîchissement de l\'écran',
 
     /* Flow */
     'Flow' => 'Flux',
