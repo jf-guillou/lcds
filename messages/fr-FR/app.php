@@ -43,6 +43,7 @@ return [
     'Screen manager' => 'Gestionnaire d\'écran',
     'Set roles for {username}' => 'Sélection des rôles pour {username}',
     'Set Roles' => 'Définir les rôles',
+    'Affect' => 'Affecter',
     'User creation failed' => 'Echec de la création de l\'utilisateur',
     'This user doesn\'t exist in LDAP' => 'Cet utilisateur n\'existe pas dans la base LDAP',
     'This user is already registered' => 'Cet utilisateur est déjà enregistré',

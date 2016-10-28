@@ -27,7 +27,7 @@ $this->params['breadcrumbs'][] = $this->title;
             [
                 'attribute' => 'role',
                 'value' => function ($model, $key, $index, $column) {
-                    return Yii::t('app', $model->role);
+                    return $model->role ? Yii::t('app', $model->role->name) : null;
                 },
             ],
 

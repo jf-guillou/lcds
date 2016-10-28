@@ -22,7 +22,7 @@ $this->params['breadcrumbs'][] = Yii::t('app', 'Update');
 
         <div class="row">
             <div class="col-lg-6">
-                <?= $form->field($model, 'role')->dropDownList($roles) ?>
+                <?= $form->field($model, 'roleName')->dropDownList($roles) ?>
             </div>
             <div class="col-lg-6">
                 <?= $form->field($model, 'flows')->listBox($flows, ['multiple' => 'true']) ?>
@@ -30,7 +30,7 @@ $this->params['breadcrumbs'][] = Yii::t('app', 'Update');
         </div>
 
         <div class="form-group">
-            <?= Html::submitButton(Yii::t('app', 'Affecter'), ['class' => 'btn btn-success']) ?>
+            <?= Html::submitButton(Yii::t('app', 'Affect'), ['class' => 'btn btn-success']) ?>
         </div>
 
         <?php ActiveForm::end(); ?>
@@ -41,7 +41,7 @@ $this->params['breadcrumbs'][] = Yii::t('app', 'Update');
 <script type="text/javascript">
 window.jqReady.push(function() {
     var flowableRoles = <?= json_encode($flowableRoles) ?>;
-    $('#user-role').change(function() {
+    $('#user-rolename').change(function() {
         $('#user-flows').parent().toggle(flowableRoles.indexOf($(this).val()) != -1)
     }).trigger('change');
 });

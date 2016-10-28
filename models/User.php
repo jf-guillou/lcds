@@ -40,7 +40,7 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
     {
         return [
             [['username'], 'required'],
-            [['added_at', 'last_login_at', 'role', 'flows'], 'safe'],
+            [['added_at', 'last_login_at', 'roleName', 'flows'], 'safe'],
             [['username', 'hash', 'authkey', 'access_token'], 'string', 'max' => 64],
         ];
     }
@@ -54,7 +54,7 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
             'access_token' => Yii::t('app', 'Access token'),
             'added_at' => Yii::t('app', 'Added at'),
             'last_login_at' => Yii::t('app', 'Last login at'),
-            'role' => Yii::t('app', 'Role'),
+            'roleName' => Yii::t('app', 'Role'),
             'flows' => Yii::t('app', 'Flows'),
         ];
     }
@@ -284,31 +284,55 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
     /**
      * Retrieve user role from authmanager.
      *
-     * @return string|null first role
+     * @return \yii\rbac\Role|null first role
      */
     public function getRole()
     {
         $roles = Yii::$app->authManager->getRolesByUser($this->getId());
         $roleNames = array_keys($roles);
 
-        return count($roleNames) ? $roleNames[0] : null;
+        return count($roleNames) ? $roles[$roleNames[0]] : null;
+    }
+
+    /**
+     * Retrieve user role from authmanager.
+     *
+     * @return string|null first role name
+     */
+    public function getRoleName()
+    {
+        $role = $this->role;
+
+        return $role ? $role->name : null;
     }
 
     /**
      * Set user role in authmanager.
      *
-     * @param string $role role name
+     * @param string $roleName
      *
      * @return bool success
      */
-    public function setRole($role)
+    public function setRoleName($roleName)
     {
         $auth = Yii::$app->authManager;
         $auth->revokeAll($this->getId());
-        if (($r = $auth->getRole($role)) !== null) {
+        if (($r = $auth->getRole($roleName)) !== null) {
             return $auth->assign($r, $this->getId()) !== null;
         }
 
         return false;
+    }
+
+    /**
+     * Indicates if we have to display flows with associated role.
+     *
+     * @return bool need to display flow
+     */
+    public function getNeedsFlow()
+    {
+        $role = $this->role;
+
+        return $role && $role->data && array_key_exists('requireFlow', $role->data);
     }
 }

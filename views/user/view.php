@@ -32,13 +32,14 @@ $this->params['breadcrumbs'][] = $this->title;
             'last_login_at',
             [
                 'attribute' => 'role',
-                'value' => Yii::t('app', $model->role),
+                'value' => $model->role ? Yii::t('app', $model->role->name) : null,
             ],
             [
                 'attribute' => 'flows',
                 'value' => count($model->flows) ? implode(', ', array_map(function ($f) {
-                    return Yii::t('app', $f->name);
+                    return $f->name;
                 }, $model->flows)) : null,
+                'visible' => $model->needsFlow,
             ],
         ],
     ]) ?>
