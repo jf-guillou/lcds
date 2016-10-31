@@ -27,14 +27,14 @@ class Installer
     public static function copyConfiguration(array $paths)
     {
         foreach ($paths as $from => $to) {
-            echo 'mv '.$from.' '.$to.': ';
+            echo 'copy '.$from.' '.$to.': ';
             if (is_dir($to) || is_file($to)) {
                 echo 'destination file exists.'.PHP_EOL;
             } elseif (is_dir($from) || is_file($from)) {
-                if (rename($from, $to)) {
+                if (copy($from, $to)) {
                     echo 'done.'.PHP_EOL;
                 } else {
-                    echo 'error while moving file.'.PHP_EOL;
+                    echo 'error while copying file.'.PHP_EOL;
                 }
             } else {
                 echo 'file not found.'.PHP_EOL;
