@@ -1,6 +1,6 @@
 <?php
 
-namespace app\commands;
+namespace lcds\composer;
 
 class Installer
 {

@@ -37,10 +37,15 @@
     "config": {
         "process-timeout": 1800
     },
+    "autoload": {
+        "psr-4": {
+            "lcds\\": ""
+        }
+    },
     "scripts": {
         "post-install-cmd": [
             "yii\\composer\\Installer::postCreateProject",
-            "app\\commands\\Installer::postInstall"
+            "lcds\\composer\\Installer::postInstall"
         ]
     },
     "extra": {
@@ -56,7 +61,7 @@
                 "config/params.php"
             ]
         },
-        "app\\commands\\Installer::postInstall": {
+        "lcds\\composer\\Installer::postInstall": {
             "copyConfiguration": [
                 {
                     "config/db.example.php": "config/db.php",
