@@ -13,7 +13,7 @@ services:
 before_install:
   - mysql -e 'CREATE DATABASE lcds;'
   - cp config/db.travis.php config/db.php
-  - cp config/params.exemple.php config/params.php
+  - cp config/params.example.php config/params.php
 
 install:
   - composer global require "fxp/composer-asset-plugin:^1.2.0"
