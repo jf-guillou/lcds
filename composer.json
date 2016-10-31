@@ -23,7 +23,11 @@
         "norkunas/youtube-dl-php": "^0.3.0",
         "mhor/php-mediainfo": "^2.2",
         "johngrogg/ics-parser": "dev-master",
-        "bower-asset/weather-icons": "^2.0"
+        "bower-asset/weather-icons": "^2.0",
+        "bower-asset/jquery-file-upload": "^9.13",
+        "bower-asset/moment": "^2.15",
+        "bower-asset/jquery-textfill": "^0.6.0",
+        "bower-asset/raphael": "^2.2"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "*",
