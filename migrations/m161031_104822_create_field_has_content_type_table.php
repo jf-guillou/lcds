@@ -30,13 +30,13 @@ class m161031_104822_create_field_has_content_type_table extends Migration
 
         $this->createIndex(
             'fk_field_has_content_type_field1_idx',
-            'field',
+            'field_has_content_type',
             'field_id'
         );
 
         $this->createIndex(
             'fk_field_has_content_type_content_type1_idx',
-            'field',
+            'field_has_content_type',
             'content_type_id'
         );
 
