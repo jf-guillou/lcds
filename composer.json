@@ -36,8 +36,9 @@
         "process-timeout": 1800
     },
     "scripts": {
-        "post-create-project-cmd": [
-            "yii\\composer\\Installer::postCreateProject"
+        "post-install-cmd": [
+            "yii\\composer\\Installer::postCreateProject",
+            "app\\commands\\Installer::postInstall"
         ]
     },
     "extra": {
@@ -50,7 +51,15 @@
                 }
             ],
             "generateCookieValidationKey": [
-                "config/web.php"
+                "config/params.php"
+            ]
+        },
+        "app\\commands\\Installer::postInstall": {
+            "copyConfiguration": [
+                {
+                    "config/db.example.php": "config/db.php",
+                    "config/params.example.php": "config/params.php"
+                }
             ]
         },
         "asset-installer-paths": {

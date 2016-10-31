@@ -10,10 +10,14 @@ php:
 services:
   - mysql
 
+env:
+  - TRAVIS_BUILD=1
+
 before_install:
   - mysql -e 'CREATE DATABASE lcds;'
-  - cp config/db.travis.php config/db.php
-  - cp config/params.example.php config/params.php
+  - sed -e "s/'username' => '[^']*'/'username' => 'travis'/" -i config/db.example.php
+  - sed -e "s/'password' => '[^']*'/'password' => ''/" -i config/db.example.php
+  - echo "extension = ldap.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
 
 install:
   - composer global require "fxp/composer-asset-plugin:^1.2.0"
