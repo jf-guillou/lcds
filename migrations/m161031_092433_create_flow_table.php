@@ -18,7 +18,7 @@ class m161031_092433_create_flow_table extends Migration
         }
 
         $this->createTable('flow', [
-            'id' => $this->integer()->primaryKey()->append('AUTO_INCREMENT'),
+            'id' => $this->integer()->append('AUTO_INCREMENT'),
             'name' => $this->string(64)->notNull(),
             'description' => $this->string(1024),
             'parent_id' => $this->integer(),
