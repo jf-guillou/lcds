@@ -18,15 +18,9 @@ class m161031_103929_create_template_background_table extends Migration
         }
 
         $this->createTable('template_background', [
-            'id' => $this->integer()->notNull()->append('AUTO_INCREMENT'),
+            'id' => $this->primaryKey()->notNull()->append('AUTO_INCREMENT'),
             'webpath' => $this->string(256)->notNull(),
         ], $tableOptions);
-
-        $this->addPrimaryKey(
-            'pk_template_background',
-            'template_background',
-            ['id']
-        );
     }
 
     /**

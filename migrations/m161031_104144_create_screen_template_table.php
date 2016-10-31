@@ -18,17 +18,11 @@ class m161031_104144_create_screen_template_table extends Migration
         }
 
         $this->createTable('screen_template', [
-            'id' => $this->integer()->notNull()->append('AUTO_INCREMENT'),
+            'id' => $this->primaryKey()->notNull()->append('AUTO_INCREMENT'),
             'name' => $this->string(64)->notNull(),
             'background_id' => $this->integer(),
             'css' => $this->text(),
         ], $tableOptions);
-
-        $this->addPrimaryKey(
-            'pk_screen_template',
-            'screen_template',
-            ['id']
-        );
 
         $this->createIndex(
             'fk_screen_template_template_background1_idx',
@@ -36,7 +30,7 @@ class m161031_104144_create_screen_template_table extends Migration
             'background_id'
         );
 
-        $this->addPrimaryKey(
+        $this->addForeignKey(
             'fk_screen_template_template_background1',
             'screen_template',
             'background_id',

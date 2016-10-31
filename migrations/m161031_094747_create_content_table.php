@@ -18,7 +18,7 @@ class m161031_094747_create_content_table extends Migration
         }
 
         $this->createTable('content', [
-            'id' => $this->integer()->notNull()->append('AUTO_INCREMENT'),
+            'id' => $this->primaryKey()->notNull()->append('AUTO_INCREMENT'),
             'name' => $this->string(64)->notNull(),
             'description' => $this->string(1024),
             'flow_id' => $this->integer()->notNull(),
@@ -30,12 +30,6 @@ class m161031_094747_create_content_table extends Migration
             'add_ts' => $this->timestamp()->notNull()->defaultExpression('CURRENT_TIMESTAMP'),
             'enabled' => $this->boolean()->notNull()->defaultValue(true),
         ], $tableOptions);
-
-        $this->addPrimaryKey(
-            'pk_content',
-            'content',
-            ['id']
-        );
 
         $this->createIndex(
             'fk_content_flow1_idx',

@@ -18,19 +18,13 @@ class m161031_105334_create_screen_table extends Migration
         }
 
         $this->createTable('screen', [
-            'id' => $this->integer()->notNull()->append('AUTO_INCREMENT'),
+            'id' => $this->primaryKey()->notNull()->append('AUTO_INCREMENT'),
             'name' => $this->string(64)->notNull(),
             'description' => $this->string(1024),
             'template_id' => $this->integer()->notNull(),
             'duration' => $this->integer()->notNull()->defaultValue(60),
             'last_changes' => $this->timestamp()->notNull()->defaultExpression('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'),
         ], $tableOptions);
-
-        $this->addPrimaryKey(
-            'pk_screen',
-            'screen',
-            ['id']
-        );
 
         $this->createIndex(
             'fk_screen_template1_idx',

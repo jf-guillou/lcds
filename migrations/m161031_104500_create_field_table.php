@@ -18,7 +18,7 @@ class m161031_104500_create_field_table extends Migration
         }
 
         $this->createTable('field', [
-            'id' => $this->integer()->notNull()->append('AUTO_INCREMENT'),
+            'id' => $this->primaryKey()->notNull()->append('AUTO_INCREMENT'),
             'template_id' => $this->integer()->notNull(),
             'x1' => $this->float()->notNull(),
             'y1' => $this->float()->notNull(),
@@ -27,12 +27,6 @@ class m161031_104500_create_field_table extends Migration
             'css' => $this->text(),
             'js' => $this->text(),
         ], $tableOptions);
-
-        $this->addPrimaryKey(
-            'pk_field',
-            'field',
-            ['id']
-        );
 
         $this->createIndex(
             'fk_field_template1_idx',

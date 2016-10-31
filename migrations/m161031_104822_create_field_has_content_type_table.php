@@ -40,7 +40,7 @@ class m161031_104822_create_field_has_content_type_table extends Migration
             'content_type_id'
         );
 
-        $this->addPrimaryKey(
+        $this->addForeignKey(
             'fk_field_has_content_type_field1',
             'field_has_content_type',
             'field_id',
@@ -50,7 +50,7 @@ class m161031_104822_create_field_has_content_type_table extends Migration
             'CASCADE'
         );
 
-        $this->addPrimaryKey(
+        $this->addForeignKey(
             'fk_field_has_content_type_content_type1',
             'field_has_content_type',
             'content_type_id',
