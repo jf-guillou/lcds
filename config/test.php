@@ -53,7 +53,7 @@ $config = [
         'cache' => [
             'class' => 'yii\caching\FileCache',
         ],
-        'db' => require(__DIR__.'/db.php'),
+        'db' => require(__DIR__.'/db.test.php'),
     ],
     'params' => $params,
 ];
