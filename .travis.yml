@@ -16,7 +16,7 @@ install:
   - composer global require "fxp/composer-asset-plugin:^1.2.0"
   - composer install
   - composer require "edvlerblog/yii2-adldap-module"
-  - ./yii migration
+  - ./yii migrate
 
 before_script:
   - echo 'date.timezone = "Europe/Paris"' >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
