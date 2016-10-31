@@ -23,7 +23,7 @@ class m161031_091506_create_user_table extends Migration
             'authkey' => $this->string(64)->notNull(),
             'access_token' => $this->string(64)->notNull(),
             'added_at' => $this->timestamp()->notNull()->defaultExpression('CURRENT_TIMESTAMP'),
-            'last_login_at' => $this->timestamp(),
+            'last_login_at' => $this->timestamp()->null(),
         ], $tableOptions);
 
         $this->addPrimaryKey(

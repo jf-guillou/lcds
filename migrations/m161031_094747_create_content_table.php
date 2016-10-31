@@ -25,8 +25,8 @@ class m161031_094747_create_content_table extends Migration
             'type_id' => $this->string(45)->notNull(),
             'data' => $this->text(),
             'duration' => $this->integer()->notNull()->defaultValue(10),
-            'start_ts' => $this->timestamp(),
-            'end_ts' => $this->timestamp(),
+            'start_ts' => $this->timestamp()->null(),
+            'end_ts' => $this->timestamp()->null(),
             'add_ts' => $this->timestamp()->notNull()->defaultExpression('CURRENT_TIMESTAMP'),
             'enabled' => $this->boolean()->notNull()->defaultValue(true),
         ], $tableOptions);
