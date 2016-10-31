@@ -51,8 +51,8 @@
     },
     "scripts": {
         "post-install-cmd": [
-            "yii\\composer\\Installer::postCreateProject",
-            "lcds\\composer\\Installer::postInstall"
+            "lcds\\composer\\Installer::postInstall",
+            "yii\\composer\\Installer::postCreateProject"
         ]
     },
     "extra": {
