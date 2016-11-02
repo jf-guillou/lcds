@@ -1,9 +1,6 @@
 ![Project logo](https://raw.githubusercontent.com/jf-guillou/lcds/master/web/images/lcds_logo-200.png)
 
 # Light Centralized Digital Signage
-> Pretty much self explainatory
-
-[![Build Status](https://travis-ci.org/jf-guillou/lcds.svg?branch=master)](https://travis-ci.org/jf-guillou/lcds) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/jf-guillou/lcds/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/jf-guillou/lcds/?branch=master) [![GitHub license](https://img.shields.io/badge/license-New%20BSD-blue.svg)](https://raw.githubusercontent.com/jf-guillou/lcds/master/LICENSE.md)
 
 There are already dozens of digital signage managers. But no easy to use opensource CMS based projects.
 
@@ -11,6 +8,8 @@ Now there's this one.
 
 Based on the [Yii2 framework](http://www.yiiframework.com/).
 See [https://github.com/jf-guillou/lcds/blob/master/composer.json](composer.json) for the complete list of extensions used in this project.
+
+[![Build Status](https://travis-ci.org/jf-guillou/lcds.svg?branch=master)](https://travis-ci.org/jf-guillou/lcds) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/jf-guillou/lcds/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/jf-guillou/lcds/?branch=master) [![GitHub license](https://img.shields.io/badge/license-New%20BSD-blue.svg)](https://raw.githubusercontent.com/jf-guillou/lcds/master/LICENSE.md)
 
 **Table of contents**
 - [Requirements](#requirements)
@@ -34,6 +33,8 @@ See [https://github.com/jf-guillou/lcds/blob/master/composer.json](composer.json
 > Lower PHP versions are unsupported but should work
 
 ## INSTALLATION
+
+**Do not forget to change /path/to/install in the following guide to your liking.**
 
 ### Install app
 
