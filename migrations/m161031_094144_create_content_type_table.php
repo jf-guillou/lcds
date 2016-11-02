@@ -26,6 +26,20 @@ class m161031_094144_create_content_type_table extends Migration
             'content_type',
             ['id']
         );
+
+        $this->batchInsert('content_type', ['id'], [
+            ['Agenda'],
+            ['DateTime'],
+            ['HostedImage'],
+            ['HostedVideo'],
+            ['Image'],
+            ['Media'],
+            ['RSS'],
+            ['Text'],
+            ['Ticker'],
+            ['Video'],
+            ['Weather'],
+        ]);
     }
 
     /**
