@@ -6,7 +6,9 @@ Light Centralized Digital Signage
 REQUIREMENTS
 ------------
 
-- PHP >= 5.4
+- PHP >= 5.6
+- MySQL >= 5.5 OR MariaDB >= 10.0
+- [Composer](https://getcomposer.org/)
 
 INSTALLATION
 ------------
