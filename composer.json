@@ -27,19 +27,16 @@
         "bower-asset/jquery-file-upload": "^9.13",
         "bower-asset/moment": "^2.15",
         "bower-asset/jquery-textfill": "^0.6.0",
-        "bower-asset/raphael": "^2.2"
+        "bower-asset/raphael": "^2.2",
+        "edvlerblog/yii2-adldap-module": "^1.1"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "*",
         "yiisoft/yii2-gii": "*",
         "yiisoft/yii2-faker": "*",
-        "edvlerblog/yii2-adldap-module": "^1.1",
         "codeception/base": "^2.2.3",
         "codeception/verify": "~0.3.1",
         "codeception/specify": "~0.4.3"
-    },
-    "suggest": {
-        "edvlerblog/yii2-adldap-module": "Allows access to LDAP backend to authenticate users"
     },
     "config": {
         "process-timeout": 1800
