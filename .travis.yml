@@ -8,8 +8,7 @@ services:
 
 before_install:
   - mysql -e 'CREATE DATABASE lcds;'
-  - sed -e "s/'username' => '[^']*'/'username' => 'travis'/" -i config/db.example.php
-  - sed -e "s/'password' => '[^']*'/'password' => ''/" -i config/db.example.php
+  - cp config/db.test.php config/db.example.php
   - echo "extension = ldap.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
 
 install:
