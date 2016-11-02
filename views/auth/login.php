@@ -11,9 +11,7 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="auth-login">
 
-    
-
-    <?php $form = ActiveForm::begin(); ?>
+    <?php $form = ActiveForm::begin(['id' => 'login-form']); ?>
 
     <div class="row">
         <div class="col-sm-6 col-md-4 col-md-offset-4">
