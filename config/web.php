@@ -1,6 +1,7 @@
 <?php
 
 $params = require __DIR__.'/params.php';
+$db = require __DIR__.'/db.php';
 
 $config = [
     'id' => 'lcds',
@@ -63,7 +64,7 @@ $config = [
         'cache' => [
             'class' => 'yii\caching\FileCache',
         ],
-        'db' => require(__DIR__.'/db.php'),
+        'db' => $db,
     ],
     'params' => $params,
 ];
