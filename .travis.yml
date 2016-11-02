@@ -1,5 +1,7 @@
 language: php
 php:
+  - '5.4'
+  - '5.5'
   - '5.6'
   - '7.0'
 
@@ -7,7 +9,7 @@ services:
   - mysql
 
 before_install:
-  - mysql -e 'CREATE DATABASE lcds-test;'
+  - mysql -e 'CREATE DATABASE lcds_test;'
   - cp config/db.test.php config/db.example.php
   - echo "extension = ldap.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
 
