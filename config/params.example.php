@@ -1,11 +1,15 @@
 <?php
 
 return [
-    'adminEmail' => 'admin@example.com',
+    // Supported languages 'en-US', 'fr-FR'
+    'language' => 'en-US',
+    // Pretty urls, see README to configure
+    'prettyUrl' => false,
+    // Autofilled with composer install
     'cookieValidationKey' => '',
-    'debugAllowedIPs' => null,
+    // Outgoing proxy
     'proxy' => false,
-    // Auth
+    // Authentication
     'useKerberos' => false,
     'kerberosPrincipalVar' => 'REDIRECT_REMOTE_USER',
     'useLdap' => false,
@@ -20,19 +24,25 @@ return [
         'use_tls' => true,
         'use_sso' => true,
     ],
+    // Cookie duration in seconds
     'cookieDuration' => 60 * 60 * 24 * 7,
-    'language' => 'en-US',
+
     // Content types
+    // Agenda renderer
     'agenda' => [
         'width' => 1260,
         'height' => 880,
         'calendarTimezone' => 'UTC',
         'displayTeachers' => false,
     ],
-    'weather' => [ // https://darksky.net/dev
+    // Weather widget
+    'weather' => [ // Get an API key at https://darksky.net/dev
         'language' => 'en',
         'units' => 'us',
         'apikey' => '',
         'withSummary' => false,
     ],
+
+    // Debug
+    'debugAllowedIPs' => null,
 ];

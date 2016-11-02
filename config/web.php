@@ -23,7 +23,7 @@ $config = [
             'loginUrl' => ['auth/login'],
         ],
         'urlManager' => [
-            'enablePrettyUrl' => true,
+            'enablePrettyUrl' => $params['prettyUrl'],
             'showScriptName' => false,
         ],
         'errorHandler' => [
