@@ -53,7 +53,10 @@ class Agenda extends Content
     }
 
     /**
-     * {@inheritdoc}
+     * Render an image based on Agenda feed.
+     *
+     * @param string $url      feed url
+     * @param string $filename storage file name
      */
     public function genImage($url, $filename)
     {
@@ -545,9 +548,9 @@ class Agenda extends Content
     /**
      * Trim and decode array content.
      *
-     * @param array $arr input array
+     * @param string[] $arr input array
      *
-     * @return array trimed array
+     * @return string[] trimed array
      */
     private static function trimArray($arr)
     {

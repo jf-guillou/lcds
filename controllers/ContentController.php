@@ -44,7 +44,7 @@ class ContentController extends BaseController
     /**
      * Lists all Content models.
      *
-     * @return mixed
+     * @return string
      */
     public function actionIndex()
     {
@@ -72,7 +72,7 @@ class ContentController extends BaseController
      *
      * @param int $id
      *
-     * @return mixed
+     * @return string
      */
     public function actionView($id)
     {
@@ -92,7 +92,7 @@ class ContentController extends BaseController
      *
      * @param int $flowId
      *
-     * @return mixed
+     * @return \yii\web\Reponse|string redirect or render
      */
     public function actionCreate($flowId)
     {
@@ -121,7 +121,7 @@ class ContentController extends BaseController
      * @param int    $flowId
      * @param string $type   content type
      *
-     * @return mixed
+     * @return \yii\web\Reponse|string redirect or render
      */
     public function actionGenerate($flowId, $type = null)
     {
@@ -241,7 +241,7 @@ class ContentController extends BaseController
      *
      * @param int $id
      *
-     * @return mixed
+     * @return \yii\web\Reponse|string redirect or render
      */
     public function actionUpdate($id)
     {
@@ -267,7 +267,7 @@ class ContentController extends BaseController
      *
      * @param int $id
      *
-     * @return mixed
+     * @return \yii\web\Reponse
      */
     public function actionDelete($id)
     {
@@ -287,7 +287,7 @@ class ContentController extends BaseController
      *
      * @param int $id content id
      *
-     * @return mixed
+     * @return \yii\web\Reponse
      */
     public function actionToggle($id)
     {

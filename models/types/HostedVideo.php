@@ -3,7 +3,6 @@
 namespace app\models\types;
 
 use Yii;
-use app\models\Content;
 use yii\web\UploadedFile;
 use yii\helpers\FileHelper;
 use YoutubeDl\YoutubeDl;

@@ -9,7 +9,6 @@ use app\models\Field;
 use app\models\TemplateBackground;
 use yii\data\ActiveDataProvider;
 use yii\helpers\Url;
-use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
@@ -44,7 +43,7 @@ class ScreenTemplateController extends BaseController
     /**
      * Lists all ScreenTemplate models.
      *
-     * @return mixed
+     * @return string
      */
     public function actionIndex()
     {
@@ -62,7 +61,7 @@ class ScreenTemplateController extends BaseController
      *
      * @param int $id
      *
-     * @return mixed
+     * @return string
      */
     public function actionView($id)
     {
@@ -82,7 +81,7 @@ class ScreenTemplateController extends BaseController
      * Creates a new ScreenTemplate model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      *
-     * @return mixed
+     * @return \yii\web\Reponse|string redirect or render
      */
     public function actionCreate()
     {
@@ -104,7 +103,7 @@ class ScreenTemplateController extends BaseController
      *
      * @param int $id
      *
-     * @return mixed
+     * @return \yii\web\Reponse|string redirect or render
      */
     public function actionUpdate($id)
     {
@@ -126,7 +125,7 @@ class ScreenTemplateController extends BaseController
      *
      * @param int $id
      *
-     * @return mixed
+     * @return \yii\web\Reponse
      */
     public function actionDelete($id)
     {
@@ -208,7 +207,7 @@ class ScreenTemplateController extends BaseController
      *
      * @param int $id field id
      *
-     * @return mixed
+     * @return string
      */
     public function actionEditField($id)
     {
@@ -304,7 +303,7 @@ class ScreenTemplateController extends BaseController
     /**
      * Builds an array of backgrounds usable in view.
      *
-     * @return array backgrounds
+     * @return string[] backgrounds
      */
     public static function backgroundsArray()
     {

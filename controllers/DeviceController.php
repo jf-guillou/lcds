@@ -41,7 +41,7 @@ class DeviceController extends BaseController
     /**
      * Lists all Device models.
      *
-     * @return mixed
+     * @return string
      */
     public function actionIndex()
     {
@@ -59,7 +59,7 @@ class DeviceController extends BaseController
      *
      * @param int $id
      *
-     * @return mixed
+     * @return string
      */
     public function actionView($id)
     {
@@ -79,7 +79,7 @@ class DeviceController extends BaseController
      * Creates a new Device model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      *
-     * @return mixed
+     * @return \yii\web\Reponse|string redirect or render
      */
     public function actionCreate()
     {
@@ -100,7 +100,7 @@ class DeviceController extends BaseController
      *
      * @param int $id
      *
-     * @return mixed
+     * @return \yii\web\Reponse|string redirect or render
      */
     public function actionUpdate($id)
     {
@@ -121,7 +121,7 @@ class DeviceController extends BaseController
      *
      * @param int $id
      *
-     * @return mixed
+     * @return \yii\web\Reponse
      */
     public function actionDelete($id)
     {
@@ -136,7 +136,7 @@ class DeviceController extends BaseController
      * @param int $id
      * @param int $screenId
      *
-     * @return mixed
+     * @return \yii\web\Reponse|string redirec or render
      */
     public function actionLink($id, $screenId = null)
     {
@@ -166,7 +166,7 @@ class DeviceController extends BaseController
      * @param int $id
      * @param int $flowId
      *
-     * @return mixed
+     * @return \yii\web\Reponse
      */
     public function actionUnlink($id, $screenId)
     {
@@ -184,7 +184,7 @@ class DeviceController extends BaseController
      *
      * @param int $id screen id
      *
-     * @return mixed
+     * @return \yii\web\Reponse
      */
     public function actionToggle($id)
     {

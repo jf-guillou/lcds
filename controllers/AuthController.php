@@ -43,7 +43,7 @@ class AuthController extends BaseController
     /**
      * Index redirects to login action.
      *
-     * @return mixed
+     * @return \yii\web\Reponse|string redirect or render
      */
     public function actionIndex()
     {
@@ -54,7 +54,7 @@ class AuthController extends BaseController
      * Login an user based on kerberos auth if available, else use login form
      * with LDAP backend if available or DB.
      *
-     * @return mixed
+     * @return \yii\web\Reponse|string redirect or render
      */
     public function actionLogin()
     {
@@ -92,6 +92,11 @@ class AuthController extends BaseController
         ]);
     }
 
+    /**
+     * Check for kerberos configuration and try to authenticate user.
+     *
+     * @return \app\models\User|null found user
+     */
     private function kerberosAuth()
     {
         // Kerberos auth
@@ -106,7 +111,7 @@ class AuthController extends BaseController
     /**
      * Disconnects current user.
      *
-     * @return mixed
+     * @return \yii\web\Reponse
      */
     public function actionLogout()
     {

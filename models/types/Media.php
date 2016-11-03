@@ -282,7 +282,7 @@ class Media extends Content
     /**
      * Try to get media info for this media.
      *
-     * @return \MediaInfo|null media info
+     * @return \Mhor\MediaInfo\Container\MediaInfoContainer|null media info
      */
     protected static function getMediaInfo($realFilepath)
     {
@@ -296,7 +296,9 @@ class Media extends Content
     /**
      * Use mediainfo to parse media duration.
      *
-     * @return int media duration
+     * @param string $realFilepath
+     *
+     * @return int|null media duration
      */
     public static function getDuration($realFilepath)
     {
@@ -377,8 +379,6 @@ class Media extends Content
     /**
      * After delete event
      * Try to delete file if necessary.
-     *
-     * @return bool success
      */
     public function afterDelete()
     {

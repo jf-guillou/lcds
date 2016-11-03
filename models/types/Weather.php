@@ -4,7 +4,6 @@ namespace app\models\types;
 
 use Yii;
 use app\models\Content;
-use yii\helpers\Url;
 
 /**
  * This is the model class for Weather content type.

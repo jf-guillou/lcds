@@ -22,7 +22,7 @@ class MainController extends BaseController
     /**
      * Display homepage.
      *
-     * @return mixed
+     * @return string
      */
     public function actionIndex()
     {

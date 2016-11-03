@@ -42,7 +42,7 @@ class FlowController extends BaseController
     /**
      * Lists all Flow models.
      *
-     * @return mixed
+     * @return string
      */
     public function actionIndex()
     {
@@ -65,7 +65,7 @@ class FlowController extends BaseController
      *
      * @param int $id
      *
-     * @return mixed
+     * @return string
      */
     public function actionView($id)
     {
@@ -88,7 +88,7 @@ class FlowController extends BaseController
      * Creates a new Flow model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      *
-     * @return mixed
+     * @return \yii\web\Reponse|string redirect or render
      */
     public function actionCreate()
     {
@@ -112,7 +112,7 @@ class FlowController extends BaseController
      *
      * @param int $id
      *
-     * @return mixed
+     * @return \yii\web\Reponse|string redirect or render
      */
     public function actionUpdate($id)
     {
@@ -136,7 +136,7 @@ class FlowController extends BaseController
      *
      * @param int $id
      *
-     * @return mixed
+     * @return \yii\web\Reponse
      */
     public function actionDelete($id)
     {

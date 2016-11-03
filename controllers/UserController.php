@@ -46,7 +46,7 @@ class UserController extends Controller
     /**
      * Lists all User models.
      *
-     * @return mixed
+     * @return string render
      */
     public function actionIndex()
     {
@@ -64,7 +64,7 @@ class UserController extends Controller
      *
      * @param string $id
      *
-     * @return mixed
+     * @return string render
      */
     public function actionView($id)
     {
@@ -77,7 +77,7 @@ class UserController extends Controller
      * Creates a new User model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      *
-     * @return mixed
+     * @return \yii\web\Response|string redirect or render
      */
     public function actionCreate()
     {
@@ -103,7 +103,7 @@ class UserController extends Controller
     /**
      * Import user from LDAP and save it.
      *
-     * @return mixed
+     * @return \yii\web\Response|string redirect or render
      */
     public function actionImport()
     {
@@ -134,7 +134,7 @@ class UserController extends Controller
      *
      * @param string $id
      *
-     * @return mixed
+     * @return \yii\web\Response
      */
     public function actionDelete($id)
     {
@@ -148,7 +148,7 @@ class UserController extends Controller
      *
      * @param string $id user id
      *
-     * @return mixed
+     * @return \yii\web\Response|string redirect or render
      */
     public function actionSetRoles($id)
     {

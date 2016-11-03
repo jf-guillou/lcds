@@ -28,7 +28,7 @@ class FrontendController extends BaseController
      * Checks authorization based on session & cookie
      * Else create a new screen and display auth.
      *
-     * @return mixed
+     * @return string
      */
     public function actionIndex()
     {
@@ -84,7 +84,7 @@ class FrontendController extends BaseController
      *
      * @param int $id screen id
      *
-     * @return mixed
+     * @return \yii\web\Reponse|string redirect or render
      */
     public function actionScreen($id, $preview = false)
     {
@@ -206,6 +206,13 @@ class FrontendController extends BaseController
         return ['success' => true, 'next' => $next];
     }
 
+    /**
+     * Send an screen reload order to device.
+     *
+     * @param int $id screen id
+     *
+     * @return \yii\web\Reponse
+     */
     public function actionForceReload($id)
     {
         if (Yii::$app->user->can('setScreens')) {

@@ -42,7 +42,7 @@ class ScreenController extends BaseController
     /**
      * Lists all Screen models.
      *
-     * @return mixed
+     * @return string
      */
     public function actionIndex()
     {
@@ -65,7 +65,7 @@ class ScreenController extends BaseController
      *
      * @param int $id
      *
-     * @return mixed
+     * @return string
      */
     public function actionView($id)
     {
@@ -88,7 +88,7 @@ class ScreenController extends BaseController
      * Creates a new Screen model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      *
-     * @return mixed
+     * @return \yii\web\Reponse|string redirect or render
      */
     public function actionCreate()
     {
@@ -117,7 +117,7 @@ class ScreenController extends BaseController
      *
      * @param int $id
      *
-     * @return mixed
+     * @return \yii\web\Reponse|string redirect or render
      */
     public function actionUpdate($id)
     {
@@ -146,7 +146,7 @@ class ScreenController extends BaseController
      *
      * @param int $id
      *
-     * @return mixed
+     * @return \yii\web\Reponse
      */
     public function actionDelete($id)
     {
@@ -161,7 +161,7 @@ class ScreenController extends BaseController
      * @param int $id
      * @param int $flowId
      *
-     * @return mixed
+     * @return \yii\web\Reponse|string redirect or render
      */
     public function actionLink($id, $flowId = null)
     {
@@ -191,7 +191,7 @@ class ScreenController extends BaseController
      * @param int $id
      * @param int $flowId
      *
-     * @return mixed
+     * @return \yii\web\Reponse
      */
     public function actionUnlink($id, $flowId)
     {

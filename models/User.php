@@ -104,7 +104,7 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
      * @param string $username
      * @param string $password
      *
-     * @return \User|null created user
+     * @return User|null created user
      */
     public static function create($username, $password)
     {
@@ -139,7 +139,7 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
      *
      * @param string $id user ID
      *
-     * @return \User|null found user
+     * @return User|null found user
      */
     public static function findInLdap($id)
     {
