@@ -13,6 +13,7 @@ use yii\db\Expression;
  * @property string $description
  * @property string $last_auth
  * @property bool $enabled
+ * @property int $lastId
  * @property DeviceHasScreen[] $deviceHasScreens
  * @property Screen[] $screens
  */

@@ -1,3 +1,5 @@
+/** global: updateScreenUrl */
+
 /**
  * Screen class constructor
  * @param {string} updateScreenUrl global screen update checks url

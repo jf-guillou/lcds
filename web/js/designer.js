@@ -1,9 +1,13 @@
+/** global: fields contentType templateId editFieldUrl setFieldPostUrl selfContentIds */
+
 // Raphael handler for draw init action
 // Draws fields
 function preDraw() {
   paper = this;
   for (var f in fields) {
-    createField(fields[f]);
+    if (fields.hasOwnProperty(f)) {
+      createField(fields[f]);
+    }
   }
 }
 
@@ -134,7 +138,6 @@ function handleMove(dx, dy, x, y, e) {
         dy = pH - oY - oH; // oY + oH + dY = pH -> dY = 
       }
       oH = oH + dy;
-      console.log(oY, oH, dy);
       break;
     case 'LEFT':
       if (oW - dx < resizeMin) {
@@ -211,7 +214,6 @@ function handleMoveEnd(e) {
   o.y1 = this.attr('y') / pH;
   o.x2 = (this.attr('x') + this.attr('width')) / pW;
   o.y2 = (this.attr('y') + this.attr('height')) / pH;
-  //console.log(o);
   $.post(setFieldPosUrl + o.id, {
     Field: o
   });

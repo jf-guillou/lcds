@@ -30,12 +30,7 @@ foreach ($fields as $field) :
         'top: '.($field->y1 * 100).'%;',
         'right: '.((1 - $field->x2) * 100).'%;',
         'bottom: '.((1 - $field->y2) * 100).'%;',
-        //'width: '.($field->x2 * 100).'%;',
-        //'height: '.($field->y2 * 100).'%;',
     ];
-    //if ($field->css) {
-    //    $properties[] = $field->css;
-    //}
     $css[] = '#field_'.$field->id.' { '.implode(' ', $properties).'}';
     if ($field->css) {
         $css[] = $field->css;

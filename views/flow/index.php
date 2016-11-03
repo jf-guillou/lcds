@@ -19,17 +19,12 @@ $this->params['breadcrumbs'][] = $this->title;
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
         'columns' => [
-            //['class' => 'yii\grid\SerialColumn'],
-
-            //'id',
             'name',
             'description',
             [
                 'attribute' => 'parent',
-                //'label' => Yii::t('app', 'Template'),
                 'value' => 'parent.name',
             ],
-
             [
                 'class' => 'yii\grid\ActionColumn',
                 'visibleButtons' => [
