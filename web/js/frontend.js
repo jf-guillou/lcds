@@ -21,7 +21,6 @@ Screen.prototype.checkUpdates = function() {
       if (s.lastChanges == null) {
         s.lastChanges = j.data.lastChanges;
       } else if (s.lastChanges != j.data.lastChanges) {
-        console.log('Screen changes');
         s.reload();
         s.nextUrl = null;
         return;
@@ -48,19 +47,16 @@ Screen.prototype.reload = function(minDuration) {
   this.endAt = minDuration ? Date.now() + minDuration : 0;
   this.stopping = true;
   for (var i in this.fields) {
+    if (!this.fields.hasOwnProperty(i)) {
+      continue;
+    }
     var f = this.fields[i];
     if (f.timeout && f.endAt > this.endAt) {
       this.endAt = f.endAt;
     }
   }
 
-  if (this.endAt !== 0) {
-    if (this.nextUrl) {
-      console.log('Screen will change to', this.nextUrl, 'in', this.endAt - Date.now(), 'ms');
-    } else {
-      console.log('Screen will reload in', this.endAt - Date.now(), 'ms');
-    }
-  } else {
+  if (this.endAt === 0) {
     this.doReload();
   }
 }
@@ -74,6 +70,17 @@ Screen.prototype.doReload = function() {
   } else {
     window.location.reload();
   }
+}
+
+/**
+ * Check every field for content
+ * @param  {Content} data 
+ * @return {boolean} content is displayed
+ */
+Screen.prototype.displaysData = function(data) {
+  return this.fields.filter(function(field) {
+    return field.current && field.current.data == data;
+  }).length > 0;
 }
 
 /**
@@ -179,18 +186,19 @@ Field.prototype.pickNext = function() {
         this.next = c;
         break;
       }
-    } else if (this.screen.fields.filter(function(field) {
-        return field.current && field.current.data == c.data;
-      }).length) {
+      continue;
+    }
+
+    if (this.screen.displaysData(c.data)) {
       // Same content already displayed on other field, avoid if enough content
       if (this.contents.length < 3) {
         this.next = c;
         break;
       }
-    } else {
-      this.next = c;
-      break;
+      continue;
     }
+
+    this.next = c;
   }
 
   this.display();
