@@ -255,26 +255,27 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
     {
         if ($flows === '' || count($flows) === 0) {
             $this->unlinkAll('flows', true);
-        } else {
-            $prevFlows = [];
-            foreach ($this->flows as $f) {
-                $prevFlows[] = $f->id;
-            }
 
-            $unlink = array_diff($prevFlows, $flows);
-            if (count($unlink)) {
-                $uFlows = Flow::findAll($unlink);
-                foreach ($uFlows as $f) {
-                    $this->unlink('flows', $f, true);
-                }
-            }
+            return true;
+        }
 
-            $link = array_diff($flows, $prevFlows);
-            if (count($link)) {
-                $lFlows = Flow::findAll($link);
-                foreach ($lFlows as $f) {
-                    $this->link('flows', $f);
-                }
+        $prevFlows = array_map(function ($f) {
+            return $f->id;
+        }, $this->flows);
+
+        $unlink = array_diff($prevFlows, $flows);
+        if (count($unlink)) {
+            $uFlows = Flow::findAll($unlink);
+            foreach ($uFlows as $f) {
+                $this->unlink('flows', $f, true);
+            }
+        }
+
+        $link = array_diff($flows, $prevFlows);
+        if (count($link)) {
+            $lFlows = Flow::findAll($link);
+            foreach ($lFlows as $f) {
+                $this->link('flows', $f);
             }
         }
 

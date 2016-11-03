@@ -52,11 +52,6 @@ class HostedVideo extends Video
             return false;
         }
 
-        // $this->filename = $video->getFilename();
-        // $this->path = self::getPath().$this->filename;
-        // $this->size = $video->getFile()->getSize();
-        // $this->duration = $video->getDuration();
-
         $this->filename = $video->getFilename();
         $tmpFilepath = sys_get_temp_dir().$this->filename;
 
@@ -69,7 +64,7 @@ class HostedVideo extends Video
 
         if ($this->validate(['upload'])) {
             if (static::validateFile($fileInstance->tempName)) {
-                return ['filename' => $filename, 'tmppath' => $tmpFilepath, 'duration' => static::getDuration($tmpFilepath)];
+                return ['filename' => $this->filename, 'tmppath' => $tmpFilepath, 'duration' => static::getDuration($tmpFilepath)];
             }
             $this->addError(static::TYPE, Yii::t('app', 'Invalid file'));
         } else {

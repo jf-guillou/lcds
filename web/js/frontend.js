@@ -156,7 +156,8 @@ Field.prototype.randomizeSortContents = function() {
 Field.prototype.pickNext = function() {
   if (this.screen.stopping) { // Stoping screen
     if (this.screen.endAt < Date.now()) {
-      return this.screen.doReload();
+      this.screen.doReload();
+      return;
     }
   }
 

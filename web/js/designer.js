@@ -94,6 +94,7 @@ function getField(id, cb) {
       cb(e);
       return false;
     }
+    return;
   });
 }
 

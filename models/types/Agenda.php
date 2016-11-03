@@ -61,7 +61,7 @@ class Agenda extends Content
         $content = self::fromCache($url);
         if (!$content) {
             $content = self::downloadContent($url);
-            self::toCache($url, $content, self::BASE_CACHE_TIME);
+            self::toCache($url, $content);
         }
 
         $this->opts = \Yii::$app->params['agenda'];
@@ -137,7 +137,7 @@ class Agenda extends Content
 
             // Sets global multiple locations, to enable width divisers
             // A single location cannot be used by multiple groups at the same time
-            if ($prevLocation != null && $location != $prevLocation) {
+            if ($prevLocation !== null && $location != $prevLocation) {
                 $hasMultipleLocations = true;
             }
             $prevLocation = $location;
@@ -159,8 +159,6 @@ class Agenda extends Content
                 'position' => 0,
             ];
         }
-
-        // exit(var_dump($blocks));
 
         // Sort blocks by day and group
         usort($blocks, function ($a, $b) {
@@ -188,9 +186,7 @@ class Agenda extends Content
                     $w = 2;
                 } elseif (preg_match('/\d$/i', $g)) { // 123
                     $w = 3;
-                }/* elseif (preg_match('/\s\d{3}$/i', $g)) {
-                    $w = 3;
-                }*/
+                }
                 if (!array_key_exists($w, $diviserWeight)) {
                     $diviserWeight[$w] = [];
                 }
@@ -228,12 +224,11 @@ class Agenda extends Content
 
         ksort($diviserWeight);
 
-        // exit(var_dump($diviserWeight));
-
         // Check if room planning (never overlaps) to allow full width on different groups
         if (($forceSingleDiv = !$hasMultipleLocations)) {
+            $blocksCount = count($blocks);
             foreach ($blocks as $i => $b) {
-                for ($j = $i + 1; $j < count($blocks); ++$j) {
+                for ($j = $i + 1; $j < $blocksCount; ++$j) {
                     if (self::overlap($b, $blocks[$j])) {
                         $forceSingleDiv = false;
                         break 2;
@@ -271,7 +266,7 @@ class Agenda extends Content
                     if ((int) $lChar) {
                         $lChar = (int) $lChar - 1;
                     } else {
-                        $lChar = ord(strtolower($lChar)) - 97; // ord('a') = 97
+                        $lChar = ord(strtolower($lChar)) - 97; // 97 is a
                     }
 
                     // Make sure we don't go full ham
@@ -290,8 +285,6 @@ class Agenda extends Content
             }
             $parentDiv = $div;
         }
-
-        // exit(var_dump($divisers, $positions));
 
         // Draw event blocks on image
         foreach ($blocks as $b) {
@@ -363,8 +356,9 @@ class Agenda extends Content
         $this->leftBlockWidth = 2 + $this->strW * 2 + 2;
 
         // Draw hours
-        $this->hourStep = ($this->opts['height'] - $this->headerHeight) / count(self::HOURS);
-        for ($i = 0; $i < count(self::HOURS); ++$i) {
+        $hoursCount = count(self::HOURS);
+        $this->hourStep = ($this->opts['height'] - $this->headerHeight) / $hoursCount;
+        for ($i = 0; $i < $hoursCount; ++$i) {
             $offset = $this->headerHeight + $this->hourStep * $i;
             imageline($this->img, 0, $offset, $this->opts['width'] - 1, $offset, $this->color['grey']);
 
@@ -389,8 +383,9 @@ class Agenda extends Content
         }
 
         // Draw days
-        $this->dayStep = ($this->opts['width'] - $this->leftBlockWidth) / count(self::DAYS);
-        for ($i = 0; $i < count(self::DAYS); ++$i) {
+        $daysCount = count(self::DAYS);
+        $this->dayStep = ($this->opts['width'] - $this->leftBlockWidth) / $daysCount;
+        for ($i = 0; $i < $daysCount; ++$i) {
             $offset = $this->leftBlockWidth + $this->dayStep * $i;
             imagestring(
                 $this->img,
@@ -408,17 +403,17 @@ class Agenda extends Content
     /**
      * Draws an event block on calendar image.
      *
-     * @param int    $day         day index
-     * @param int    $hour        hour index
-     * @param int    $duration    duration in hours
-     * @param string $text        event content text
-     * @param string $bgColor     background color
-     * @param string $borderColor border color
-     * @param string $textColor   text color
-     * @param int    $diviser     event width diviser
-     * @param int    $position    position inside day column
+     * @param int      $day         day index
+     * @param int      $hour        hour index
+     * @param int      $duration    duration in hours
+     * @param string[] $text        event content text
+     * @param string   $bgColor     background color
+     * @param string   $borderColor border color
+     * @param string   $textColor   text color
+     * @param int      $diviser     event width diviser
+     * @param int      $position    position inside day column
      */
-    private function drawEvent($day = 0, $hour = 0, $duration = 1, $text = 'Derp', $bgColor = 'white', $borderColor = 'black', $textColor = 'black', $diviser = 1, $position = 0)
+    private function drawEvent($day = 0, $hour = 0, $duration = 1, $text = [], $bgColor = 'white', $borderColor = 'black', $textColor = 'black', $diviser = 1, $position = 0)
     {
         // Setup x, y, width and height
         $x1 = $this->leftBlockWidth + $this->dayStep * $day + ($this->dayStep / $diviser * $position);

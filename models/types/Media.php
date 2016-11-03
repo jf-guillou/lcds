@@ -12,6 +12,10 @@ use app\models\ContentType;
 
 /**
  * This is the model class for Media content type.
+ *
+ * @property \FileInstance $upload
+ * @property  int $size
+ * @property  filename $string
  */
 class Media extends Content
 {
@@ -70,15 +74,13 @@ class Media extends Content
             if ($this->upload->saveAs($tmpFilepath)) {
                 if (static::validateFile($tmpFilepath)) {
                     return ['filename' => $this->filename, 'tmppath' => $tmpFilepath, 'duration' => static::getDuration($tmpFilepath)];
-                } else {
-                    $this->addError('upload', Yii::t('app', 'Invalid file'));
                 }
+                $this->addError('upload', Yii::t('app', 'Invalid file'));
                 unlink($tmpFilepath);
-            } else {
-                $this->addError('upload', Yii::t('app', 'Cannot save file'));
+
+                return false;
             }
-        } else {
-            //$this->addError('upload', Yii::t('app', 'Unable to validate file'));
+            $this->addError('upload', Yii::t('app', 'Cannot save file'));
         }
 
         return false;
@@ -113,7 +115,7 @@ class Media extends Content
      *
      * @param string $url
      *
-     * @return bool success
+     * @return bool|string[] error or json success string
      */
     public function sideload($url)
     {
@@ -161,10 +163,8 @@ class Media extends Content
                 return ['filename' => $this->filename, 'tmppath' => $tmpFilepath, 'duration' => static::getDuration($tmpFilepath)];
             }
             $this->addError('upload', Yii::t('app', 'Invalid file'));
-        } else {
-            //$this->addError('upload', Yii::t('app', 'Unable to validate file'));
         }
-        //unlink($fileInstance->tempName);
+        unlink($fileInstance->tempName);
 
         return false;
     }
@@ -179,14 +179,10 @@ class Media extends Content
      */
     public function readHeaderFilename($curl, $header)
     {
-        if (strpos($header, 'Content-Length:') === 0) {
-            if (preg_match('/(\d+)/', $header, $matches)) {
-                $this->size = trim($matches[1]);
-            }
-        } elseif (strpos($header, 'Content-Disposition:') === 0) {
-            if (preg_match('/filename=(.*)$/', $header, $matches)) {
-                $this->filename = trim(str_replace('"', '', $matches[1]));
-            }
+        if (strpos($header, 'Content-Length:') === 0 && preg_match('/(\d+)/', $header, $matches)) {
+            $this->size = intval(trim($matches[1]));
+        } elseif (strpos($header, 'Content-Disposition:') === 0 && preg_match('/filename=(.*)$/', $header, $matches)) {
+            $this->filename = trim(str_replace('"', '', $matches[1]));
         }
 
         return strlen($header);
@@ -330,22 +326,18 @@ class Media extends Content
 
                 $parts = explode(DIRECTORY_SEPARATOR, $tmppath);
                 $tmpname = array_pop($parts);
-                if (implode(DIRECTORY_SEPARATOR, $parts) == sys_get_temp_dir() && strpos($tmpname, 'LCDS_') === 0 && strpos(DIRECTORY_SEPARATOR, $this->filename) === false) {
-                    if (file_exists($tmppath)) {
-                        $this->filename = static::getUniqFilename(static::getRealPath(), $this->filename);
-                        $this->data = static::getWebPath().$this->filename;
-                        $realFilepath = static::getRealPath().$this->filename;
+                if (implode(DIRECTORY_SEPARATOR, $parts) == sys_get_temp_dir() && strpos($tmpname, 'LCDS_') === 0 && strpos(DIRECTORY_SEPARATOR, $this->filename) === false && file_exists($tmppath)) {
+                    $this->filename = static::getUniqFilename(static::getRealPath(), $this->filename);
+                    $this->data = static::getWebPath().$this->filename;
+                    $realFilepath = static::getRealPath().$this->filename;
 
-                        return rename($tmppath, $realFilepath);
-                    } else {
-                        return false;
-                    }
-                } else {
-                    return false;
+                    return rename($tmppath, $realFilepath);
                 }
-            } else {
-                return true;
+
+                return false;
             }
+
+            return true;
         }
 
         return false;

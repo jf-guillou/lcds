@@ -63,17 +63,12 @@ class AuthController extends BaseController
         }
 
         // Kerberos auth
-        if (Yii::$app->params['useKerberos'] && isset($_SERVER[Yii::$app->params['kerberosPrincipalVar']])) {
-            $username = $_SERVER[Yii::$app->params['kerberosPrincipalVar']];
+        $identity = $this->getFromKerberos();
+        if ($identity) {
+            // Login auto saves in DB
+            Yii::$app->user->login($identity, Yii::$app->params['cookieDuration']);
 
-            // Find in DB/LDAP
-            $identity = User::findIdentity($username);
-            if ($identity) {
-                // Login auto saves in DB
-                Yii::$app->user->login($identity, Yii::$app->params['cookieDuration']);
-
-                return $this->goBack();
-            }
+            return $this->goBack();
         }
 
         // User login form
@@ -95,6 +90,17 @@ class AuthController extends BaseController
         return $this->render('login', [
             'model' => $model,
         ]);
+    }
+
+    private function kerberosAuth()
+    {
+        // Kerberos auth
+        if (Yii::$app->params['useKerberos'] && isset($_SERVER[Yii::$app->params['kerberosPrincipalVar']])) {
+            $username = $_SERVER[Yii::$app->params['kerberosPrincipalVar']];
+
+            // Find in DB/LDAP
+            return User::findIdentity($username);
+        }
     }
 
     /**
