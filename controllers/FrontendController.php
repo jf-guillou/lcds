@@ -84,7 +84,7 @@ class FrontendController extends BaseController
      *
      * @param int $id screen id
      *
-     * @return \yii\web\Reponse|string redirect or render
+     * @return \yii\web\Response|string redirect or render
      */
     public function actionScreen($id, $preview = false)
     {
@@ -211,7 +211,7 @@ class FrontendController extends BaseController
      *
      * @param int $id screen id
      *
-     * @return \yii\web\Reponse
+     * @return \yii\web\Response
      */
     public function actionForceReload($id)
     {

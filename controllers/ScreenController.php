@@ -88,7 +88,7 @@ class ScreenController extends BaseController
      * Creates a new Screen model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      *
-     * @return \yii\web\Reponse|string redirect or render
+     * @return \yii\web\Response|string redirect or render
      */
     public function actionCreate()
     {
@@ -117,7 +117,7 @@ class ScreenController extends BaseController
      *
      * @param int $id
      *
-     * @return \yii\web\Reponse|string redirect or render
+     * @return \yii\web\Response|string redirect or render
      */
     public function actionUpdate($id)
     {
@@ -146,7 +146,7 @@ class ScreenController extends BaseController
      *
      * @param int $id
      *
-     * @return \yii\web\Reponse
+     * @return \yii\web\Response
      */
     public function actionDelete($id)
     {
@@ -161,7 +161,7 @@ class ScreenController extends BaseController
      * @param int $id
      * @param int $flowId
      *
-     * @return \yii\web\Reponse|string redirect or render
+     * @return \yii\web\Response|string redirect or render
      */
     public function actionLink($id, $flowId = null)
     {
@@ -191,7 +191,7 @@ class ScreenController extends BaseController
      * @param int $id
      * @param int $flowId
      *
-     * @return \yii\web\Reponse
+     * @return \yii\web\Response
      */
     public function actionUnlink($id, $flowId)
     {

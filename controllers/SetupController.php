@@ -12,7 +12,7 @@ class SetupController extends BaseController
     /**
      * Run migrations.
      *
-     * @return \yii\web\Reponse
+     * @return \yii\web\Response
      */
     public function actionIndex()
     {

@@ -51,7 +51,7 @@ class TemplateBackgroundController extends Controller
      * Creates a new TemplateBackground model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      *
-     * @return \yii\web\Reponse|string redirect or render
+     * @return \yii\web\Response|string redirect or render
      */
     public function actionCreate($template_id = null)
     {
@@ -78,7 +78,7 @@ class TemplateBackgroundController extends Controller
      *
      * @param int $id
      *
-     * @return \yii\web\Reponse
+     * @return \yii\web\Response
      */
     public function actionDelete($id)
     {

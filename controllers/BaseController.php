@@ -16,7 +16,7 @@ class BaseController extends Controller
      * On delete action, go to item list
      * Else go back to referer.
      *
-     * @return \yii\web\Reponse redirect
+     * @return \yii\web\Response redirect
      */
     public function smartGoBack()
     {

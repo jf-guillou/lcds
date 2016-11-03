@@ -81,7 +81,7 @@ class ScreenTemplateController extends BaseController
      * Creates a new ScreenTemplate model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      *
-     * @return \yii\web\Reponse|string redirect or render
+     * @return \yii\web\Response|string redirect or render
      */
     public function actionCreate()
     {
@@ -103,7 +103,7 @@ class ScreenTemplateController extends BaseController
      *
      * @param int $id
      *
-     * @return \yii\web\Reponse|string redirect or render
+     * @return \yii\web\Response|string redirect or render
      */
     public function actionUpdate($id)
     {
@@ -125,7 +125,7 @@ class ScreenTemplateController extends BaseController
      *
      * @param int $id
      *
-     * @return \yii\web\Reponse
+     * @return \yii\web\Response
      */
     public function actionDelete($id)
     {

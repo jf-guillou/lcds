@@ -79,7 +79,7 @@ class DeviceController extends BaseController
      * Creates a new Device model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      *
-     * @return \yii\web\Reponse|string redirect or render
+     * @return \yii\web\Response|string redirect or render
      */
     public function actionCreate()
     {
@@ -100,7 +100,7 @@ class DeviceController extends BaseController
      *
      * @param int $id
      *
-     * @return \yii\web\Reponse|string redirect or render
+     * @return \yii\web\Response|string redirect or render
      */
     public function actionUpdate($id)
     {
@@ -121,7 +121,7 @@ class DeviceController extends BaseController
      *
      * @param int $id
      *
-     * @return \yii\web\Reponse
+     * @return \yii\web\Response
      */
     public function actionDelete($id)
     {
@@ -136,7 +136,7 @@ class DeviceController extends BaseController
      * @param int $id
      * @param int $screenId
      *
-     * @return \yii\web\Reponse|string redirec or render
+     * @return \yii\web\Response|string redirec or render
      */
     public function actionLink($id, $screenId = null)
     {
@@ -166,7 +166,7 @@ class DeviceController extends BaseController
      * @param int $id
      * @param int $flowId
      *
-     * @return \yii\web\Reponse
+     * @return \yii\web\Response
      */
     public function actionUnlink($id, $screenId)
     {
@@ -184,7 +184,7 @@ class DeviceController extends BaseController
      *
      * @param int $id screen id
      *
-     * @return \yii\web\Reponse
+     * @return \yii\web\Response
      */
     public function actionToggle($id)
     {

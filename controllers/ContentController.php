@@ -92,7 +92,7 @@ class ContentController extends BaseController
      *
      * @param int $flowId
      *
-     * @return \yii\web\Reponse|string redirect or render
+     * @return \yii\web\Response|string redirect or render
      */
     public function actionCreate($flowId)
     {
@@ -121,7 +121,7 @@ class ContentController extends BaseController
      * @param int    $flowId
      * @param string $type   content type
      *
-     * @return \yii\web\Reponse|string redirect or render
+     * @return \yii\web\Response|string redirect or render
      */
     public function actionGenerate($flowId, $type = null)
     {
@@ -241,7 +241,7 @@ class ContentController extends BaseController
      *
      * @param int $id
      *
-     * @return \yii\web\Reponse|string redirect or render
+     * @return \yii\web\Response|string redirect or render
      */
     public function actionUpdate($id)
     {
@@ -267,7 +267,7 @@ class ContentController extends BaseController
      *
      * @param int $id
      *
-     * @return \yii\web\Reponse
+     * @return \yii\web\Response
      */
     public function actionDelete($id)
     {
@@ -287,7 +287,7 @@ class ContentController extends BaseController
      *
      * @param int $id content id
      *
-     * @return \yii\web\Reponse
+     * @return \yii\web\Response
      */
     public function actionToggle($id)
     {
