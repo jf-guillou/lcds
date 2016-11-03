@@ -1,4 +1,4 @@
-/** global: fields contentType templateId editFieldUrl setFieldPostUrl selfContentIds */
+/** global: fields, contentType, templateId, editFieldUrl, setFieldPostUrl, selfContentIds */
 
 // Raphael handler for draw init action
 // Draws fields
