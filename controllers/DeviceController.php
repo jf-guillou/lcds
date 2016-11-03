@@ -76,25 +76,6 @@ class DeviceController extends BaseController
     }
 
     /**
-     * Creates a new Device model.
-     * If creation is successful, the browser will be redirected to the 'view' page.
-     *
-     * @return \yii\web\Response|string redirect or render
-     */
-    public function actionCreate()
-    {
-        $model = new Device();
-
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
-        } else {
-            return $this->render('create', [
-                'model' => $model,
-            ]);
-        }
-    }
-
-    /**
      * Updates an existing Device model.
      * If update is successful, the browser will be redirected to the 'view' page.
      *
