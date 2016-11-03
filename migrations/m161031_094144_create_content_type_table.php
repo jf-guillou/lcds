@@ -13,6 +13,7 @@ class m161031_094144_create_content_type_table extends Migration
      */
     public function up()
     {
+        $tableOptions = null;
         if ($this->db->driverName === 'mysql') {
             $tableOptions = 'CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE=InnoDB';
         }
