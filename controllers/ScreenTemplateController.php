@@ -70,7 +70,7 @@ class ScreenTemplateController extends BaseController
         return $this->render('view', [
             'model' => $screenTemplate,
             'background' => $screenTemplate->background ? $screenTemplate->background->uri : null,
-            'fields' => $screenTemplate->fieldsArray,
+            'fields' => $screenTemplate->getFields()->with('contentTypes')->asArray()->all(),
             'contentTypes' => ContentType::getAllList(),
             'setFieldPosUrl' => Url::to([Yii::$app->controller->id.'/set-field-pos', 'id' => '']),
             'editFieldUrl' => Url::to([Yii::$app->controller->id.'/edit-field', 'id' => '']),

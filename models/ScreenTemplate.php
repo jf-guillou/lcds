@@ -80,14 +80,6 @@ class ScreenTemplate extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getFieldsArray()
-    {
-        return $this->hasMany(Field::className(), ['template_id' => 'id'])->with('contentTypes')->asArray();
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
     public function getScreens()
     {
         return $this->hasMany(Screen::className(), ['template_id' => 'id']);
