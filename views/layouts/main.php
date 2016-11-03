@@ -20,6 +20,7 @@ AppAsset::register($this);
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <?= Html::csrfMetaTags() ?>
     <title><?= Html::encode($this->title) ?></title>
+    <link rel="shortcut icon" href="<?php echo Yii::$app->request->baseUrl; ?>/favicon.ico" type="image/x-icon" />
     <?php $this->head() ?>
 </head>
 <body>
@@ -41,7 +42,7 @@ AppAsset::register($this);
             ['label' => Yii::t('app', 'Templates'), 'url' => ['/screen-template'], 'visible' => Yii::$app->user->can('setTemplates')],
             ['label' => Yii::t('app', 'Screens'), 'url' => ['/screen'], 'visible' => Yii::$app->user->can('setScreens')],
             ['label' => Yii::t('app', 'Flows'), 'url' => ['/flow'], 'visible' => Yii::$app->user->can('setOwnFlowContent')],
-            ['label' => Yii::t('app', 'Content'), 'url' => ['/content'], 'visible' => Yii::$app->user->can('setOwnFlowContent')],
+            ['label' => Yii::t('app', 'Content'), 'url' => ['/content'], 'visible' => Yii::$app->user->can('setContent')],
             ['label' => Yii::t('app', 'Users'), 'url' => ['/user'], 'visible' => Yii::$app->user->can('admin')],
             Yii::$app->user->isGuest ? (
                 ['label' => Yii::t('app', 'Login'), 'url' => ['/auth/login']]
