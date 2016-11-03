@@ -84,7 +84,7 @@ class Weather extends Content
         $content = self::fromCache($url);
         if (!$content) {
             $content = self::downloadContent($url);
-            self::toCache($url, $content, self::BASE_CACHE_TIME);
+            self::toCache($url, $content);
         }
 
         return $this->format(json_decode($content));

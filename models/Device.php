@@ -63,7 +63,11 @@ class Device extends \yii\db\ActiveRecord
         $this->save();
     }
 
-    //TODO ME
+    /**
+     * Get last inserted AUTO_INCREMENT id from database.
+     *
+     * @return int last insert id
+     */
     public function getLastId()
     {
         return $this->getDb()->getLastInsertID();

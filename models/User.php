@@ -19,6 +19,8 @@ use yii\db\Expression;
  * @property bool $remember_me
  * @property UserHasFlow[] $userHasFlows
  * @property Flow[] $flows
+ * @property \yii\rbac\Role $role
+ * @property string $roleName
  */
 class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
 {

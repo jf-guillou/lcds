@@ -169,7 +169,6 @@ class ScreenTemplateController extends BaseController
 
         $field = new Field();
         $field->template_id = $templateId;
-        $max = mt_getrandmax();
         $field->x1 = self::randf(0.1, 0.4);
         $field->y1 = self::randf(0.1, 0.4);
         $field->x2 = self::randf($field->x1, 0.8);
@@ -313,7 +312,6 @@ class ScreenTemplateController extends BaseController
 
         $array = [];
         foreach ($bgs as $bg) {
-            $parts = explode('/', $bg->webpath);
             $array[$bg->id] = [
                 'id' => $bg->id,
                 'name' => $bg->name,

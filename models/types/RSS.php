@@ -26,7 +26,7 @@ class RSS extends Content
         $content = self::fromCache($data);
         if (!$content) {
             $content = self::downloadContent($data);
-            self::toCache($data, $content, self::BASE_CACHE_TIME);
+            self::toCache($data, $content);
         }
 
         return nl2br(Html::encode($content));

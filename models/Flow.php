@@ -17,7 +17,7 @@ use Yii;
  * @property ScreenHasFlow[] $screenHasFlows
  * @property Screen[] $screens
  * @property UserHasFlow[] $userHasFlows
- * @property User[] $userUsernames
+ * @property User[] $users
  */
 class Flow extends \yii\db\ActiveRecord
 {

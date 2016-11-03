@@ -22,7 +22,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <div class="form-group field-upload-file">
             <label class="control-label" for="content-upload-file"><?= Yii::t('app', 'Paste or drag&drop the file or url to upload') ?></label>
             <div id="content-upload-file" class="file-upload">
-                <?= Html::fileInput('content', false, ['class' => 'content-file-upload']) ?>
+                <?= Html::fileInput('content', null, ['class' => 'content-file-upload']) ?>
             </div>
             <div class="help-block"></div>
         </div>

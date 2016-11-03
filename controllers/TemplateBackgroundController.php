@@ -59,8 +59,8 @@ class TemplateBackgroundController extends Controller
 
         if ($modelUpload->load(Yii::$app->request->post())) {
             if ($modelUpload->upload(UploadedFile::getInstance($modelUpload, 'background'))) {
-                if ($screen_id != null) {
-                    return $this->redirect(['template/view', 'id' => $screen_id]);
+                if ($template_id != null) {
+                    return $this->redirect(['template/view', 'id' => $template_id]);
                 }
 
                 return $this->redirect(['index']);

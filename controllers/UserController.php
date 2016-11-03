@@ -111,7 +111,7 @@ class UserController extends Controller
 
         if ($model->load(Yii::$app->request->post()) && $model->validate(['username'])) {
             if (!User::findIdentity($model->username)) {
-                if (($user = User::findInLdap($model)) !== null) {
+                if (($user = User::findInLdap($model->username)) !== null) {
                     $user->save(false);
 
                     return $this->redirect(['view', 'id' => $user->username]);
