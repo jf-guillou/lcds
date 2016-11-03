@@ -97,7 +97,7 @@ class AuthController extends BaseController
      *
      * @return \app\models\User|null found user
      */
-    private function kerberosAuth()
+    private function getFromKerberos()
     {
         // Kerberos auth
         if (Yii::$app->params['useKerberos'] && isset($_SERVER[Yii::$app->params['kerberosPrincipalVar']])) {
