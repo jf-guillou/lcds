@@ -152,8 +152,8 @@ class DeviceController extends BaseController
                 'dataProvider' => $dataProvider,
             ]);
         } else {
-            if (!$model->getScreens()->where(['id' => $screenId])->exists()) {
-                $model->link('screens', Screen::findOne($screenId));
+            if (!$model->getScreens()->where(['id' => $screenId])->exists() && ($screen = Screen::findOne($screenId)) !== null) {
+                $model->link('screens', $screen);
             }
 
             return $this->redirect(['view', 'id' => $id]);
@@ -164,7 +164,7 @@ class DeviceController extends BaseController
      * Remove a Screen from a Device.
      *
      * @param int $id
-     * @param int $flowId
+     * @param int $screenId
      *
      * @return \yii\web\Response
      */
@@ -172,8 +172,8 @@ class DeviceController extends BaseController
     {
         $model = $this->findModel($id);
 
-        if ($model->getScreens()->where(['id' => $screenId])->exists()) {
-            $model->unlink('screens', Screen::findOne($screenId), true);
+        if ($model->getScreens()->where(['id' => $screenId])->exists() && ($screen = Screen::findOne($screenId)) !== null) {
+            $model->unlink('screens', $screen, true);
         }
 
         return $this->redirect(['view', 'id' => $id]);

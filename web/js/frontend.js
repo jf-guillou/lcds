@@ -252,7 +252,9 @@ function onLoad() {
   // Setup content updates loop
   setInterval(function() {
     for (var f in screen.fields) {
-      screen.fields[f].getContents();
+      if (screen.fields.hasOwnProperty(f)) {
+        screen.fields[f].getContents();
+      }
     }
     screen.checkUpdates();
   }, 60000);

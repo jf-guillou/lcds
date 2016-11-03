@@ -177,8 +177,8 @@ class ScreenController extends BaseController
                 'dataProvider' => $dataProvider,
             ]);
         } else {
-            if (!$model->getFlows()->where(['id' => $flowId])->exists()) {
-                $model->link('flows', Flow::findOne($flowId));
+            if (!$model->getFlows()->where(['id' => $flowId])->exists() && ($flow = Flow::findOne($flowId)) !== null) {
+                $model->link('flows', $flow);
             }
 
             return $this->redirect(['view', 'id' => $id]);
@@ -197,8 +197,8 @@ class ScreenController extends BaseController
     {
         $model = $this->findModel($id);
 
-        if ($model->getFlows()->where(['id' => $flowId])->exists()) {
-            $model->unlink('flows', Flow::findOne($flowId), true);
+        if ($model->getFlows()->where(['id' => $flowId])->exists() && ($flow = Flow::findOne($flowId)) !== null) {
+            $model->unlink('flows', $flow, true);
         }
 
         return $this->redirect(['view', 'id' => $id]);

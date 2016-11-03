@@ -112,7 +112,7 @@ function removeField(id) {
 // Field move handler
 var resizeMin = 20;
 
-function handleMove(dx, dy, x, y, e) {
+function handleMove(dx, dy, x, y) {
   var oX = this.ox;
   var oY = this.oy;
   var oH = this.oh;
@@ -178,7 +178,7 @@ function handleMove(dx, dy, x, y, e) {
 // Field move start handler
 var resizeTreshold = 6;
 
-function handleMoveStart(x, y, e) {
+function handleMoveStart(x, y) {
   this.toFront();
   this.text.toFront();
   this.resizing = null;
@@ -204,7 +204,7 @@ function handleMoveStart(x, y, e) {
 }
 
 // Field move end handler
-function handleMoveEnd(e) {
+function handleMoveEnd() {
   if (!this.moved) {
     return;
   }
@@ -274,7 +274,6 @@ $(document).on('beforeSubmit', '#screen-template-field-form', function() {
 // Field delete handler
 $(document).on('click', '.field-delete', function() {
   var $btn = $(this);
-  console.log($btn);
   $.ajax({
     url: $btn.attr('href'),
     type: 'GET',
