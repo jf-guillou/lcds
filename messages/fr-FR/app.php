@@ -74,10 +74,15 @@ return [
     'Create Template Background' => 'Ajouter une image de fond',
     'Background upload' => 'Envoi d\'une image de fond',
     'Add field' => 'Ajouter un champ',
+    'Edit field' => 'Modifier un champ',
     'Manage backgrounds' => 'Gérer les fonds',
     'Add a background' => 'Ajouter un fond',
     'The requested template does not exist.' => 'Ce modèle n\'existe pas.',
     'The requested template background does not exist.' => 'Cette images de fond n\'existe pas.',
+    'X1' => 'X1',
+    'Y1' => 'Y1',
+    'X2' => 'X2',
+    'Y2' => 'Y2',
 
     /* Screen */
     'Screen' => 'Ecran',
@@ -97,6 +102,7 @@ return [
     'Append URL parameters' => 'Paramètres suffixe URL',
     'You do not have enough rights to view this flow.' => 'Vous n\'avez pas assez de droits pour voir ce flux.',
     'The requested flow does not exist.' => 'Ce flux n\'existe pas.',
+    'Parent' => 'Parent',
 
     /* Content */
     'Content' => 'Contenu',
