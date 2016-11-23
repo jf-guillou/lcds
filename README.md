@@ -22,6 +22,8 @@ See [https://github.com/jf-guillou/lcds/blob/master/composer.json](composer.json
     - [Nginx](#nginx)
   - [Ready](#ready)
 - [Upgrade](#upgrade)
+- [Client](#client)
+  - [Raspberry Pi](#raspberry-pi)
 
 
 ## REQUIREMENTS
@@ -136,4 +138,174 @@ cd /path/to/install/lcds
 git pull
 composer install --no-dev
 ./yii migrate --interactive=0
+```
+
+## CLIENT
+
+The client configuration mostly depends on the hardware you are going to use.
+
+Basically, just set the homepage of the browser to your web server adress with '/frontend' suffix
+
+  https://lcds-server/frontend
+
+### Raspberry Pi
+
+The whole project was based on the idea that a proper digital signage could be handled with Raspberry Pi only.
+
+The server part can also be handled by a Raspberry Pi, there isn't much performance required for this CMS.
+
+The client part requires a little more configuration due to the wanky video hardware acceleration on these type of chips.
+
+#### Installation
+
+I recommand using the [minibian](https://minibianpi.wordpress.com/) OS. Trimed of unused libraries and still fully compatible with Raspbian apps.
+
+As of today, the latest version is [Minibian 2016-03-12](https://minibianpi.wordpress.com/2016/03/12/minibian-2016-03-12-is-out/), [direct download](https://sourceforge.net/projects/minibian/files/2016-03-12-jessie-minibian.tar.gz/download)
+
+- Burn this image on a 4Gb or more µSD card using the [appropriate tool](https://minibianpi.wordpress.com/setup/)
+- Login using root / raspberry
+- Extend the partition to fill SD card
+  - Automatically :
+      apt update && apt install raspi-config && raspi-config nonint do_expand_rootfs && reboot
+  - Manually :
+    https://minibianpi.wordpress.com/how-to/resize-sd/
+
+#### Configuration
+
+##### TL;DR
+
+Auto-installer
+
+  wget "https://raw.githubusercontent.com/jf-guillou/lcds/master/tools/raspberrypi.sh" -O - | bash
+
+##### Detailled instructions
+
+- Packages installation
+```
+apt update && apt upgrade
+apt install raspi-config keyboard-configuration console-data rpi-update nano sudo lightdm spectrwm xwit python python-tk lxterminal
+```
+A GUI will ask to configure the installed packages, mainly locales.
+
+- Install browser
+```
+wget -qO - "http://bintray.com/user/downloadSubjectPublicKey?username=bintray" | sudo apt-key add -
+echo "deb http://dl.bintray.com/kusti8/chromium-rpi jessie main" | sudo tee -a /etc/apt/sources.list
+apt update
+apt install omxplayer kweb youtube-dl
+```
+The kweb installer will prompt for suggested packages, you should always refuse them (N).
+
+- Configure OS
+```
+raspi-config nonint do_memory_split 128
+raspi-config nonint do_change_timezone
+```
+
+- Change root password
+```
+passwd
+```
+
+- Create autostart user & set its password
+```
+useradd -m -s /bin/bash -G sudo -G video pi
+passwd pi
+```
+
+- Configure display
+** Don't forget to edit LCDS_FRONTEND value ! **
+```
+# Light DM autologin on user pi
+echo "autologin-user=pi" >> /etc/lightdm/lightdm.conf
+
+# Spectrwm autostart script
+echo "
+disable_border        = 1
+bar_enabled           = 0
+autorun               = ws[1]:/home/pi/autorun.sh
+" > /home/pi/.spectrwm.conf
+chown pi: /home/pi/.spectrwm.conf
+```
+
+- Setup scripts
+```
+mkdir /home/pi/bin
+# Autostart script
+echo '#!/bin/bash
+
+###
+# Set this value according to your installation
+###
+LCDS_FRONTEND="https://lcds-webserver/frontend"
+
+# Move cursor out of the way
+xwit -root -warp $( cat /sys/module/*fb*/parameters/fbwidth ) $( cat /sys/module/*fb*/parameters/fbheight )
+
+# Disable DPMS / Screen blanking
+xset s off
+
+SWITCH=/tmp/turnmeoff
+rm $SWITCH
+
+export PATH="/home/pi/bin:$PATH"
+
+BROWSER="kweb3"
+LOG=/home/pi/autorun.log
+VIDEO="omxplayer.bin"
+while true; do
+  if [ -f $SWITCH ]
+  then
+    if pgrep $BROWSER
+    then
+      echo "$(date "+%F %T") : Killing $BROWSER now" >> $LOG
+      pgrep $VIDEO && kill -9 $(pidof $VIDEO) # Kill player first if necessary
+      kill -1 $(pidof $BROWSER) # Kill browser
+      xset dpms force off # Disable X
+      tvservice -o # Turn off screen
+    fi
+  else
+    if ! pgrep $BROWSER
+    then
+      echo "$(date "+%F %T") : Start $BROWSER now" >> $LOG
+      tvservice -p # Turn on screen
+      sleep 5
+      xset -dpms
+      sleep 5
+      $BROWSER $LCDS_FRONTEND & # Start browser on frontend
+    fi
+  fi
+  sleep 10
+done;
+' > /home/pi/autostart.sh
+
+chown pi: /home/pi/autostart.sh
+chmod u+x /home/pi/autostart.sh
+```
+
+- Configure browser in kiosk mode
+```
+echo "-JEKR+-zbhrqfpoklgtjneduwxyavcsmi#?!.," > /home/pi/.kweb.conf
+
+chown pi: /home/pi/.kweb.conf
+```
+
+- Configure media player
+```
+echo "
+omxplayer_in_terminal_for_video = False
+omxplayer_in_terminal_for_audio = False
+useAudioplayer = False
+useVideoplayer = False
+" >> /usr/local/bin/kwebhelper_settings.py
+
+wget https://raw.githubusercontent.com/jf-guillou/lcds/master/tools/omxplayer -O /home/pi/bin/omxplayer
+
+chown pi: /home/pi/bin/omxplayer
+chmod u+x /home/pi/bin/omxplayer
+```
+
+- Firmware update
+```
+rpi-update && reboot
 ```
