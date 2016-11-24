@@ -1,12 +1,9 @@
 #!/bin/bash
 echo "Install and update packages"
 apt update && apt upgrade -y
-apt install -y raspi-config keyboard-configuration console-data rpi-update nano sudo lightdm spectrwm xwit python python-tk lxterminal
-
-echo "Install browser"
-wget -qO - "http://bintray.com/user/downloadSubjectPublicKey?username=bintray" | sudo apt-key add -
-echo "deb http://dl.bintray.com/kusti8/chromium-rpi jessie main" | sudo tee -a /etc/apt/sources.list
-apt update
+apt install -y keyboard-configuration
+apt install -y console-data
+apt install -y raspi-config rpi-update nano sudo lightdm spectrwm xwit python python-tk lxterminal
 
 echo "Configure OS"
 raspi-config nonint do_memory_split 128
@@ -20,6 +17,10 @@ useradd -m -s /bin/bash -G sudo -G video pi
 echo "Change autostart user password"
 passwd pi
 
+echo "Install browser"
+wget -qO - "http://bintray.com/user/downloadSubjectPublicKey?username=bintray" | sudo apt-key add -
+echo "deb http://dl.bintray.com/kusti8/chromium-rpi jessie main" | sudo tee -a /etc/apt/sources.list
+apt update
 whiptail --msgbox "The kweb installer will prompt for suggested packages, you should anwser No (N) for all of them." 0 0
 apt install -y omxplayer kweb youtube-dl
 

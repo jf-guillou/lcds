@@ -168,7 +168,7 @@ As of today, the latest version is [Minibian 2016-03-12](https://minibianpi.word
 - Burn this image on a 4Gb or more µSD card using the [appropriate tool](https://minibianpi.wordpress.com/setup/)
 - Login using root / raspberry
 - Extend the partition to fill SD card
-  - Automatically : `apt update && apt install raspi-config && raspi-config nonint do_expand_rootfs && reboot`
+  - Automatically : `apt update && apt install -y raspi-config && raspi-config nonint do_expand_rootfs && reboot`
   - Manually : https://minibianpi.wordpress.com/how-to/resize-sd/
 
 ### Auto-Configuration
@@ -190,15 +190,6 @@ apt install raspi-config keyboard-configuration console-data rpi-update nano sud
 ```
 A GUI will ask to configure the installed packages, mainly locales.
 
-- Install browser
-```bash
-wget -qO - "http://bintray.com/user/downloadSubjectPublicKey?username=bintray" | sudo apt-key add -
-echo "deb http://dl.bintray.com/kusti8/chromium-rpi jessie main" | sudo tee -a /etc/apt/sources.list
-apt update
-apt install omxplayer kweb youtube-dl
-```
-The kweb installer will prompt for suggested packages, you should always refuse them (N).
-
 - Configure OS
 ```bash
 raspi-config nonint do_memory_split 128
@@ -215,6 +206,15 @@ passwd
 useradd -m -s /bin/bash -G sudo -G video pi
 passwd pi
 ```
+
+- Install browser
+```bash
+wget -qO - "http://bintray.com/user/downloadSubjectPublicKey?username=bintray" | sudo apt-key add -
+echo "deb http://dl.bintray.com/kusti8/chromium-rpi jessie main" | sudo tee -a /etc/apt/sources.list
+apt update
+apt install omxplayer kweb youtube-dl
+```
+The kweb installer will prompt for suggested packages, you should always refuse them (N).
 
 - Configure display
 **Don't forget to edit LCDS_FRONTEND value !**
