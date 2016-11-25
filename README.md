@@ -220,7 +220,7 @@ The kweb installer will prompt for suggested packages, you should always refuse 
 **Don't forget to edit LCDS_FRONTEND value !**
 ```bash
 # Light DM autologin on user pi
-echo "autologin-user=pi" >> /etc/lightdm/lightdm.conf
+sed -i s/#autologin-user=/autologin-user=pi/ /etc/lightdm/lightdm.conf
 
 # Spectrwm autostart script
 echo "

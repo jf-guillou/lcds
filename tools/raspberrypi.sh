@@ -25,7 +25,7 @@ whiptail --msgbox "The kweb installer will prompt for suggested packages, you sh
 apt install -y omxplayer kweb youtube-dl
 
 echo "Configure display"
-echo "autologin-user=pi" >> /etc/lightdm/lightdm.conf
+sed -i s/#autologin-user=/autologin-user=pi/ /etc/lightdm/lightdm.conf
 echo "
 disable_border        = 1
 bar_enabled           = 0
