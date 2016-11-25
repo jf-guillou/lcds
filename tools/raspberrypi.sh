@@ -103,7 +103,6 @@ wget https://raw.githubusercontent.com/jf-guillou/lcds/master/tools/omxplayer -O
 
 chown pi: /home/pi/bin/omxplayer
 chmod u+x /home/pi/bin/omxplayer
-```
 
 echo "Firmware update. This will reboot the pi!"
 rpi-update && reboot
