@@ -185,8 +185,9 @@ Below are the complete explanations for the commands used in the auto-install sc
 
 - Packages installation
 ```bash
-apt update && apt upgrade
-apt install raspi-config keyboard-configuration console-data rpi-update nano sudo lightdm spectrwm xwit python python-tk lxterminal
+apt update
+apt upgrade -y
+apt install -y apt-utils raspi-config keyboard-configuration console-data rpi-update nano sudo lightdm spectrwm xwit python python-tk lxterminal
 ```
 A GUI will ask to configure the installed packages, mainly locales.
 
