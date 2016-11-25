@@ -1,13 +1,14 @@
 #!/bin/bash
-echo "Install and update packages"
-apt update && apt upgrade -y
-apt install -y keyboard-configuration
-apt install -y console-data
-apt install -y raspi-config rpi-update nano sudo lightdm spectrwm xwit python python-tk lxterminal
+LCDS_FRONTEND=$(whiptail --inputbox "Please input your webserver frontend address (ie: 'https://lcds-webserver/frontend')" 0 0 --nocancel 3>&1 1>&2 2>&3)
 
-echo "Configure OS"
+echo "Install and update packages"
+apt update
+apt upgrade -y
+apt install -y apt-utils raspi-config
 raspi-config nonint do_memory_split 128
 raspi-config nonint do_change_timezone
+apt install -y keyboard-configuration console-data
+apt install -y rpi-update nano sudo lightdm spectrwm xwit python python-tk lxterminal
 
 echo "Change root password"
 passwd
@@ -21,7 +22,6 @@ echo "Install browser"
 wget -qO - "http://bintray.com/user/downloadSubjectPublicKey?username=bintray" | sudo apt-key add -
 echo "deb http://dl.bintray.com/kusti8/chromium-rpi jessie main" | sudo tee -a /etc/apt/sources.list
 apt update
-whiptail --msgbox "The kweb installer will prompt for suggested packages, you should anwser No (N) for all of them." 0 0
 apt install -y omxplayer kweb youtube-dl
 
 echo "Configure display"
@@ -35,7 +35,6 @@ chown pi: /home/pi/.spectrwm.conf
 
 echo "Setup scripts"
 mkdir /home/pi/bin
-LCDS_FRONTEND=$(whiptail --inputbox "Please input your webserver frontend address (ie: 'https://lcds-webserver/frontend')" 0 0 --nocancel 3>&1 1>&2 2>&3)
 echo '#!/bin/bash
 
 ###
