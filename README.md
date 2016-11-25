@@ -175,7 +175,7 @@ As of today, the latest version is [Minibian 2016-03-12](https://minibianpi.word
 
 Configuration of the Raspberry Pi can be mostly automated, beside some prompts for specific details : 
 
-`wget "https://raw.githubusercontent.com/jf-guillou/lcds/master/tools/raspberrypi.sh" -O - | bash`
+`wget "https://raw.githubusercontent.com/jf-guillou/lcds/master/tools/raspberrypi.sh" -O - | bash -s -`
 
 ### Manual Configuration
 
