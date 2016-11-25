@@ -81,10 +81,10 @@ while true; do
   fi
   sleep 10
 done;
-' > /home/pi/autostart.sh
+' > /home/pi/autorun.sh
 
-chown pi: /home/pi/autostart.sh
-chmod u+x /home/pi/autostart.sh
+chown pi: /home/pi/autorun.sh
+chmod u+x /home/pi/autorun.sh
 
 echo "Configure browser in kiosk mode"
 echo "-JEKR+-zbhrqfpoklgtjneduwxyavcsmi#?!.," > /home/pi/.kweb.conf
