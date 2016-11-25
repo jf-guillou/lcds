@@ -167,6 +167,8 @@ As of today, the latest version is [Minibian 2016-03-12](https://minibianpi.word
 
 - Burn this image on a 4Gb or more µSD card using the [appropriate tool](https://minibianpi.wordpress.com/setup/)
 - Login using root / raspberry
+- Do not forget to change root password with
+  `passwd`
 - Extend the partition to fill SD card
   - Automatically : `apt update && apt install -y raspi-config && raspi-config nonint do_expand_rootfs && reboot`
   - Manually : https://minibianpi.wordpress.com/how-to/resize-sd/
@@ -215,7 +217,7 @@ echo "deb http://dl.bintray.com/kusti8/chromium-rpi jessie main" | sudo tee -a /
 apt update
 apt install omxplayer kweb youtube-dl
 ```
-The kweb installer will prompt for suggested packages, you should always refuse them (N).
+The kweb installer may prompt for suggested packages, you should always refuse them (N).
 
 - Configure display
 **Don't forget to edit LCDS_FRONTEND value !**

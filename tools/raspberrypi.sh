@@ -3,20 +3,15 @@ LCDS_FRONTEND=$(whiptail --inputbox "Please input your webserver frontend addres
 
 echo "Install and update packages"
 apt update
-apt upgrade -y
 apt install -y apt-utils raspi-config
 raspi-config nonint do_memory_split 128
 raspi-config nonint do_change_timezone
 apt install -y keyboard-configuration console-data
+apt upgrade -y
 apt install -y rpi-update nano sudo lightdm spectrwm xwit python python-tk lxterminal
 
-echo "Change root password"
-passwd
-
-echo "Create autostart user"
+echo "Create autorun user"
 useradd -m -s /bin/bash -G sudo -G video pi
-echo "Change autostart user password"
-passwd pi
 
 echo "Install browser"
 wget -qO - "http://bintray.com/user/downloadSubjectPublicKey?username=bintray" | sudo apt-key add -
