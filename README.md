@@ -313,3 +313,6 @@ chmod u+x /home/pi/bin/omxplayer
 ```bash
 rpi-update && reboot
 ```
+
+- Ready
+The browser should start, register with lcds server and display the authorization screen.
