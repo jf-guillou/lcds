@@ -24,6 +24,14 @@ class HostedVideo extends Video
     /**
      * {@inheritdoc}
      */
+    public function rules()
+    {
+        return Media::rules();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function sideload($url)
     {
         if (!self::validateUrl($url)) {
@@ -52,7 +60,7 @@ class HostedVideo extends Video
         }
 
         $this->filename = $video->getFilename();
-        $tmpFilepath = sys_get_temp_dir().$this->filename;
+        $tmpFilepath = sys_get_temp_dir().'/'.$this->filename;
 
         $fileInstance = new UploadedFile();
         $fileInstance->name = $this->filename;

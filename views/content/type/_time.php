@@ -8,7 +8,7 @@ use kartik\datetime\DateTimePicker;
 ?>
 <div class="row">
     <div class="col-lg-2">
-        <?= $form->field($model, 'duration')->textInput() ?>
+        <?= $form->field($model, 'duration')->textInput(['id' => 'content-duration']) ?>
     </div>
     <div class="col-lg-5">
         <?= $form->field($model, 'start_ts')->widget(DateTimePicker::className(), [

@@ -328,7 +328,7 @@ class Media extends Content
 
                 $parts = explode(DIRECTORY_SEPARATOR, $tmppath);
                 $tmpname = array_pop($parts);
-                if (implode(DIRECTORY_SEPARATOR, $parts) == sys_get_temp_dir() && strpos($tmpname, 'LCDS_') === 0 && strpos(DIRECTORY_SEPARATOR, $this->filename) === false && file_exists($tmppath)) {
+                if (implode(DIRECTORY_SEPARATOR, $parts) == sys_get_temp_dir() && strpos(DIRECTORY_SEPARATOR, $this->filename) === false && file_exists($tmppath)) {
                     $this->filename = static::getUniqFilename(static::getRealPath(), $this->filename);
                     $this->data = static::getWebPath().$this->filename;
                     $realFilepath = static::getRealPath().$this->filename;
