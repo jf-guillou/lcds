@@ -41,4 +41,12 @@ $this->params['breadcrumbs'][] = $this->title;
         ],
     ]) ?>
 
+    <?php if (is_subclass_of($model, 'app\models\types\Media')) : ?>
+    <div class="text-center">
+        <h3><?= Yii::t('app', 'Preview'); ?></h3>
+        <div class="media-preview">
+            <?= $model->getData() ?>
+        </div>
+    </div>
+    <?php endif; ?>
 </div>
