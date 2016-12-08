@@ -34,7 +34,6 @@ function createField(field) {
   );
   r.text = t.attr('text-anchor', 'start');
   r.drag(handleMove, handleMoveStart, handleMoveEnd)
-    .click(editField);
 }
 
 // Create a new field and store it
@@ -206,6 +205,7 @@ function handleMoveStart(x, y) {
 // Field move end handler
 function handleMoveEnd() {
   if (!this.moved) {
+    editField.call(this);
     return;
   }
 
