@@ -103,14 +103,26 @@ function Content(c) {
   }
 }
 
+/**
+ * Check if content should be ajax preloaded
+ * @return {boolean}
+ */
 Content.prototype.shouldPreload = function() {
   return this.canPreload() && !this.isPreloading() && !this.isPreloaded();
 }
 
+/**
+ * Check if content has pre-loadable material
+ * @return {boolean} 
+ */
 Content.prototype.canPreload = function() {
   return this.getResource() && this.type.search(/Video|Image|Agenda/) != -1;
 }
 
+/**
+ * Extract url from contant data
+ * @return {string} resource url
+ */
 Content.prototype.getResource = function() {
   if (this.src) {
     return this.src;
@@ -131,68 +143,88 @@ Content.prototype.getResource = function() {
   return src;
 }
 
-Content.prototype.isPreloaded = function(expires) {
+/**
+ * Check cache for preload status of content
+ * @return {Boolean} 
+ */
+Content.prototype.isPreloaded = function() {
   if (!this.canPreload()) {
     return true;
   }
 
-  if (expires === undefined) {
-    var cache = screen.cache[this.getResource()]
-    switch (cache) {
-      case undefined: // unset
-      case false: // preloading
-        return false;
-      case true: // preloaded without expire
-        return true;
-      default: // check expire
-        return (new Date()).valueOf() < cache;
-    }
-  } else if (expires === null) {
-    console.log(this.getResource() + ' has no Expires header');
+  var cache = screen.cache[this.getResource()]
+  switch (cache) {
+    case undefined: // unset
+    case false: // preloading
+      return false;
+    case true: // preloaded without expire
+      return true;
+    default: // check expire
+      return (new Date()).valueOf() < cache;
+  }
+}
+
+/**
+ * Set content cache status
+ * @param {string} expires header
+ */
+Content.prototype.setPreloaded = function(expires) {
+  if (expires === null) {
+    // Missing Expires header, do not cache
     screen.cache[this.getResource()] = true;
-  } else if (expires) {
+  }
+
+  if (expires) {
     var exp = new Date(expires).valueOf();
     var diff = exp - (new Date()).valueOf();
-    if (diff < 10000) {
-      console.log(this.getResource() + ' should\'t have Expires header, too short: ' + diff / 1000 + ' sec');
-      screen.cache[this.getResource()] = true;
-    } else {
-      console.log(this.getResource() + ' cached for: ' + diff / 1000 + ' sec');
-      screen.cache[this.getResource()] = exp + 5000;
-    }
+    // Do not cache short Expires
+    screen.cache[this.getResource()] = diff < 10000 ? true : exp + 5000;
   } else {
-    console.log(this.getResource() + ' has been discarded');
+    // Discard now expired content
     delete screen.cache[this.getResource()];
   }
 }
 
-Content.prototype.isPreloading = function(state) {
-  if (state === undefined) {
-    return screen.cache[this.getResource()] === false;
-  } else if (state && !this.isPreloading()) {
+/**
+ * Check cache for in progress preloading
+ * @return {Boolean}
+ */
+Content.prototype.isPreloading = function() {
+  return screen.cache[this.getResource()] === false;
+}
+
+/**
+ * Set content preloading status
+ * @param {boolean} state is preloading
+ */
+Content.prototype.setPreloading = function(state) {
+  if (state) {
     screen.cache[this.getResource] = false;
   } else if (this.isPreloading()) {
     delete screen.cache[this.getResource()];
   }
 }
 
+/**
+ * Ajax call to preload content
+ * @return {[type]} [description]
+ */
 Content.prototype.preload = function() {
   var src = this.getResource();
   if (!src) {
-    this.isPreloaded(true);
+    this.setPreloaded(true);
     return;
   }
-  this.isPreloading(true);
+  this.setPreloading(true);
 
-  console.log('Preloading ' + src);
   var c = this;
   $.ajax({
     method: 'GET',
     url: src,
   }).done(function(data, textStatus, jqXHR) {
-    c.isPreloaded(jqXHR.getResponseHeader('Expires'));
+    c.setPreloaded(jqXHR.getResponseHeader('Expires'));
   }).fail(function(jqXHR, textStatus, errorThrown) {
-    c.isPreloaded(false); // Discard until next Content init
+    c.setPreloaded(false); // Discard until next Content init
   });
 }
 
@@ -261,22 +293,20 @@ Field.prototype.randomizeSortContents = function() {
  * Loop through field contents to pick next displayable content
  */
 Field.prototype.pickNext = function() {
-  if (screen.stopping) { // Stoping screen
-    if (screen.endAt < Date.now()) {
-      screen.doReload();
-      return;
-    }
+  if (screen.stopping && screen.endAt < Date.now()) { // Stoping screen
+    screen.doReload();
+    return;
   }
 
   this.previous = this.current;
   this.current = null;
   var pData = this.previous && this.previous.data;
   // Avoid repeat & other field same content
-  this.randomizeSortContents();
+  //this.randomizeSortContents();
   for (var i = 0; i < this.contents.length; i++) {
     var c = this.contents[i];
-    // Skip too long content
-    if (screen.endAt != null && c.duration + Date.now() > screen.endAt) {
+    // Skip too long or not preloaded content 
+    if ((screen.endAt != null && c.duration + Date.now() > screen.endAt) || !c.isPreloaded()) {
       continue;
     }
 
@@ -295,11 +325,6 @@ Field.prototype.pickNext = function() {
         this.next = c;
         break;
       }
-      continue;
-    }
-
-    // Wait for resource preload
-    if (!c.isPreloaded()) {
       continue;
     }
 
@@ -337,7 +362,6 @@ Field.prototype.display = function() {
     this.timeout = setTimeout(function() {
       f.pickNext();
     }, 2000);
-    console.error('No content to display for', this);
   }
 }
 
