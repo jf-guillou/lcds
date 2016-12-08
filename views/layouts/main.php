@@ -69,7 +69,7 @@ AppAsset::register($this);
 
 <footer class="footer">
     <div class="container">
-        <p class="pull-left">&copy; <a href="https://github.com/jf-guillou/">jf-guillou</a> <?= date('Y') ?></p>
+        <p class="pull-left">&copy; <a href="https://github.com/jf-guillou/">jf-guillou</a> <?= date('Y') ?> - <?= Yii::t('app', 'Developed for the IUT of Saint-Brieuc')?></p>
 
         <p class="pull-right"><?= Yii::powered() ?> <a href="https://github.com/jf-guillou/lcds/">Github</a></p>
     </div>

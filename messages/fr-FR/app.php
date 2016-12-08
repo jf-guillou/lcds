@@ -25,6 +25,7 @@ return [
     'URL' => 'URL',
     'The requested page does not exist.' => 'La page demandée n\'existe pas.',
     'Are you sure you want to delete this item?' => 'Êtes-vous sur de vouloir supprimer cet objet ?',
+    'Developed for the IUT of Saint-Brieuc' => 'Développé pour l\'IUT de Saint-Brieuc',
 
     /* User */
     'User' => 'Utilisateur',
