@@ -8,19 +8,24 @@ use yii\helpers\Url;
 $this->title = 'LCDS';
 ?>
 <div class="main-index">
-    <h1><?= $this->title ?></h1>
-    <h2>Light Centralized Digital Signage</h2>
 
-    <p>
-        This application allows you to setup simple screens to be displayed of any device with a web browser.
-    </p>
+    <div class="text-center">
+        <h1><?= $this->title ?></h1>
+        <h2>Light Centralized Digital Signage</h2>
+
+        <p>
+            This application allows you to setup simple screens to be displayed of any device with a web browser.
+        </p>
+    </div>
 
     <div class="row">
         <?php
         if (Yii::$app->user->can('setDevices')) : ?>
-        <div class="col-lg-4 text-center">
-            <h3><?= Html::a('Device', ['/device']) ?></h3>
-            <h4>Manage physical equipments</h4>
+        <div class="col-lg-4">
+            <div class="text-center">
+                <h3><?= Html::a('Device', ['/device']) ?></h3>
+                <h4>Manage physical equipments</h4>
+            </div>
             <ul>
                 <li>Toggle devices</li>
                 <li>Modify names and descriptions</li>
@@ -31,9 +36,11 @@ $this->title = 'LCDS';
         <?php
         endif;
         if (Yii::$app->user->can('setTemplates')) : ?>
-        <div class="col-lg-4 text-center">
-            <h3><?= Html::a('Template', ['/screen-template']) ?></h3>
-            <h4>Create and edit templates</h4>
+        <div class="col-lg-4">
+            <div class="text-center">
+                <h3><?= Html::a('Template', ['/screen-template']) ?></h3>
+                <h4>Create and edit templates</h4>
+            </div>
             <ul>
                 <li>Create template</li>
                 <li>Edit fields</li>
@@ -43,9 +50,11 @@ $this->title = 'LCDS';
         <?php
         endif;
         if (Yii::$app->user->can('setScreens')) : ?>
-        <div class="col-lg-4 text-center">
-            <h3><?= Html::a('Screen', ['/screen']) ?></h3>
-            <h4>Integrate flow and templates to devices</h4>
+        <div class="col-lg-4">
+            <div class="text-center">
+                <h3><?= Html::a('Screen', ['/screen']) ?></h3>
+                <h4>Integrate flow and templates to devices</h4>
+            </div>
             <ul>
                 <li>Screen preview</li>
                 <li>Integrate template</li>
@@ -56,9 +65,11 @@ $this->title = 'LCDS';
         <?php
         endif;
         if (Yii::$app->user->can('setOwnFlowContent')) : ?>
-        <div class="col-lg-4 text-center">
-            <h3><?= Html::a('Flow', ['/flow']) ?></h3>
-            <h4>Create and add content to screens</h4>
+        <div class="col-lg-4">
+            <div class="text-center">
+                <h3><?= Html::a('Flow', ['/flow']) ?></h3>
+                <h4>Create and add content to screens</h4>
+            </div>
             <ul>
                 <li>Assisted content creation</li>
                 <li>Toggle content display</li>
@@ -67,9 +78,11 @@ $this->title = 'LCDS';
         <?php
         endif;
         if (Yii::$app->user->can('setContent')) : ?>
-        <div class="col-lg-4 text-center">
-            <h3><?= Html::a('Content', ['/content']) ?></h3>
-            <h4>Content global management</h4>
+        <div class="col-lg-4">
+            <div class="text-center">
+                <h3><?= Html::a('Content', ['/content']) ?></h3>
+                <h4>Content global management</h4>
+            </div>
             <ul>
                 <li>Advanced edition</li>
             </ul>
@@ -77,9 +90,11 @@ $this->title = 'LCDS';
         <?php
         endif;
         if (Yii::$app->user->can('admin')) : ?>
-        <div class="col-lg-4 text-center">
-            <h3><?= Html::a('Users', ['/user']) ?></h3>
-            <h4>Handle user rights</h4>
+        <div class="col-lg-4">
+            <div class="text-center">
+                <h3><?= Html::a('Users', ['/user']) ?></h3>
+                <h4>Handle user rights</h4>
+            </div>
             <ul>
                 <li>Create and import users</li>
                 <li>Add access and modification rights</li>
