@@ -11,6 +11,7 @@ function Screen(updateScreenUrl) {
   this.endAt = null;
   this.nextUrl = null;
   this.stopping = false;
+  this.cache = {};
 }
 
 /**
@@ -95,6 +96,96 @@ function Content(c) {
   this.duration = c.duration * 1000;
   this.type = c.type;
   this.displayCount = 0;
+  this.src = null;
+
+  if (this.shouldPreload()) {
+    this.preload();
+  }
+}
+
+Content.prototype.shouldPreload = function() {
+  return this.canPreload() && !this.isPreloading() && !this.isPreloaded();
+}
+
+Content.prototype.canPreload = function() {
+  return this.type.search(/Video|Image|Agenda/) != -1;
+}
+
+Content.prototype.getResource = function() {
+  if (this.src) {
+    return this.src;
+  }
+  var src = this.data.match(/src="([^"]+)"/);
+  if (!src) {
+    return false;
+  }
+  this.src = src[1];
+  return src[1];
+}
+
+Content.prototype.isPreloaded = function(expires) {
+  if (!this.canPreload()) {
+    return true;
+  }
+
+  if (expires === undefined) {
+    var cache = screen.cache[this.getResource()]
+    switch (cache) {
+      case undefined: // unset
+      case false: // preloading
+        return false;
+      case true: // preloaded without expire
+        return true;
+      default: // check expire
+        return (new Date()).valueOf() < cache;
+    }
+  } else if (expires === null) {
+    console.log(this.getResource() + ' has no Expires header');
+    screen.cache[this.getResource()] = true;
+  } else if (expires) {
+    var exp = new Date(expires).valueOf();
+    var diff = exp - (new Date()).valueOf();
+    if (diff < 10000) {
+      console.log(this.getResource() + ' should\'t have Expires header, too short: ' + diff / 1000 + ' sec');
+      screen.cache[this.getResource()] = true;
+    } else {
+      console.log(this.getResource() + ' cached for: ' + diff / 1000 + ' sec');
+      screen.cache[this.getResource()] = exp + 5000;
+    }
+  } else {
+    console.log(this.getResource() + ' has been discarded');
+    delete screen.cache[this.getResource()];
+  }
+}
+
+Content.prototype.isPreloading = function(state) {
+  if (state === undefined) {
+    return screen.cache[this.getResource()] === false;
+  } else if (state && !this.isPreloading()) {
+    screen.cache[this.getResource] = false;
+  } else if (this.isPreloading()) {
+    delete screen.cache[this.getResource()];
+  }
+}
+
+Content.prototype.preload = function() {
+  var src = this.getResource();
+  if (!src) {
+    this.isPreloaded(true);
+    return;
+  }
+  this.isPreloading(true);
+
+  console.log('Preloading ' + src);
+  var c = this;
+  $.ajax({
+    method: 'GET',
+    url: src,
+  }).done(function(data, textStatus, jqXHR) {
+    c.isPreloaded(jqXHR.getResponseHeader('Expires'));
+  }).fail(function(jqXHR, textStatus, errorThrown) {
+    c.isPreloaded(false); // Discard until next Content init
+  });
 }
 
 /**
@@ -102,7 +193,7 @@ function Content(c) {
  * @param {jQuery.Object} $f field object
  * @param {Screen} screen parent screen object
  */
-function Field($f, screen) {
+function Field($f) {
   this.$field = $f;
   this.id = $f.attr('data-id');
   this.url = $f.attr('data-url');
@@ -114,7 +205,6 @@ function Field($f, screen) {
   this.next = null;
   this.timeout = null;
   this.endAt = null;
-  this.screen = screen;
 }
 
 /**
@@ -163,9 +253,9 @@ Field.prototype.randomizeSortContents = function() {
  * Loop through field contents to pick next displayable content
  */
 Field.prototype.pickNext = function() {
-  if (this.screen.stopping) { // Stoping screen
-    if (this.screen.endAt < Date.now()) {
-      this.screen.doReload();
+  if (screen.stopping) { // Stoping screen
+    if (screen.endAt < Date.now()) {
+      screen.doReload();
       return;
     }
   }
@@ -178,7 +268,7 @@ Field.prototype.pickNext = function() {
   for (var i = 0; i < this.contents.length; i++) {
     var c = this.contents[i];
     // Skip too long content
-    if (this.screen.endAt != null && c.duration + Date.now() > this.screen.endAt) {
+    if (screen.endAt != null && c.duration + Date.now() > screen.endAt) {
       continue;
     }
 
@@ -191,12 +281,17 @@ Field.prototype.pickNext = function() {
       continue;
     }
 
-    if (this.screen.displaysData(c.data)) {
+    if (screen.displaysData(c.data)) {
       // Same content already displayed on other field, avoid if enough content
       if (this.contents.length < 3) {
         this.next = c;
         break;
       }
+      continue;
+    }
+
+    // Wait for resource preload
+    if (!c.isPreloaded()) {
       continue;
     }
 
@@ -230,7 +325,10 @@ Field.prototype.display = function() {
     }, this.current.duration);
     this.endAt = this.current.duration + Date.now()
   } else {
-    this.timeout = null;
+    var f = this;
+    this.timeout = setTimeout(function() {
+      f.pickNext();
+    }, 2000);
     console.error('No content to display for', this);
   }
 }
@@ -240,11 +338,13 @@ Field.prototype.display = function() {
  * Initialize Screen and Fields
  * Setup updates interval timeouts
  */
+var screen = null;
+
 function onLoad() {
-  var screen = new Screen(updateScreenUrl);
+  screen = new Screen(updateScreenUrl);
   // Init
   $('.field').each(function() {
-    var f = new Field($(this), screen);
+    var f = new Field($(this));
     f.getContents();
     screen.fields.push(f);
   });
