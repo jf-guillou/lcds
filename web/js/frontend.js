@@ -108,19 +108,27 @@ Content.prototype.shouldPreload = function() {
 }
 
 Content.prototype.canPreload = function() {
-  return this.type.search(/Video|Image|Agenda/) != -1;
+  return this.getResource() && this.type.search(/Video|Image|Agenda/) != -1;
 }
 
 Content.prototype.getResource = function() {
   if (this.src) {
     return this.src;
   }
-  var src = this.data.match(/src="([^"]+)"/);
-  if (!src) {
+  var srcMatch = this.data.match(/src="([^"]+)"/);
+  if (!srcMatch) {
     return false;
   }
-  this.src = src[1];
-  return src[1];
+  var src = srcMatch[1];
+  if (src.indexOf('/') === 0) {
+    src = window.location.origin + src;
+  }
+  if (src.indexOf('http') !== 0) {
+    return false;
+  }
+
+  this.src = src;
+  return src;
 }
 
 Content.prototype.isPreloaded = function(expires) {
