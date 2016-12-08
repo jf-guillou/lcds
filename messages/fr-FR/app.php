@@ -22,6 +22,7 @@ return [
     'Reload' => 'Rafraîchir',
     'JS' => 'JS',
     'CSS' => 'CSS',
+    'URL' => 'URL',
     'The requested page does not exist.' => 'La page demandée n\'existe pas.',
     'Are you sure you want to delete this item?' => 'Êtes-vous sur de vouloir supprimer cet objet ?',
 
@@ -172,6 +173,7 @@ return [
     'Sunday' => 'Dimanche',
 
     /* Weather */
+    'Latitude & longitude' => 'Latitude & longitude',
     'Weather' => 'Météo',
     'Display weather for given coordinates.' => 'Affiche la météo à partir de coordonnées.',
     '°F' => '°C',
