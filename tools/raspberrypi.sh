@@ -8,7 +8,7 @@ raspi-config nonint do_memory_split 128
 raspi-config nonint do_change_timezone
 apt install -y keyboard-configuration console-data
 apt upgrade -y
-apt install -y rpi-update nano sudo lightdm spectrwm xwit python python-tk lxterminal
+apt install -y rpi-update nano sudo lightdm spectrwm xwit python python-tk lxterminal squid3
 
 echo "Create autorun user"
 useradd -m -s /bin/bash -G sudo -G video pi
@@ -47,6 +47,7 @@ SWITCH=/tmp/turnmeoff
 rm $SWITCH
 
 export PATH="/home/pi/bin:$PATH"
+export http_proxy="http://localhost:3128"
 
 BROWSER="kweb3"
 LOG=/home/pi/autorun.log
@@ -97,6 +98,22 @@ wget https://raw.githubusercontent.com/jf-guillou/lcds/master/tools/omxplayer -O
 
 chown pi: /home/pi/bin/omxplayer
 chmod u+x /home/pi/bin/omxplayer
+
+echo "Configure local proxy"
+echo "http_port 127.0.0.1:3128
+
+acl localhost src 127.0.0.1
+
+http_access allow localhost
+http_access deny all
+
+cache_dir aufs /var/spool/squid3 1024 16 256
+maximum_object_size 256 MB
+
+cache_store_log /var/log/squid3/store.log
+read_ahead_gap 1 MB
+" >> /etc/squid3/squid.local.conf
+echo "include /etc/squid3/squid.local.conf" >> /etc/squid3/squid.conf
 
 echo "Firmware update. This will reboot the pi!"
 rpi-update && reboot

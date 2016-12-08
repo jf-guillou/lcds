@@ -189,7 +189,7 @@ Below are the complete explanations for the commands used in the auto-install sc
 ```bash
 apt update
 apt upgrade -y
-apt install -y apt-utils raspi-config keyboard-configuration console-data rpi-update nano sudo lightdm spectrwm xwit python python-tk lxterminal
+apt install -y apt-utils raspi-config keyboard-configuration console-data rpi-update nano sudo lightdm spectrwm xwit python python-tk lxterminal squid3
 ```
 A GUI will ask to configure the installed packages, mainly locales.
 
@@ -255,6 +255,7 @@ SWITCH=/tmp/turnmeoff
 rm $SWITCH
 
 export PATH="/home/pi/bin:$PATH"
+export http_proxy="http://localhost:3128"
 
 BROWSER="kweb3"
 LOG=/home/pi/autorun.log
@@ -309,6 +310,24 @@ wget https://raw.githubusercontent.com/jf-guillou/lcds/master/tools/omxplayer -O
 
 chown pi: /home/pi/bin/omxplayer
 chmod u+x /home/pi/bin/omxplayer
+```
+
+- Configure local proxy
+```bash
+echo "http_port 127.0.0.1:3128
+
+acl localhost src 127.0.0.1
+
+http_access allow localhost
+http_access deny all
+
+cache_dir aufs /var/spool/squid3 1024 16 256
+maximum_object_size 256 MB
+
+cache_store_log /var/log/squid3/store.log
+read_ahead_gap 1 MB
+" >> /etc/squid3/squid.local.conf
+echo "include /etc/squid3/squid.local.conf" >> /etc/squid3/squid.conf
 ```
 
 - Firmware update
