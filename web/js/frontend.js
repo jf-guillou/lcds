@@ -223,7 +223,7 @@ Content.prototype.preload = function() {
     url: src,
   }).done(function(data, textStatus, jqXHR) {
     c.setPreloaded(jqXHR.getResponseHeader('Expires'));
-  }).fail(function(jqXHR, textStatus, errorThrown) {
+  }).fail(function() {
     c.setPreloaded(false); // Discard until next Content init
   });
 }
@@ -231,7 +231,6 @@ Content.prototype.preload = function() {
 /**
  * Field class constructor
  * @param {jQuery.Object} $f field object
- * @param {Screen} screen parent screen object
  */
 function Field($f) {
   this.$field = $f;
@@ -338,6 +337,7 @@ Field.prototype.pickNext = function() {
  * Display next content in field html
  */
 Field.prototype.display = function() {
+  var f = this;
   if (this.next && this.next.duration > 0) {
     this.current = this.next
     this.current.displayCount++;
@@ -352,13 +352,11 @@ Field.prototype.display = function() {
     if (this.timeout) {
       clearTimeout(this.timeout);
     }
-    var f = this;
     this.timeout = setTimeout(function() {
       f.pickNext();
     }, this.current.duration);
     this.endAt = this.current.duration + Date.now()
   } else {
-    var f = this;
     this.timeout = setTimeout(function() {
       f.pickNext();
     }, 2000);
