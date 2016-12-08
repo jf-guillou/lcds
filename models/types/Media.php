@@ -327,7 +327,7 @@ class Media extends Content
                 $tmppath = FileHelper::normalizePath($this->data);
 
                 $parts = explode(DIRECTORY_SEPARATOR, $tmppath);
-                $tmpname = array_pop($parts);
+                array_pop($parts); // Remove filename
                 if (implode(DIRECTORY_SEPARATOR, $parts) == sys_get_temp_dir() && strpos(DIRECTORY_SEPARATOR, $this->filename) === false && file_exists($tmppath)) {
                     $this->filename = static::getUniqFilename(static::getRealPath(), $this->filename);
                     $this->data = static::getWebPath().$this->filename;
