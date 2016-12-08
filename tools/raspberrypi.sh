@@ -115,5 +115,10 @@ read_ahead_gap 1 MB
 " >> /etc/squid3/squid.local.conf
 echo "include /etc/squid3/squid.local.conf" >> /etc/squid3/squid.conf
 
+echo "Configure auto-shutdown"
+echo "0 18 * * 1-5 touch /tmp/turnmeoff >> /home/pi/autorun.log 2>&1
+0 7 * * 1-5 /usr/bin/sudo /sbin/reboot >> /home/pi/autorun.log 2>&1
+" >> /var/spool/cron/crontabs/root
+
 echo "Firmware update. This will reboot the pi!"
 rpi-update && reboot

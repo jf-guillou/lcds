@@ -179,6 +179,11 @@ Configuration of the Raspberry Pi can be mostly automated, beside some prompts f
 
 `wget "https://raw.githubusercontent.com/jf-guillou/lcds/master/tools/raspberrypi.sh" -O - | bash -s -`
 
+This will install everything and configure most options at the beginning. This whole installation can take an hour.
+
+Please also note that by default, the screen will shutdown at 6pm and reboot at 7am every weekday.
+This can be modified using [crontab -e](https://help.ubuntu.com/community/CronHowto).
+
 ### Manual Configuration
 
 **In case you don't trust an automatic installer**
@@ -329,6 +334,15 @@ read_ahead_gap 1 MB
 " >> /etc/squid3/squid.local.conf
 echo "include /etc/squid3/squid.local.conf" >> /etc/squid3/squid.conf
 ```
+
+- Configure auto shutdown
+```bash
+echo "0 18 * * 1-5 touch /tmp/turnmeoff >> /home/pi/autorun.log 2>&1
+0 7 * * 1-5 /usr/bin/sudo /sbin/reboot >> /home/pi/autorun.log 2>&1
+" >> /var/spool/cron/crontabs/root
+```
+This will make the screen black after 6pm and reboot the pi at 7am.
+The reboot is not mandatory, but helps a lot with the general wonkyness of the RPi.
 
 - Firmware update
 ```bash
