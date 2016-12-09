@@ -57,9 +57,9 @@ class ContentController extends BaseController
             'query' => $query,
         ]);
 
-        $dataProvider->sort->attributes['type.name'] = [
-            'asc' => [ContentType::tableName().'.name' => SORT_ASC],
-            'desc' => [ContentType::tableName().'.name' => SORT_DESC],
+        $dataProvider->sort->attributes['type.tName'] = [
+            'asc' => [ContentType::tableName().'.id' => SORT_ASC],
+            'desc' => [ContentType::tableName().'.id' => SORT_DESC],
         ];
 
         return $this->render('index', [
@@ -110,7 +110,7 @@ class ContentController extends BaseController
 
             return $this->render('create', [
                 'model' => $model,
-                'contentTypes' => ContentType::getAllList(false, true),
+                'contentTypes' => ContentType::getAllList(false),
             ]);
         }
     }
@@ -136,17 +136,17 @@ class ContentController extends BaseController
 
         $contentType = ContentType::findOne($type);
         if ($contentType === null) {
-            $types = ContentType::getAll(false, true);
+            $types = ContentType::getAll(false);
 
             return $this->render('type-choice', [
                 'types' => $types,
                 'flow' => $flowId,
             ]);
         } else {
-            $model = Content::newFromType($contentType->id);
+            $model = new Content(['flow_id' => $flow->id, 'type_id' => $contentType->id]);
             if ($model->load(Yii::$app->request->post())) {
-                $model->flow_id = $flow->id;
-                $model->type_id = $contentType->id;
+                //$model->flow_id = $flow->id;
+                //$model->type_id = $contentType->id;
                 if ($model->save()) {
                     return $this->redirect(['flow/view', 'id' => $flow->id]);
                 }
@@ -201,12 +201,12 @@ class ContentController extends BaseController
             return ['success' => false, 'message' => Yii::t('app', 'Not authorized')];
         }
 
-        $upload = Content::newFromType($type);
-        if (($res = $upload->upload(UploadedFile::getInstanceByName('content'))) !== false) {
+        $model = new Content(['type_id' => $type]);
+        if (($res = $model->type->upload(UploadedFile::getInstanceByName('content'))) !== false) {
             return ['success' => true, 'filepath' => $res['tmppath'], 'duration' => $res['duration'], 'filename' => $res['filename']];
         }
 
-        return ['success' => false, 'message' => $upload->getLoadError()];
+        return ['success' => false, 'message' => $model->type->getLoadError()];
     }
 
     /**
@@ -227,12 +227,12 @@ class ContentController extends BaseController
             return ['success' => false, 'message' => Yii::t('app', 'Not authorized')];
         }
 
-        $upload = Content::newFromType($type);
-        if (($res = $upload->sideload($url)) !== false) {
+        $model = new Content(['type_id' => $type]);
+        if (($res = $model->type->sideload($url)) !== false) {
             return ['success' => true, 'filepath' => $res['tmppath'], 'duration' => $res['duration'], 'filename' => $res['filename']];
         }
 
-        return ['success' => false, 'message' => $upload->getLoadError()];
+        return ['success' => false, 'message' => $model->type->getLoadError()];
     }
 
     /**

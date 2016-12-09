@@ -2,8 +2,6 @@
 
 namespace app\models\types;
 
-use app\models\Content;
-
 /**
  * This is the model class for Video content type.
  */
@@ -12,18 +10,13 @@ class Video extends Media
     const TYPE = 'video';
     const TYPE_PATH = 'videos/';
 
-    public static $usable = false;
-    public static $preview = '@web/images/video.preview.jpg';
-
-    /**
-     * {@inheritdoc}
-     */
-    public function rules()
-    {
-        return array_merge(parent::rules(), [
-            [['upload'], 'file', 'skipOnEmpty' => true, 'extensions' => 'avi, mp4, mkv'],
-        ]);
-    }
+    public $html = '<iframe src="%data%" />';
+    public $css = '%field% > * { height: 100%; width: 100%; }';
+    public $appendParams = '_win=%x1%,%y1%,%x2%,%y2%;_aspect-mode=letterbox';
+    public $usable = false;
+    public $input = 'url';
+    public $output = 'url';
+    public $preview = '@web/images/video.preview.jpg';
 
     /**
      * {@inheritdoc}

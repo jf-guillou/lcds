@@ -3,7 +3,6 @@
 namespace app\models;
 
 use Yii;
-use yii\web\ServerErrorHttpException;
 
 /**
  * This is the model class for table "content".
@@ -24,23 +23,6 @@ use yii\web\ServerErrorHttpException;
  */
 class Content extends \yii\db\ActiveRecord
 {
-    const BASE_CACHE_TIME = 3600;
-    const IS_FILE = false;
-    const SUB_PATH = 'app\\models\\types\\';
-
-    public static $typeName = null;
-    public static $typeDescription = null;
-    public static $html = null;
-    public static $css = null;
-    public static $js = null;
-    public static $appendParams = null;
-    public static $selfUpdate = false;
-    public static $input = null;
-    public static $output = null;
-    public static $usable = false;
-    public static $preview = null;
-    public static $canPreview = false;
-
     /**
      * {@inheritdoc}
      */
@@ -54,7 +36,7 @@ class Content extends \yii\db\ActiveRecord
      */
     public function rules()
     {
-        return [
+        return array_merge([
             [['name', 'flow_id', 'type_id'], 'required'],
             [['flow_id', 'duration'], 'integer'],
             [['data'], 'string'],
@@ -65,7 +47,7 @@ class Content extends \yii\db\ActiveRecord
             [['description'], 'string', 'max' => 1024],
             [['flow_id'], 'exist', 'skipOnError' => true, 'targetClass' => Flow::className(), 'targetAttribute' => ['flow_id' => 'id']],
             [['type_id'], 'exist', 'skipOnError' => true, 'targetClass' => ContentType::className(), 'targetAttribute' => ['type_id' => 'id']],
-        ];
+        ], $this->type ? $this->type->contentRules() : []);
     }
 
     /**
@@ -73,7 +55,7 @@ class Content extends \yii\db\ActiveRecord
      */
     public function attributeLabels()
     {
-        return [
+        return array_merge([
             'id' => Yii::t('app', 'ID'),
             'name' => Yii::t('app', 'Name'),
             'description' => Yii::t('app', 'Description'),
@@ -85,7 +67,7 @@ class Content extends \yii\db\ActiveRecord
             'end_ts' => Yii::t('app', 'End on'),
             'add_ts' => Yii::t('app', 'Added at'),
             'enabled' => Yii::t('app', 'Enabled'),
-        ];
+        ], $this->type ? $this->type->contentLabels() : []);
     }
 
     /**
@@ -105,67 +87,6 @@ class Content extends \yii\db\ActiveRecord
     }
 
     /**
-     * Get class from content type ID.
-     *
-     * @param string $typeId content type id
-     *
-     * @return string class name
-     */
-    public static function fromType($typeId)
-    {
-        $className = self::SUB_PATH.$typeId;
-        if (!class_exists($className)) {
-            throw new ServerErrorHttpException(Yii::t('app', 'The requested content type has no class.'));
-        }
-
-        return $className;
-    }
-
-    /**
-     * Instanciate a class from content type ID.
-     *
-     * @param string $typeId content type id
-     *
-     * @return mixed class instance
-     */
-    public static function newFromType($typeId)
-    {
-        $className = self::fromType($typeId);
-
-        return new $className();
-    }
-
-    /**
-     * Overloading default instanciate model.
-     * Initialize a children class based on type_id column of $row.
-     *
-     * @param array $row
-     *
-     * @return mixed class instance
-     */
-    public static function instantiate($row)
-    {
-        $typeId = $row['type_id'];
-        if (!$typeId) {
-            throw new ServerErrorHttpException(Yii::t('app', 'The requested content has no content type.'));
-        }
-
-        $class = self::fromType($typeId);
-
-        return new $class();
-    }
-
-    /**
-     * Decide if content file should be deleted by checking usage in DB.
-     *
-     * @return bool deletable
-     */
-    protected function shouldDeleteFile()
-    {
-        return false;
-    }
-
-    /**
      * Build a query for a specific user, allowing to see only authorized contents.
      *
      * @param \User $user
@@ -175,9 +96,9 @@ class Content extends \yii\db\ActiveRecord
     public static function availableQuery($user)
     {
         if ($user->can('setFlowContent')) {
-            return self::find();
+            return self::find()->joinWith(['type']);
         } elseif ($user->can('setOwnFlowContent')) {
-            return self::find()->joinWith(['flow.users'])->where(['username' => $user->identity->username]);
+            return self::find()->joinWith(['type', 'flow.users'])->where(['username' => $user->identity->username]);
         }
     }
 
@@ -209,30 +130,7 @@ class Content extends \yii\db\ActiveRecord
      */
     public function processData($data)
     {
-        return $data;
-    }
-
-    /**
-     * Downloads content from URL through proxy if necessary.
-     *
-     * @param string $url
-     *
-     * @return string content
-     */
-    public static function downloadContent($url)
-    {
-        if (\Yii::$app->params['proxy']) {
-            $ctx = [
-                'http' => [
-                    'proxy' => 'tcp://vdebian:8080',
-                    'request_fulluri' => true,
-                ],
-            ];
-
-            return file_get_contents($url, false, stream_context_create($ctx));
-        } else {
-            return file_get_contents($url);
-        }
+        return $this->type->processData($data);
     }
 
     /**
@@ -244,57 +142,94 @@ class Content extends \yii\db\ActiveRecord
     public function getData()
     {
         $data = $this->data;
-        if ($this::$appendParams) {
-            $data .= (strpos($data, '?') === false ? '?' : '&').$this::$appendParams;
+        if ($this->type->appendParams) {
+            $data .= (strpos($data, '?') === false ? '?' : '&').$this->type->appendParams;
         }
 
         $data = $this->processData($data);
 
-        if ($this::$html) {
-            return str_replace('%data%', $data, $this::$html);
+        if ($this->type->html) {
+            return str_replace('%data%', $data, $this->type->html);
         }
 
         return $data;
     }
 
-    /**
-     * Check cache existence.
-     *
-     * @param string $key cache key
-     *
-     * @return bool has cached data
-     */
-    public function hasCache($key)
+    public function beforeSave($insert)
     {
-        return \Yii::$app->cache->exists(static::$typeName.$key);
-    }
-
-    /**
-     * Get from cache.
-     *
-     * @param string $key cache key
-     *
-     * @return string cached data
-     */
-    public function fromCache($key)
-    {
-        $cache = \Yii::$app->cache;
-        $cacheKey = static::$typeName.$key;
-        if ($cache->exists($cacheKey)) {
-            return $cache->get($cacheKey);
+        if (!parent::beforeSave($insert)) {
+            return false;
         }
+
+        $res = $this->type->beforeSaveContent($insert, $this->data);
+        if ($res === true || $res === false) {
+            return $res;
+        }
+
+        $this->data = $res;
+
+        return true;
     }
 
     /**
-     * Store to cache.
-     *
-     * @param string $key     cache key
-     * @param string $content cache data
+     * After delete event
+     * Try to delete file if necessary.
      */
-    public function toCache($key, $content)
+    public function afterDelete()
     {
-        $cache = \Yii::$app->cache;
-        $cacheKey = static::$typeName.$key;
-        $cache->set($cacheKey, $content, static::BASE_CACHE_TIME);
+        if ($this->shouldDeleteFile()) {
+            unlink($this->getRealFilepath());
+        }
+        parent::afterDelete();
+    }
+
+    /**
+     * Decide if content file should be deleted by checking usage in DB.
+     *
+     * @return bool deletable
+     */
+    protected function shouldDeleteFile()
+    {
+        if ($this->type->input == ContentType::KINDS['FILE']) {
+            return self::find()
+                ->joinWith(['type'])
+                ->where([ContentType::tableName().'.id' => ContentType::getAllFileTypeIds()])
+                ->andWhere(['data' => $this->data])
+                ->count() == 0;
+        }
+
+        return false;
+    }
+
+    /**
+     * Get filepath from web root.
+     *
+     * @return string filepath
+     */
+    public function getFilepath()
+    {
+        $type = $this->type;
+
+        return str_replace($type::BASE_URI, '', $this->getWebFilepath());
+    }
+
+    /**
+     * Get Yii aliased filepath.
+     *
+     * @return string filepath
+     */
+    public function getWebFilepath()
+    {
+        return $this->data;
+    }
+
+    /**
+     * Get filesystem filepath.
+     *
+     * @return string filepath
+     */
+    public function getRealFilepath()
+    {
+        return \Yii::getAlias('@app/').'web/'.$this->getFilepath();
     }
 }

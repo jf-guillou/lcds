@@ -2,21 +2,21 @@
 
 namespace app\models\types;
 
-use app\models\Content;
+use app\models\ContentType;
 
 /**
  * This is the model class for DateTime content type.
  */
-class DateTime extends Content
+class DateTime extends ContentType
 {
-    public static $typeName = 'Date&Time';
-    public static $selfUpdate = true;
-    public static $html = '<span class="datetime"></span>';
-    public static $css = '%field% { text-align: center; vertical-align: middle; }';
-    public static $input = 'none';
-    public static $output = 'raw';
-    public static $usable = true;
-    public static $js = <<<'EOT'
+    public $name = 'Date&Time';
+    public $selfUpdate = true;
+    public $html = '<span class="datetime"></span>';
+    public $css = '%field% { text-align: center; vertical-align: middle; }';
+    public $input = 'none';
+    public $output = 'raw';
+    public $usable = true;
+    public $js = <<<'EOT'
 {
   var $f = $('%field%');
   if (!$f.length) { return; }

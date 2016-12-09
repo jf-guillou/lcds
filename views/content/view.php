@@ -31,7 +31,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'id',
             'name',
             'description',
-            'type.name',
+            'type.tName',
             'data:ntext',
             'duration',
             'start_ts',
