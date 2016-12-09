@@ -10,8 +10,6 @@ class Video extends Media
     const TYPE = 'video';
     const TYPE_PATH = 'videos/';
 
-    public $name = 'Video';
-    public $description = 'Direct link to a video on an internet website. Hosted video is usually more appropriate.';
     public $html = '<iframe src="%data%" />';
     public $css = '%field% > * { height: 100%; width: 100%; }';
     public $appendParams = '_win=%x1%,%y1%,%x2%,%y2%;_aspect-mode=letterbox';
@@ -19,6 +17,16 @@ class Video extends Media
     public $input = 'url';
     public $output = 'url';
     public $preview = '@web/images/video.preview.jpg';
+
+    /**
+     * {@inheritdoc}
+     */
+    public function __construct($config = [])
+    {
+        parent::__construct($config);
+        $this->name = Yii::t('app', 'Video');
+        $this->description = Yii::t('app', 'Direct link to a video on an internet website. Hosted video is usually more appropriate.');
+    }
 
     /**
      * {@inheritdoc}

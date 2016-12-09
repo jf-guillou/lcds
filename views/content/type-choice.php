@@ -19,16 +19,16 @@ $this->params['breadcrumbs'][] = $this->title;
         foreach ($types as $i => $t) : ?>
 
         <div class="col-lg-3">
-            <h3><?= $t->tName ?></h3>
+            <h3><?= $t->name ?></h3>
             <p>
                 <?php
                 if ($t->preview) : ?>
-                <img src="<?= Url::to($t->preview) ?>" alt="<?= $t->tName ?>" class="img-full" />
+                <img src="<?= Url::to($t->preview) ?>" alt="<?= $t->name ?>" class="img-full" />
                 <?php
                 endif; ?>
             </p>
             <p>
-                <?= $t->tDescription ?>
+                <?= $t->description ?>
             </p>
             <p class="text-center">
                 <?= Html::a(Yii::t('app', 'Use'), ['', 'flowId' => $flow, 'type' => $t->id], ['class' => 'btn btn-success']) ?>

@@ -6,7 +6,7 @@ use yii\widgets\ActiveForm;
 /* @var $this yii\web\View */
 /* @var $model app\models\Content */
 
-$this->title = Yii::t('app', 'Create {type} content', ['type' => $type->tName]);
+$this->title = Yii::t('app', 'Create {type} content', ['type' => $type->name]);
 $this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Contents'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
@@ -41,6 +41,6 @@ $this->params['breadcrumbs'][] = $this->title;
 </div>
 <script type="text/javascript">
 window.jqReady.push(function() {
-    
+
 });
 </script>

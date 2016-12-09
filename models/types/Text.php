@@ -10,14 +10,22 @@ use yii\helpers\Html;
  */
 class Text extends ContentType
 {
-    public $name = 'Text';
-    public $description = 'Textual content, will be adjusted to be displayed as big as possible.';
     public $html = '<span class="text">%data%</span>';
     public $css = '%field% { text-align: center; vertical-align: middle; }';
     public $input = 'text';
     public $output = 'text';
     public $usable = true;
     public $preview = '@web/images/text.preview.jpg';
+
+    /**
+     * {@inheritdoc}
+     */
+    public function __construct($config = [])
+    {
+        parent::__construct($config);
+        $this->name = Yii::t('app', 'Text');
+        $this->description = Yii::t('app', 'Textual content, will be adjusted to be displayed as big as possible.');
+    }
 
     /**
      * {@inheritdoc}

@@ -13,8 +13,6 @@ class Weather extends ContentType
     const BASE_CACHE_TIME = 600;
     const URL = 'https://api.darksky.net/forecast/%apikey%/%data%?lang=%lang%&units=%units%&exclude=hourly,daily,alerts';
 
-    public $name = 'Weather';
-    public $description = 'Display weather for given coordinates.';
     public $html = '<div class="weather">%data%</div>';
     public $css = '%field% { text-align: center; } %field% .wi { font-size: 0.8em; }';
     public $js = '';
@@ -44,6 +42,16 @@ class Weather extends ContentType
     /**
      * Power by DarkSky : https://darksky.net/poweredby/.
      */
+
+    /**
+    * {@inheritdoc}
+    */
+    public function __construct($config = [])
+    {
+        parent::__construct($config);
+        $this->name = Yii::t('app', 'Weather');
+        $this->description = Yii::t('app', 'Display weather for given coordinates.');
+    }
 
     /**
      * {@inheritdoc}

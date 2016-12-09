@@ -18,7 +18,7 @@ $this->params['breadcrumbs'][] = $this->title;
         'columns' => [
             'name',
             'description',
-            'type.tName',
+            'type.name',
             [
                 'class' => 'yii\grid\ActionColumn',
                 'template' => '{view} {update} {delete} {toggle}',

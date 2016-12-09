@@ -7,8 +7,16 @@ namespace app\models\types;
  */
 class HostedImage extends Image
 {
-    public $name = 'Hosted image';
-    public $description = 'Upload an image to servers.';
     public $input = 'file';
     public $usable = true;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function __construct($config = [])
+    {
+        parent::__construct($config);
+        $this->name = Yii::t('app', 'Hosted image');
+        $this->description = Yii::t('app', 'Upload an image to servers.');
+    }
 }

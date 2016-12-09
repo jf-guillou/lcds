@@ -70,8 +70,8 @@ class ContentType extends \yii\db\ActiveRecord
     {
         return [
             'id' => Yii::t('app', 'ID'),
-            'tName' => Yii::t('app', 'Type'),
-            'tDescription' => Yii::t('app', 'Description'),
+            'name' => Yii::t('app', 'Type'),
+            'description' => Yii::t('app', 'Description'),
             'html' => Yii::t('app', 'HTML'),
             'css' => Yii::t('app', 'CSS'),
             'js' => Yii::t('app', 'JS'),
@@ -158,7 +158,7 @@ class ContentType extends \yii\db\ActiveRecord
         $list = [];
 
         foreach ($types as $t) {
-            $list[$t->id] = $t->tName;
+            $list[$t->id] = $t->name;
         }
 
         return $list;
@@ -264,26 +264,6 @@ class ContentType extends \yii\db\ActiveRecord
     public function getFields()
     {
         return $this->hasMany(Field::className(), ['id' => 'field_id'])->viaTable('field_has_content_type', ['content_type_id' => 'id']);
-    }
-
-    /**
-     * Get translated content type name.
-     *
-     * @return string name
-     */
-    public function getTName()
-    {
-        return \Yii::t('app', $this->name);
-    }
-
-    /**
-     * Get translated content type description.
-     *
-     * @return string description
-     */
-    public function getTDescription()
-    {
-        return \Yii::t('app', $this->description);
     }
 
     /**

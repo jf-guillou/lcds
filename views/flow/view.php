@@ -24,7 +24,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'method' => 'post',
             ],
         ]) : '' ?>
-        
+
     </p>
 
     <?= DetailView::widget([
@@ -48,7 +48,7 @@ $this->params['breadcrumbs'][] = $this->title;
         'columns' => [
             'name',
             'description',
-            'type.tName',
+            'type.name',
             [
                 'class' => 'yii\grid\ActionColumn',
                 'controller' => 'content',

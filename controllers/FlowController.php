@@ -79,7 +79,7 @@ class FlowController extends BaseController
             'query' => Content::find()->joinWith(['type', 'flow'])->where([Flow::tableName().'.id' => $id]),
         ]);
 
-        $dataProvider->sort->attributes['type.tName'] = [
+        $dataProvider->sort->attributes['type.name'] = [
             'asc' => [ContentType::tableName().'.id' => SORT_ASC],
             'desc' => [ContentType::tableName().'.id' => SORT_DESC],
         ];

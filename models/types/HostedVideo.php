@@ -12,11 +12,18 @@ use YoutubeDl\YoutubeDl;
  */
 class HostedVideo extends Video
 {
-    public $name = 'Hosted video';
-    public $description = 'Upload a video to servers.';
     public $input = 'file';
-    public $output = 'url';
     public $usable = true;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function __construct($config = [])
+    {
+        parent::__construct($config);
+        $this->name = Yii::t('app', 'Hosted video');
+        $this->description = Yii::t('app', 'Upload a video to servers.');
+    }
 
     /**
      * {@inheritdoc}

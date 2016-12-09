@@ -9,7 +9,6 @@ use app\models\ContentType;
  */
 class DateTime extends ContentType
 {
-    public $name = 'Date&Time';
     public $selfUpdate = true;
     public $html = '<span class="datetime"></span>';
     public $css = '%field% { text-align: center; vertical-align: middle; }';
@@ -36,4 +35,13 @@ class DateTime extends ContentType
   $f.textfill({maxFontPixels: 0});
 }
 EOT;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function __construct($config = [])
+    {
+        parent::__construct($config);
+        $this->name = Yii::t('app', 'Date&Time');
+    }
 }

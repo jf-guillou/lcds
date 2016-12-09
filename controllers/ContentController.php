@@ -57,7 +57,7 @@ class ContentController extends BaseController
             'query' => $query,
         ]);
 
-        $dataProvider->sort->attributes['type.tName'] = [
+        $dataProvider->sort->attributes['type.name'] = [
             'asc' => [ContentType::tableName().'.id' => SORT_ASC],
             'desc' => [ContentType::tableName().'.id' => SORT_DESC],
         ];

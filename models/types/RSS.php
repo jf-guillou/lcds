@@ -9,13 +9,21 @@ use app\models\ContentType;
  */
 class RSS extends ContentType
 {
-    public $name = 'RSS';
-    public $description = 'Display an RSS feed inline.';
     public $html = '<div class="rss">%data%</div>';
     public $input = 'url';
     public $output = 'text';
     public $usable = false;
     public $preview = null;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function __construct($config = [])
+    {
+        parent::__construct($config);
+        $this->name = Yii::t('app', 'RSS');
+        $this->description = Yii::t('app', 'Display an RSS feed inline.');
+    }
 
     /**
      * {@inheritdoc}

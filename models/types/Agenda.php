@@ -15,8 +15,6 @@ class Agenda extends ContentType
     const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
     const HOURS = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18];
 
-    public $name = 'Agenda';
-    public $description = 'Display an agenda from an ICal feed.';
     public $html = '<img class="agenda" src="%data%" />';
     public $css = '%field% { text-align: center; vertical-align: middle; } %field% img { height: 100%; width: 100%; object-fit: contain; }';
     public $input = 'url';
@@ -36,6 +34,16 @@ class Agenda extends ContentType
     private $hourStep;
     private $headerHeight;
     private $leftBlockWidth;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function __construct($config = [])
+    {
+        parent::__construct($config);
+        $this->name = Yii::t('app', 'Agenda');
+        $this->description = Yii::t('app', 'Display an agenda from an ICal feed.');
+    }
 
     /**
      * {@inheritdoc}
