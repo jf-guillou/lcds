@@ -95,7 +95,6 @@ function Content(c) {
   this.data = c.data;
   this.duration = c.duration * 1000;
   this.type = c.type;
-  this.displayCount = 0;
   this.src = null;
 
   if (this.shouldPreload()) {
@@ -277,14 +276,11 @@ Field.prototype.setError = function(err) {
 }
 
 /**
- * Sort by displayCount and randomize order when equal displayCount
+ * Randomize order
  */
 Field.prototype.randomizeSortContents = function() {
   this.contents = this.contents.sort(function(a, b) {
-    if (a.displayCount === b.displayCount) {
-      return Math.random() - 0.5;
-    }
-    return a.displayCount - b.displayCount;
+    return Math.random() - 0.5;
   });
 }
 
@@ -301,7 +297,7 @@ Field.prototype.pickNext = function() {
   this.current = null;
   var pData = this.previous && this.previous.data;
   // Avoid repeat & other field same content
-  //this.randomizeSortContents();
+  this.randomizeSortContents();
   for (var i = 0; i < this.contents.length; i++) {
     var c = this.contents[i];
     // Skip too long or not preloaded content 
@@ -340,7 +336,6 @@ Field.prototype.display = function() {
   var f = this;
   if (this.next && this.next.duration > 0) {
     this.current = this.next
-    this.current.displayCount++;
     this.next = null;
     this.$field.html(this.current.data);
     this.$field.show();
