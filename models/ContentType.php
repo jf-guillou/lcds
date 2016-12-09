@@ -14,8 +14,11 @@ use Yii;
  */
 class ContentType extends \yii\db\ActiveRecord
 {
-    public $_name;
-    public $_description;
+    const BASE_CACHE_TIME = 3600;
+    const SUB_PATH = 'app\\models\\types\\';
+
+    public $name;
+    public $description;
     public $html;
     public $css;
     public $js;
@@ -26,21 +29,6 @@ class ContentType extends \yii\db\ActiveRecord
     public $usable;
     public $preview;
     public $canPreview;
-
-    public static $typeAttributes = [
-        'typeName' => '_name',
-        'typeDescription' => '_description',
-        'html' => 'html',
-        'css' => 'css',
-        'js' => 'js',
-        'appendParams' => 'appendParams',
-        'selfUpdate' => 'selfUpdate',
-        'input' => 'input',
-        'output' => 'output',
-        'usable' => 'usable',
-        'preview' => 'preview',
-        'canPreview' => 'canPreview',
-    ];
 
     const KINDS = [
         'NONE' => 'none',
@@ -70,6 +58,11 @@ class ContentType extends \yii\db\ActiveRecord
         ];
     }
 
+    public function contentRules()
+    {
+        return [];
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -77,8 +70,34 @@ class ContentType extends \yii\db\ActiveRecord
     {
         return [
             'id' => Yii::t('app', 'ID'),
-            'name' => Yii::t('app', 'Type'),
+            'tName' => Yii::t('app', 'Type'),
+            'tDescription' => Yii::t('app', 'Description'),
+            'html' => Yii::t('app', 'HTML'),
+            'css' => Yii::t('app', 'CSS'),
+            'js' => Yii::t('app', 'JS'),
         ];
+    }
+
+    public function contentLabels()
+    {
+        return [];
+    }
+
+    /**
+     * Get class from content type ID.
+     *
+     * @param string $typeId content type id
+     *
+     * @return string class name
+     */
+    public static function fromType($typeId)
+    {
+        $className = self::SUB_PATH.$typeId;
+        if (!class_exists($className)) {
+            throw new ServerErrorHttpException(Yii::t('app', 'The requested content type has no class.'));
+        }
+
+        return $className;
     }
 
     /**
@@ -90,15 +109,9 @@ class ContentType extends \yii\db\ActiveRecord
      */
     public static function instantiate($row)
     {
-        $t = new static();
-        $c = Content::fromType($row['id']);
-        foreach ($t::$typeAttributes as $cAtt => $tAtt) {
-            if ($c::$$cAtt !== null) {
-                $t->$tAtt = $c::$$cAtt;
-            }
-        }
+        $typeClass = self::fromType($row['id']);
 
-        return $t;
+        return new $typeClass();
     }
 
     /**
@@ -133,7 +146,7 @@ class ContentType extends \yii\db\ActiveRecord
         $list = [];
 
         foreach ($types as $t) {
-            $list[$t->id] = $t->name;
+            $list[$t->id] = $t->tName;
         }
 
         return $list;
@@ -151,6 +164,70 @@ class ContentType extends \yii\db\ActiveRecord
         return array_filter(array_map(function ($t) {
             return $t->input == self::KINDS['FILE'] ? $t->id : null;
         }, $types));
+    }
+
+    /**
+     * Downloads content from URL through proxy if necessary.
+     *
+     * @param string $url
+     *
+     * @return string content
+     */
+    public static function downloadContent($url)
+    {
+        if (\Yii::$app->params['proxy']) {
+            $ctx = [
+                'http' => [
+                    'proxy' => 'tcp://vdebian:8080',
+                    'request_fulluri' => true,
+                ],
+            ];
+
+            return file_get_contents($url, false, stream_context_create($ctx));
+        } else {
+            return file_get_contents($url);
+        }
+    }
+
+    /**
+     * Check cache existence.
+     *
+     * @param string $key cache key
+     *
+     * @return bool has cached data
+     */
+    public function hasCache($key)
+    {
+        return \Yii::$app->cache->exists($this->id.$key);
+    }
+
+    /**
+     * Get from cache.
+     *
+     * @param string $key cache key
+     *
+     * @return string cached data
+     */
+    public function fromCache($key)
+    {
+        $cache = \Yii::$app->cache;
+        $cacheKey = $this->id.$key;
+        if ($cache->exists($cacheKey)) {
+            return $cache->get($cacheKey);
+        }
+    }
+
+    /**
+     * Store to cache.
+     *
+     * @param string $key     cache key
+     * @param string $content cache data
+     */
+    public function toCache($key, $content)
+    {
+        $cache = \Yii::$app->cache;
+        $cacheKey = $this->id.$key;
+        $cache->set($cacheKey, $content, static::BASE_CACHE_TIME);
     }
 
     /**
@@ -182,9 +259,9 @@ class ContentType extends \yii\db\ActiveRecord
      *
      * @return string name
      */
-    public function getName()
+    public function getTName()
     {
-        return \Yii::t('app', $this->_name);
+        return \Yii::t('app', $this->name);
     }
 
     /**
@@ -192,8 +269,60 @@ class ContentType extends \yii\db\ActiveRecord
      *
      * @return string description
      */
-    public function getDescription()
+    public function getTDescription()
     {
-        return \Yii::t('app', $this->_description);
+        return \Yii::t('app', $this->description);
+    }
+
+    /**
+     * File management methods.
+     */
+
+    /**
+     * Take a file instance and upload it to FS, also save in DB.
+     *
+     * @param \FileInstance $fileInstance
+     *
+     * @return bool success
+     */
+    public function upload()
+    {
+        return false;
+    }
+
+    /**
+     * Take an url and download it, also save it in DB.
+     *
+     * @param string $url
+     *
+     * @return bool|string[] error or json success string
+     */
+    public function sideload()
+    {
+        return false;
+    }
+
+    /**
+     * Custom error getter for upload/sideload temp file.
+     *
+     * @return string error
+     */
+    public function getLoadError()
+    {
+        return '';
+    }
+
+    /**
+     * Before save event
+     * Handles file movement from tmp directory to proper media storage
+     * Makes sure there is no overwrite by appending to filename.
+     *
+     * @param bool $insert is inserted
+     *
+     * @return bool success
+     */
+    public function beforeSaveContent()
+    {
+        return true;
     }
 }

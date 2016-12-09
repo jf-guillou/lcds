@@ -3,26 +3,26 @@
 namespace app\models\types;
 
 use ICal\ICal;
-use app\models\Content;
+use app\models\ContentType;
 use yii\helpers\Url;
 
 /**
  * This is the model class for Agenda content type.
  */
-class Agenda extends Content
+class Agenda extends ContentType
 {
     const BASE_CACHE_TIME = 7200; // 2 hours
     const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
     const HOURS = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18];
 
-    public static $typeName = 'Agenda';
-    public static $typeDescription = 'Display an agenda from an ICal feed.';
-    public static $html = '<img class="agenda" src="%data%" />';
-    public static $css = '%field% { text-align: center; vertical-align: middle; } %field% img { height: 100%; width: 100%; object-fit: contain; }';
-    public static $input = 'url';
-    public static $output = 'url';
-    public static $usable = true;
-    public static $preview = '@web/images/agenda.preview.jpg';
+    public $name = 'Agenda';
+    public $description = 'Display an agenda from an ICal feed.';
+    public $html = '<img class="agenda" src="%data%" />';
+    public $css = '%field% { text-align: center; vertical-align: middle; } %field% img { height: 100%; width: 100%; object-fit: contain; }';
+    public $input = 'url';
+    public $output = 'url';
+    public $usable = true;
+    public $preview = '@web/images/agenda.preview.jpg';
 
     private $opts;
     private $img;
@@ -42,7 +42,7 @@ class Agenda extends Content
      */
     public function processData($data)
     {
-        $filename = self::$typeName.md5($data).'.png';
+        $filename = $this->name.md5($data).'.png';
         if (self::hasCache($data)) {
             return Url::to(Media::getWebPath().$filename);
         }

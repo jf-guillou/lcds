@@ -147,6 +147,14 @@ return [
     'Ticker' => 'Bandeau texte',
     'Short text content, usually under 50 characters with a short duration.' => 'Texte court (< 50 caractères) avec une durée d\'affichage réduite.',
 
+    /* Media */
+    'Invalid file' => 'Fichier invalide',
+    'Incorrect file' => 'Fichier incorrect',
+    'Empty or incorrect URL' => 'URL vide ou incorrecte',
+    'Media not found!' => 'Média introuvable !',
+    'Downloading failed' => 'Le téléchargement à échoué',
+    'Downloading error' => 'Le téléchargement a rencontré une erreur',
+
     /* Image */
     'Image' => 'Image',
     'Direct link to an image on an internet website. Hosted image is usually more appropriate.' => 'Lien vers une image depuis un site. Une image hébergée est généralement plus appropriée.',

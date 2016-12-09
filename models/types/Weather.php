@@ -3,25 +3,25 @@
 namespace app\models\types;
 
 use Yii;
-use app\models\Content;
+use app\models\ContentType;
 
 /**
  * This is the model class for Weather content type.
  */
-class Weather extends Content
+class Weather extends ContentType
 {
     const BASE_CACHE_TIME = 600;
     const URL = 'https://api.darksky.net/forecast/%apikey%/%data%?lang=%lang%&units=%units%&exclude=hourly,daily,alerts';
 
-    public static $typeName = 'Weather';
-    public static $typeDescription = 'Display weather for given coordinates.';
-    public static $html = '<div class="weather">%data%</div>';
-    public static $css = '%field% { text-align: center; } %field% .wi { font-size: 0.8em; }';
-    public static $js = '';
-    public static $input = 'latlong';
-    public static $output = 'text';
-    public static $usable = true;
-    public static $preview = '@web/images/weather.preview.jpg';
+    public $name = 'Weather';
+    public $description = 'Display weather for given coordinates.';
+    public $html = '<div class="weather">%data%</div>';
+    public $css = '%field% { text-align: center; } %field% .wi { font-size: 0.8em; }';
+    public $js = '';
+    public $input = 'latlong';
+    public $output = 'text';
+    public $usable = true;
+    public $preview = '@web/images/weather.preview.jpg';
 
     private $opts;
 
@@ -48,16 +48,11 @@ class Weather extends Content
     /**
      * {@inheritdoc}
      */
-    public function rules()
+    public function contentRules()
     {
-        $rules = parent::rules();
-        foreach ($rules as $i => $r) {
-            if (in_array('data', $r[0])) {
-                $rules[$i] = [['data'], 'match', 'pattern' => '/^-?\d+(\.\d+)?,-?\d+(\.\d+)?$/'];
-            }
-        }
-
-        return $rules;
+        return [
+            [['data'], 'match', 'pattern' => '/^-?\d+(\.\d+)?,-?\d+(\.\d+)?$/'],
+        ];
     }
 
     /**

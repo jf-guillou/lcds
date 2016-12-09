@@ -12,22 +12,11 @@ use YoutubeDl\YoutubeDl;
  */
 class HostedVideo extends Video
 {
-    public static $typeName = 'Hosted video';
-    public static $typeDescription = 'Upload a video to servers.';
-    public static $html = '<iframe src="%data%" />';
-    public static $css = '%field% > * { height: 100%; width: 100%; }';
-    public static $appendParams = '_win=%x1%,%y1%,%x2%,%y2%;_aspect-mode=letterbox';
-    public static $input = 'file';
-    public static $output = 'url';
-    public static $usable = true;
-
-    /**
-     * {@inheritdoc}
-     */
-    public function rules()
-    {
-        return Media::rules();
-    }
+    public $name = 'Hosted video';
+    public $description = 'Upload a video to servers.';
+    public $input = 'file';
+    public $output = 'url';
+    public $usable = true;
 
     /**
      * {@inheritdoc}
@@ -35,7 +24,7 @@ class HostedVideo extends Video
     public function sideload($url)
     {
         if (!self::validateUrl($url)) {
-            $this->addError(static::TYPE, Yii::t('app', 'Empty or incorrect URL'));
+            $this->addError('load', Yii::t('app', 'Empty or incorrect URL'));
 
             return false;
         }
@@ -49,34 +38,35 @@ class HostedVideo extends Video
         try {
             $video = $dl->download($url);
             if (!$video) {
-                $this->addError(static::TYPE, Yii::t('app', 'Downloading failed'));
+                $this->addError('load', Yii::t('app', 'Downloading failed'));
 
                 return false;
             }
         } catch (\Symfony\Component\Process\Exception\ProcessFailedException $e) {
-            $this->addError(static::TYPE, Yii::t('app', 'Downloading exception'));
+            $this->addError('load', Yii::t('app', 'Downloading error'));
+
+            return false;
+        } catch (\YoutubeDl\Exception\NotFoundException $e) {
+            $this->addError('load', Yii::t('app', 'Media not found!'));
 
             return false;
         }
 
-        $this->filename = $video->getFilename();
-        $tmpFilepath = sys_get_temp_dir().'/'.$this->filename;
+        $filename = $video->getFilename();
+        $tmpFilepath = sys_get_temp_dir().'/'.$filename;
 
         $fileInstance = new UploadedFile();
-        $fileInstance->name = $this->filename;
+        $fileInstance->name = $filename;
         $fileInstance->tempName = $tmpFilepath;
         $fileInstance->type = FileHelper::getMimeType($fileInstance->tempName);
         $fileInstance->size = $video->getFile()->getSize();
         $this->upload = $fileInstance;
 
-        if ($this->validate(['upload'])) {
-            if (static::validateFile($fileInstance->tempName)) {
-                return ['filename' => $this->filename, 'tmppath' => $tmpFilepath, 'duration' => static::getDuration($tmpFilepath)];
-            }
-            $this->addError(static::TYPE, Yii::t('app', 'Invalid file'));
-        } else {
-            $this->addError(static::TYPE, Yii::t('app', 'Cannot save file'));
+        if (static::validateFile($fileInstance->tempName)) {
+            return ['filename' => $filename, 'tmppath' => $tmpFilepath, 'duration' => static::getDuration($tmpFilepath)];
         }
+
+        $this->addError('load', Yii::t('app', 'Invalid file'));
         unlink($fileInstance->tempName);
 
         return false;

@@ -9,7 +9,7 @@ UploadAsset::register($this);
 /* @var $this yii\web\View */
 /* @var $model app\models\Content */
 
-$this->title = Yii::t('app', 'Create {type} content', ['type' => $type->name]);
+$this->title = Yii::t('app', 'Create {type} content', ['type' => $type->tName]);
 $this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Contents'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
@@ -46,7 +46,6 @@ $this->params['breadcrumbs'][] = $this->title;
             </div>
         </div>
 
-        <?= $form->field($model, 'filename')->hiddenInput(['id' => 'content-filename'])->label(false) ?>
         <?= $form->field($model, 'data')->hiddenInput(['id' => 'content-data'])->label(false) ?>
 
         <?= $this->render('_time', [
@@ -96,8 +95,8 @@ window.jqReady.push(function() {
     function nextStep(filepath, filename, fileduration)
     {
         uploaded = true;
-        $('#content-data').val(filepath);
-        $('#content-filename').val(filename);
+        setError();
+        $('#content-data').val(filepath + '§' + filename);
         $('#content-upload').slideUp();
         $('#content-form').slideDown();
         $('#content-description').val(filename);
@@ -128,13 +127,22 @@ window.jqReady.push(function() {
         }
 
         var cp = e.originalEvent.clipboardData;
+        console.log(cp);
         for (var i = 0; i < cp.types.length; i++) {
             var t = cp.types[i];
             if (t == 'text/plain') {
                 handleUrl(cp.getData(t));
-            } else if (t == 'Files') {
-                handleFile(cp.files);
+                return;
             }
+            if (t == 'Files') {
+                handleFile(cp.files);
+                return;
+            }
+        }
+
+        if (cp.files.length) {
+            handleFile(cp.files);
+            return;
         }
         //return false;
     });
@@ -156,9 +164,9 @@ window.jqReady.push(function() {
                     setError(data.message);
                 }
             },
-            error: function() {
+            error: function(jqXHR, textStatus) {
                 uploading = false;
-                setError('!');
+                setError(textStatus || 'Internal error');
             }
         })
     }
