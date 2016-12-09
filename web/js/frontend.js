@@ -280,7 +280,7 @@ Field.prototype.setError = function(err) {
  * Randomize order
  */
 Field.prototype.randomizeSortContents = function() {
-  this.contents = this.contents.sort(function(a, b) {
+  this.contents = this.contents.sort(function() {
     return Math.random() - 0.5;
   });
 }
