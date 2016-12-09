@@ -217,10 +217,7 @@ Content.prototype.preload = function() {
   this.setPreloading(true);
 
   var c = this;
-  $.ajax({
-    method: 'GET',
-    url: src,
-  }).done(function(data, textStatus, jqXHR) {
+  $.ajax(src).done(function(data, textStatus, jqXHR) {
     c.setPreloaded(jqXHR.getResponseHeader('Expires'));
   }).fail(function() {
     c.setPreloaded(false); // Discard until next Content init
