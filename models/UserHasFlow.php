@@ -42,7 +42,7 @@ class UserHasFlow extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'user_username' => Yii::t('app', 'User Username'),
+            'user_username' => Yii::t('app', 'Username'),
             'flow_id' => Yii::t('app', 'Flow ID'),
         ];
     }

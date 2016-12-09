@@ -44,7 +44,7 @@ class TemplateBackgroundUpload extends \yii\base\Model
      */
     public function upload($fileInstance)
     {
-        if (!$fileInstance) {
+        if ($fileInstance === null) {
             return false;
         }
 
