@@ -56,7 +56,6 @@ class TemplateBackgroundController extends Controller
     public function actionCreate($template_id = null)
     {
         $modelUpload = new TemplateBackgroundUpload();
-
         if ($modelUpload->load(Yii::$app->request->post())) {
             if ($modelUpload->upload(UploadedFile::getInstance($modelUpload, 'background'))) {
                 if ($template_id != null) {

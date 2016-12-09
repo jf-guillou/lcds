@@ -115,6 +115,18 @@ class ContentType extends \yii\db\ActiveRecord
     }
 
     /**
+     * Get raw data and transform it to content type specific needs.
+     *
+     * @param string $data
+     *
+     * @return string transformed data
+     */
+    public function processData($data)
+    {
+        return $data;
+    }
+
+    /**
      * Get all filtered content types.
      *
      * @param bool $selfUpdate does content type manages itself
@@ -283,9 +295,9 @@ class ContentType extends \yii\db\ActiveRecord
      *
      * @param \FileInstance $fileInstance
      *
-     * @return bool success
+     * @return bool|array error or json success string
      */
-    public function upload()
+    public function upload($fileInstance)
     {
         return false;
     }
@@ -295,9 +307,9 @@ class ContentType extends \yii\db\ActiveRecord
      *
      * @param string $url
      *
-     * @return bool|string[] error or json success string
+     * @return bool|array error or json success string
      */
-    public function sideload()
+    public function sideload($url)
     {
         return false;
     }
@@ -313,16 +325,15 @@ class ContentType extends \yii\db\ActiveRecord
     }
 
     /**
-     * Before save event
-     * Handles file movement from tmp directory to proper media storage
-     * Makes sure there is no overwrite by appending to filename.
+     * Transform data on beforeSave event
      *
      * @param bool $insert is inserted
+     * @param string $data content data
      *
-     * @return bool success
+     * @return string transformed data
      */
-    public function beforeSaveContent()
+    public function transformDataBeforeSave($insert, $data)
     {
-        return true;
+        return $data;
     }
 }

@@ -35,7 +35,7 @@ class UserController extends Controller
                 'only' => ['index', 'view', 'create', 'import', 'delete', 'set-roles'],
                 'rules' => [
                     ['allow' => true, 'actions' => ['index', 'view', 'create', 'delete', 'set-roles'], 'roles' => ['admin']],
-                    ['allow' => true, 'actions' => ['import'], 'matchCallback' => function ($rule, $action) {
+                    ['allow' => true, 'actions' => ['import'], 'matchCallback' => function () {
                         return Yii::$app->params['useLdap'];
                     }],
                 ],

@@ -145,8 +145,6 @@ class ContentController extends BaseController
         } else {
             $model = new Content(['flow_id' => $flow->id, 'type_id' => $contentType->id]);
             if ($model->load(Yii::$app->request->post())) {
-                //$model->flow_id = $flow->id;
-                //$model->type_id = $contentType->id;
                 if ($model->save()) {
                     return $this->redirect(['flow/view', 'id' => $flow->id]);
                 }
@@ -170,8 +168,6 @@ class ContentController extends BaseController
                             'uploadUrl' => Url::to(['content/upload', 'type' => $type]),
                             'sideloadUrl' => Url::to(['content/sideload', 'type' => $type]),
                         ]);
-                    break;
-
                 case ContentType::KINDS['NONE']:
                 case ContentType::KINDS['RAW']:
                     // RAW ContentType doesn't support Content

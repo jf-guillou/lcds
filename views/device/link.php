@@ -27,7 +27,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'template' => '{link}',
                 'header' => Yii::t('app', 'Link'),
                 'buttons' => [
-                    'link' => function ($url, $_model, $key) use ($model) {
+                    'link' => function ($url, $_model) use ($model) {
                         return Html::a('<span class="glyphicon glyphicon-plus"></span>', Url::to(['link', 'id' => $model->id, 'screenId' => $_model->id]));
                     },
                 ],

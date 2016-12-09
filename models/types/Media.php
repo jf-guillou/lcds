@@ -28,11 +28,7 @@ abstract class Media extends ContentType
     public $_filename;
 
     /**
-     * Take a file instance and upload it to FS, also save in DB.
-     *
-     * @param \FileInstance $fileInstance
-     *
-     * @return bool success
+     * {@inheritdoc}
      */
     public function upload($fileInstance)
     {
@@ -86,11 +82,7 @@ abstract class Media extends ContentType
     }
 
     /**
-     * Take an url and download it, also save it in DB.
-     *
-     * @param string $url
-     *
-     * @return bool|string[] error or json success string
+     * {@inheritdoc}
      */
     public function sideload($url)
     {
@@ -164,9 +156,7 @@ abstract class Media extends ContentType
     }
 
     /**
-     * Custom error getter for upload/sideload temp file.
-     *
-     * @return string error
+     * {@inheritdoc}
      */
     public function getLoadError()
     {
@@ -241,15 +231,9 @@ abstract class Media extends ContentType
     }
 
     /**
-     * Before save event
-     * Handles file movement from tmp directory to proper media storage
-     * Makes sure there is no overwrite by appending to filename.
-     *
-     * @param bool $insert is inserted
-     *
-     * @return bool success
+     * {@inheritdoc}
      */
-    public function beforeSaveContent($insert, $data)
+    public function transformDataBeforeSave($insert, $data)
     {
         if ($insert) {
             list($path, $filename) = explode('§', $data);
@@ -267,10 +251,10 @@ abstract class Media extends ContentType
                 }
             }
 
-            return false;
+            return null;
         }
 
-        return true;
+        return $data;
     }
 
     /**

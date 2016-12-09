@@ -161,6 +161,7 @@ return [
 
     /* Video */
     'Video' => 'Video',
+    'Direct link to a video on an internet website. Hosted video is usually more appropriate.' => 'Lien vers une vidéo depuis un site. Une vidéo hébergée est généralement plus appropriée.',
 
     /* Hosted Image */
     'Hosted image' => 'Image hébergée',

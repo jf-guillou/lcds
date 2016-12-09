@@ -161,9 +161,9 @@ class Content extends \yii\db\ActiveRecord
             return false;
         }
 
-        $res = $this->type->beforeSaveContent($insert, $this->data);
-        if ($res === true || $res === false) {
-            return $res;
+        $res = $this->type->transformDataBeforeSave($insert, $this->data);
+        if ($res == null) {
+            return false;
         }
 
         $this->data = $res;
