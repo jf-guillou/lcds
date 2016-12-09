@@ -168,19 +168,23 @@ Content.prototype.isPreloaded = function() {
  * @param {string} expires header
  */
 Content.prototype.setPreloaded = function(expires) {
-  if (expires === null) {
-    // Missing Expires header, do not cache
-    screen.cache[this.getResource()] = true;
-  }
-
-  if (expires) {
-    var exp = new Date(expires).valueOf();
-    var diff = exp - (new Date()).valueOf();
-    // Do not cache short Expires
-    screen.cache[this.getResource()] = diff < 10000 ? true : exp + 5000;
-  } else {
-    // Discard now expired content
-    delete screen.cache[this.getResource()];
+  switch (expires) {
+    case null:
+    case undefined:
+      // No Expires header, don't bother with caching
+    case true:
+      // Force content cache
+      screen.cache[this.getResource()] = true;
+      break;
+    case false:
+      // Discard content cache and disallow display
+      delete screen.cache[this.getResource()];
+      break;
+    default:
+      var exp = new Date(expires).valueOf();
+      var diff = exp - (new Date()).valueOf();
+      // Don't check short Expires and add 5 sec to valid Expires
+      screen.cache[this.getResource()] = diff < 10000 ? true : exp + 5000;
   }
 }
 
