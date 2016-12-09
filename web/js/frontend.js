@@ -199,7 +199,7 @@ Content.prototype.isPreloading = function() {
  */
 Content.prototype.setPreloading = function(state) {
   if (state) {
-    screen.cache[this.getResource] = false;
+    screen.cache[this.getResource()] = false;
   } else if (this.isPreloading()) {
     delete screen.cache[this.getResource()];
   }
