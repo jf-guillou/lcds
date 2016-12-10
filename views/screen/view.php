@@ -57,7 +57,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'controller' => 'flow',
                 'template' => '{view} {update} {unlink}',
                 'buttons' => [
-                    'unlink' => function ($url, $_model, $key) use ($model) {
+                    'unlink' => function ($url, $_model) use ($model) {
                         return Html::a('<span class="glyphicon glyphicon-remove"></span>', Url::to(['unlink', 'id' => $model->id, 'flowId' => $_model->id]));
                     },
                 ],

@@ -176,8 +176,6 @@ class ContentController extends BaseController
                     throw new NotFoundHttpException(Yii::t('app', 'The requested content type is not supported.'));
             }
         }
-
-        return $this->redirect(['flows/view', 'id' => $flowId]);
     }
 
     /**

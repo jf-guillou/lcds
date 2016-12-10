@@ -26,7 +26,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'last_login_at',
             [
                 'attribute' => 'role',
-                'value' => function ($model, $key, $index, $column) {
+                'value' => function ($model) {
                     return $model->role ? Yii::t('app', $model->role->name) : null;
                 },
             ],
@@ -34,7 +34,7 @@ $this->params['breadcrumbs'][] = $this->title;
             ['class' => 'yii\grid\ActionColumn',
                 'template' => '{view} {set-roles} {delete}',
                 'buttons' => [
-                    'set-roles' => function ($url, $model, $key) {
+                    'set-roles' => function ($url) {
                         return Html::a('<span class="glyphicon glyphicon-cog"></span>', $url);
                     },
                 ],
