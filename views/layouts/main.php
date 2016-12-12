@@ -44,6 +44,7 @@ AppAsset::register($this);
             ['label' => Yii::t('app', 'Screens'), 'url' => ['/screen'], 'visible' => Yii::$app->user->can('setScreens')],
             ['label' => Yii::t('app', 'Flows'), 'url' => ['/flow'], 'visible' => Yii::$app->user->can('setOwnFlowContent')],
             ['label' => Yii::t('app', 'Content'), 'url' => ['/content'], 'visible' => Yii::$app->user->can('setContent')],
+            ['label' => Yii::t('app', 'Content types'), 'url' => ['/content-type'], 'visible' => Yii::$app->user->can('setContentTypes')],
             ['label' => Yii::t('app', 'Users'), 'url' => ['/user'], 'visible' => Yii::$app->user->can('admin')],
             Yii::$app->user->isGuest ? (
                 ['label' => Yii::t('app', 'Login'), 'url' => ['/auth/login']]

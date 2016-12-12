@@ -7,14 +7,43 @@ use yii\console\Controller;
 
 class RbacController extends Controller
 {
-    public function actionInit()
+    public function reset()
     {
         $auth = Yii::$app->authManager;
         $auth->removeAll();
+    }
 
-        /*
-         * Rules
-         */
+    public function actionInit()
+    {
+        $this->reset();
+        $this->setupPermissionsAndRoles();
+        $this->setupDefaultAssignments();
+    }
+
+    public function setupDefaultAssignments()
+    {
+        $auth = Yii::$app->authManager;
+
+        $admin = $auth->getRole('Administrator');
+        $auth->assign($admin, 'admin');
+    }
+
+    public function actionAddContentTypes()
+    {
+        $auth = Yii::$app->authManager;
+
+        // Content Type
+        $setContentTypes = $auth->createPermission('setContentTypes');
+        $setContentTypes->description = 'Manage content types';
+        $auth->add($setContentTypes);
+
+        $admin = $auth->getRole('Administrator');
+        $auth->addChild($admin, $setContentTypes);
+    }
+
+    public function setupPermissionsAndRoles()
+    {
+        $auth = Yii::$app->authManager;
 
         /*
          * Permissions
@@ -93,8 +122,7 @@ class RbacController extends Controller
         $auth->addChild($admin, $administration);
         $auth->addChild($admin, $setDevices);
         $auth->addChild($admin, $setContent);
+        $auth->addChild($admin, $setContentTypes);
         $auth->addChild($admin, $screenManager);
-
-        $auth->assign($admin, 'admin');
     }
 }
