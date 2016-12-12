@@ -112,6 +112,11 @@ maximum_object_size 256 MB
 
 cache_store_log /var/log/squid3/store.log
 read_ahead_gap 1 MB
+
+refresh_pattern -i (\.mp4|\.jpg|\.jpeg) 43200 100% 129600 reload-into-ims
+
+strip_query_terms off
+range_offset_limit none
 " >> /etc/squid3/squid.local.conf
 echo "include /etc/squid3/squid.local.conf" >> /etc/squid3/squid.conf
 
