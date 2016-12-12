@@ -53,6 +53,23 @@ class ContentTypeController extends BaseController
     }
 
     /**
+     * Enables or disables a Device.
+     *
+     * @param int $id screen id
+     *
+     * @return \yii\web\Response
+     */
+    public function actionToggle($id)
+    {
+        $model = $this->findModel($id);
+
+        $model->enabled = !$model->enabled;
+        $model->save();
+
+        return $this->smartGoBack();
+    }
+
+    /**
      * Finds the ContentType model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      *

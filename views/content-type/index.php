@@ -18,7 +18,17 @@ $this->params['breadcrumbs'][] = $this->title;
         'columns' => [
             'name',
             'usable:boolean',
-            'enabled:boolean',
+
+            [
+                'class' => 'yii\grid\ActionColumn',
+                'template' => '{toggle}',
+                'header' => Yii::t('app', 'Enabled'),
+                'buttons' => [
+                    'toggle' => function ($url, $model) {
+                        return Html::a('<span class="glyphicon glyphicon-'.($model->enabled ? 'pause' : 'play').'"></span>', $url);
+                    },
+                ],
+            ],
         ],
     ]); ?>
 </div>
