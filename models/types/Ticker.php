@@ -2,6 +2,8 @@
 
 namespace app\models\types;
 
+use Yii;
+
 /**
  * This is the model class for Ticker content type.
  */

@@ -72,6 +72,7 @@ class ContentType extends \yii\db\ActiveRecord
             'id' => Yii::t('app', 'ID'),
             'name' => Yii::t('app', 'Type'),
             'description' => Yii::t('app', 'Description'),
+            'usable' => Yii::t('app', 'Usable'),
             'html' => Yii::t('app', 'HTML'),
             'css' => Yii::t('app', 'CSS'),
             'js' => Yii::t('app', 'JS'),
@@ -305,10 +306,10 @@ class ContentType extends \yii\db\ActiveRecord
     }
 
     /**
-     * Transform data on beforeSave event
+     * Transform data on beforeSave event.
      *
-     * @param bool $insert is inserted
-     * @param string $data content data
+     * @param bool   $insert is inserted
+     * @param string $data   content data
      *
      * @return string transformed data
      */

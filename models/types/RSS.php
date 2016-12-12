@@ -2,6 +2,7 @@
 
 namespace app\models\types;
 
+use Yii;
 use app\models\ContentType;
 
 /**
