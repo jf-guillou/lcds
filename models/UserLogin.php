@@ -24,6 +24,7 @@ class UserLogin extends \yii\base\Model
     {
         return [
             [['username', 'password'], 'required'],
+            [['username', 'password'], 'string', 'max' => 64],
             [['remember_me'], 'boolean'],
         ];
     }

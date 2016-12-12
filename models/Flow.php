@@ -39,6 +39,7 @@ class Flow extends \yii\db\ActiveRecord
             [['parent_id', 'id'], 'integer'],
             [['name'], 'string', 'max' => 64],
             [['description'], 'string', 'max' => 1024],
+            [['parent'], 'safe'],
             [['parent_id'], 'exist', 'skipOnError' => true, 'targetClass' => self::className(), 'targetAttribute' => ['parent_id' => 'id']],
         ];
     }
@@ -71,6 +72,16 @@ class Flow extends \yii\db\ActiveRecord
     public function getParent()
     {
         return $this->hasOne(self::className(), ['id' => 'parent_id']);
+    }
+
+    /**
+     * Set parent_id with flow.
+     *
+     * @param \app\models\Flow $flow parent flow
+     */
+    public function setParent($flow)
+    {
+        $this->parent_id = $flow->id;
     }
 
     /**

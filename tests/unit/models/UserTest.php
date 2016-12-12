@@ -3,6 +3,7 @@
 namespace tests\models;
 
 use app\models\User;
+use app\models\Flow;
 
 class UserTest extends \Codeception\Test\Unit
 {
@@ -52,5 +53,43 @@ class UserTest extends \Codeception\Test\Unit
         $user = User::findInLdap('non-existing-ldap-user');
 
         expect_not($user);
+    }
+
+    public function testLogin()
+    {
+        $user = User::findIdentity('admin');
+
+        // Capture login event
+        \Yii::$app->user->on(\yii\web\User::EVENT_AFTER_LOGIN, ['app\models\User', 'afterLogin']);
+
+        expect_that(\Yii::$app->user->login($user, 0));
+
+        expect_that($user->last_login_at);
+    }
+
+    public function testNeedsFlow()
+    {
+        $user = User::findIdentity('admin');
+
+        expect_not($user->needsFlow);
+    }
+
+    public function testFlows()
+    {
+        $user = User::findIdentity('admin');
+
+        expect_not($user->flows);
+
+        $flow = new Flow();
+        $flow->name = 'flow';
+        $flow->save();
+
+        $user->flows = [$flow->id];
+
+        expect_that($user->flows);
+
+        $user->flows = [];
+
+        expect_not($user->flows);
     }
 }

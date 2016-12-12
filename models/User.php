@@ -276,6 +276,11 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
         $link = array_diff($flows, $prevFlows);
         if (count($link)) {
             $lFlows = Flow::findAll($link);
+            if (count($lFlows) != count($link)) {
+                $this->addError('flows', Yii::t('app', 'Trying to add non-existing flow'));
+
+                return false;
+            }
             foreach ($lFlows as $f) {
                 $this->link('flows', $f);
             }
