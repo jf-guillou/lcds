@@ -122,7 +122,6 @@ class RbacController extends Controller
         $auth->addChild($admin, $administration);
         $auth->addChild($admin, $setDevices);
         $auth->addChild($admin, $setContent);
-        $auth->addChild($admin, $setContentTypes);
         $auth->addChild($admin, $screenManager);
     }
 }
