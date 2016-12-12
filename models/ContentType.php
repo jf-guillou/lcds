@@ -53,8 +53,9 @@ class ContentType extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['id'], 'required'],
+            [['id', 'enabled'], 'required'],
             [['id'], 'string', 'max' => 45],
+            [['enabled'], 'boolean'],
         ];
     }
 
@@ -73,6 +74,7 @@ class ContentType extends \yii\db\ActiveRecord
             'name' => Yii::t('app', 'Type'),
             'description' => Yii::t('app', 'Description'),
             'usable' => Yii::t('app', 'Usable'),
+            'enabled' => Yii::t('app', 'Enabled'),
             'html' => Yii::t('app', 'HTML'),
             'css' => Yii::t('app', 'CSS'),
             'js' => Yii::t('app', 'JS'),

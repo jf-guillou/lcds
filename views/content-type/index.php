@@ -18,6 +18,7 @@ $this->params['breadcrumbs'][] = $this->title;
         'columns' => [
             'name',
             'usable:boolean',
+            'enabled:boolean',
         ],
     ]); ?>
 </div>
