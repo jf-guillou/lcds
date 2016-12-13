@@ -37,6 +37,7 @@ class HostedVideo extends Video
         }
 
         $dl = new YoutubeDl([
+            'restrict-filenames' => true,
             'proxy' => Yii::$app->params['proxy'],
             'format' => 'best[ext=mp4]/best[ext=flv]',
         ]);
