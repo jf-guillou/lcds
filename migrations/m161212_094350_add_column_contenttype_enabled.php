@@ -2,6 +2,10 @@
 
 use yii\db\Migration;
 
+/**
+ * Handles the addition of column 'enabled' to table `content_type`.
+ */
+// @codingStandardsIgnoreLine
 class m161212_094350_add_column_contenttype_enabled extends Migration
 {
     public function up()

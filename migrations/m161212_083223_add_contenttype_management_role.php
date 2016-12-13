@@ -2,6 +2,10 @@
 
 use yii\db\Migration;
 
+/**
+ * Handles the addition of setContentTypes roles to authManager.
+ */
+// @codingStandardsIgnoreLine
 class m161212_083223_add_contenttype_management_role extends Migration
 {
     public function up()

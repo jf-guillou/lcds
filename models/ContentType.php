@@ -8,6 +8,7 @@ use Yii;
  * This is the model class for table "content_type".
  *
  * @property string $id Class name
+ * @property bool $enabled
  * @property Content[] $contents
  * @property FieldHasContentType[] $fieldHasContentTypes
  * @property Field[] $fields
