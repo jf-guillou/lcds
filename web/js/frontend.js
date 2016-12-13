@@ -34,6 +34,8 @@ Screen.prototype.checkUpdates = function() {
         s.reload(j.data.duration * 1000);
         s.nextUrl = j.data.nextScreenUrl;
       }
+    } else if (j.message == 'Unauthorized') {
+      screen.reload();
     }
   });
 }
