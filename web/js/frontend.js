@@ -139,6 +139,7 @@ Content.prototype.getResource = function() {
   if (src.indexOf('http') !== 0) {
     return false;
   }
+  src = src.replace(/(\?|&|;)_[\w\-]+=[\d\w\.,]+/g, '');
 
   this.src = src;
   return src;
