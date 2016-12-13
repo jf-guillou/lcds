@@ -38,6 +38,14 @@ See [https://github.com/jf-guillou/lcds/blob/master/composer.json](composer.json
 - [Composer](https://getcomposer.org/)
 > Lower PHP versions are unsupported but should work
 
+### Optional
+
+- youtube-dl : Used by HostedVideo sideloader -- Make sure to keep updated
+```bash
+sudo wget https://yt-dl.org/downloads/latest/youtube-dl -O /usr/local/bin/youtube-dl
+sudo chmod a+rx /usr/local/bin/youtube-dl
+```
+
 ## INSTALLATION
 
 **Do not forget to change /path/to/install in the following guide to your liking.**

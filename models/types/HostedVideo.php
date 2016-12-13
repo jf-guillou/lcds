@@ -51,10 +51,12 @@ class HostedVideo extends Video
             }
         } catch (\Symfony\Component\Process\Exception\ProcessFailedException $e) {
             $this->addError('load', Yii::t('app', 'Downloading error'));
+            Yii::error($e->getMessage());
 
             return false;
         } catch (\YoutubeDl\Exception\NotFoundException $e) {
             $this->addError('load', Yii::t('app', 'Media not found!'));
+            Yii::error($e->getMessage());
 
             return false;
         }
