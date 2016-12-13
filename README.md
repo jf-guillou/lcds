@@ -264,8 +264,8 @@ xwit -root -warp $( cat /sys/module/*fb*/parameters/fbwidth ) $( cat /sys/module
 # Disable DPMS / Screen blanking
 xset s off
 
-SWITCH=/tmp/turnmeoff
-rm $SWITCH
+TURNMEOFF=/tmp/turnoff_display
+rm $TURNMEOFF
 
 export PATH="/home/pi/bin:$PATH"
 export http_proxy="http://localhost:3128"
@@ -274,7 +274,7 @@ BROWSER="kweb3"
 LOG=/home/pi/autorun.log
 VIDEO="omxplayer.bin"
 while true; do
-  if [ -f $SWITCH ]
+  if [ -f $TURNMEOFF ]
   then
     if pgrep $BROWSER
     then
@@ -350,7 +350,7 @@ echo "include /etc/squid3/squid.local.conf" >> /etc/squid3/squid.conf
 
 - Configure auto shutdown
 ```bash
-echo "0 18 * * 1-5 touch /tmp/turnmeoff >> /home/pi/autorun.log 2>&1
+echo "0 18 * * 1-5 touch /tmp/turnoff_display >> /home/pi/autorun.log 2>&1
 0 7 * * 1-5 /usr/bin/sudo /sbin/reboot >> /home/pi/autorun.log 2>&1
 " >> /var/spool/cron/crontabs/root
 ```
