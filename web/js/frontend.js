@@ -104,6 +104,15 @@ function Content(c) {
   }
 }
 
+Content.preload = {
+  PRELOADING: -2,
+  PRELOADING_QUEUE: -3,
+  HTTP_FAIL: -3,
+  NO_EXPIRE_HEADER: -4,
+  OK: -8,
+}
+
+
 /**
  * Check if content should be ajax preloaded
  * @return {boolean}
@@ -146,6 +155,18 @@ Content.prototype.getResource = function() {
 }
 
 /**
+ * Set content cache status
+ * @param {string} expires header
+ */
+Content.prototype.setPreloadState = function(expires) {
+  if (expires === null || expires == '') {
+    expires = Content.preload.NO_EXPIRE_HEADER;
+  }
+
+  screen.cache[this.getResource()] = expires < -1 ? expires : Content.preload.OK
+}
+
+/**
  * Check cache for preload status of content
  * @return {Boolean} 
  */
@@ -154,41 +175,7 @@ Content.prototype.isPreloaded = function() {
     return true;
   }
 
-  var cache = screen.cache[this.getResource()]
-  switch (cache) {
-    case undefined: // unset
-    case false: // preloading
-      return false;
-    case true: // preloaded without expire
-      return true;
-    default: // check expire
-      return (new Date()).valueOf() < cache;
-  }
-}
-
-/**
- * Set content cache status
- * @param {string} expires header
- */
-Content.prototype.setPreloaded = function(expires) {
-  switch (expires) {
-    case null:
-    case undefined:
-      // No Expires header, don't bother with caching
-    case true:
-      // Force content cache
-      screen.cache[this.getResource()] = true;
-      break;
-    case false:
-      // Discard content cache and disallow display
-      delete screen.cache[this.getResource()];
-      break;
-    default:
-      var exp = new Date(expires).valueOf();
-      var diff = exp - (new Date()).valueOf();
-      // Don't check short Expires and add 5 sec to valid Expires
-      screen.cache[this.getResource()] = diff < 10000 ? true : exp + 5000;
-  }
+  return screen.cache[this.getResource()] === Content.preload.OK
 }
 
 /**
@@ -196,19 +183,7 @@ Content.prototype.setPreloaded = function(expires) {
  * @return {Boolean}
  */
 Content.prototype.isPreloading = function() {
-  return screen.cache[this.getResource()] === false;
-}
-
-/**
- * Set content preloading status
- * @param {boolean} state is preloading
- */
-Content.prototype.setPreloading = function(state) {
-  if (state) {
-    screen.cache[this.getResource()] = false;
-  } else if (this.isPreloading()) {
-    delete screen.cache[this.getResource()];
-  }
+  return screen.cache[this.getResource()] === Content.preload.PRELOADING;
 }
 
 /**
@@ -218,17 +193,20 @@ Content.prototype.setPreloading = function(state) {
 Content.prototype.preload = function() {
   var src = this.getResource();
   if (!src) {
-    this.setPreloaded(true);
     return;
   }
-  this.setPreloading(true);
+  this.setPreloadState(Content.preload.PRELOADING);
 
   var c = this;
   $.ajax(src).done(function(data, textStatus, jqXHR) {
-    c.setPreloaded(jqXHR.getResponseHeader('Expires'));
+    c.setPreloadState(jqXHR.getResponseHeader('Expires'));
   }).fail(function() {
-    c.setPreloaded(false); // Discard until next Content init
+    c.setPreloadState(Content.preload.FAIL);
   });
+}
+
+Content.prototype.canDisplay = function(screen) {
+  return (screen.endAt == null || this.duration + Date.now() > screen.endAt) && this.isPreloaded();
 }
 
 /**
@@ -297,6 +275,7 @@ Field.prototype.pickNext = function() {
     return;
   }
 
+  var f = this;
   this.previous = this.current;
   this.current = null;
   var pData = this.previous && this.previous.data;
@@ -305,7 +284,7 @@ Field.prototype.pickNext = function() {
   for (var i = 0; i < this.contents.length; i++) {
     var c = this.contents[i];
     // Skip too long or not preloaded content 
-    if ((screen.endAt != null && c.duration + Date.now() > screen.endAt) || !c.isPreloaded()) {
+    if (!c.canDisplay(screen)) {
       continue;
     }
 
@@ -328,9 +307,16 @@ Field.prototype.pickNext = function() {
     }
 
     this.next = c;
+    break
   }
 
-  this.display();
+  if (this.next) {
+    this.display();
+  } else {
+    setTimeout(function() {
+      f.pickNext();
+    }, 200);
+  }
 }
 
 /**
@@ -355,10 +341,6 @@ Field.prototype.display = function() {
       f.pickNext();
     }, this.current.duration);
     this.endAt = this.current.duration + Date.now()
-  } else {
-    this.timeout = setTimeout(function() {
-      f.pickNext();
-    }, 2000);
   }
 }
 
