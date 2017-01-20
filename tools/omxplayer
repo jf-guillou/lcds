@@ -1,32 +1,54 @@
 #!/usr/bin/python
 
+import os
 import sys
 import subprocess
 import urllib
 import urlparse
 
+def getScreenDimensions():
+  if not os.environ.has_key('SCREEN_WIDTH_PX') or not os.environ.has_key('SCREEN_HEIGHT_PX'):
+    w, h = (int(v) for v in 
+      subprocess.Popen(
+        'DISPLAY=:0 xrandr | grep "\*" | cut -d" " -f4',
+        shell=True,
+        stdout=subprocess.PIPE,
+        stderr=file('/dev/null','wa')
+      ).communicate()[0].strip().split('\n')[0].split('x')
+    )
+    return w, h
+  else:
+    return int(os.environ.get('SCREEN_WIDTH_PX')), int(os.environ.get('SCREEN_HEIGHT_PX'))
+
 args = sys.argv
 url = urlparse.urlparse(args[-1])
+frag = url.fragment
 
-query = urlparse.parse_qs(url.query, True)
-query_c = dict(query)
 params = {}
+query = frag.split(';')
 
-for (key, value) in query.items():
-  if key.startswith("_"):
-    del query_c[key]
-    params[key[1:]] = value[0]
+for param in query:
+  if not param.startswith('_'):
+    continue
+  key = param
+  value = ''
+  if '=' in param:
+    key, value = param.split('=')
+  params[key[1:]] = value
 
-url = url._replace(query=urllib.urlencode(query_c))
+url = url._replace(fragment='')
 args[-1] = url.geturl()
 
 for (key, value) in params.items():
   if key == 'win':
     x1, y1, x2, y2 = (float(v) for v in value.split(','))
-    w, h = (int(v) for v in subprocess.Popen('DISPLAY=:0 xrandr | grep "\*" | cut -d" " -f4',shell=True,stdout=subprocess.PIPE,stderr=file('/dev/null','wa')).communicate()[0].strip().split('\n')[0].split('x'))
+    w, h = getScreenDimensions()
     value = ','.join(str(int(round(v))) for v in [x1*w, y1*h, x2*w, y2*h])
 
-  args.insert(1, '--'+key+'='+value)
+  if value is '':
+    args.insert(1, '--'+key)
+  else:
+    args.insert(1, '--'+key+'='+value)
 
 args[0] = '/usr/bin/omxplayer'
 subprocess.call(args)

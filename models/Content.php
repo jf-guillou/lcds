@@ -143,7 +143,7 @@ class Content extends \yii\db\ActiveRecord
     {
         $data = $this->data;
         if ($this->type->appendParams) {
-            $data .= (strpos($data, '?') === false ? '?' : '&').$this->type->appendParams;
+            $data .= (strpos($data, '#') === false ? '#' : ';').$this->type->appendParams;
         }
 
         $data = $this->processData($data);
