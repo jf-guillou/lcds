@@ -97,7 +97,6 @@ class FrontendController extends BaseController
         if ($screen === null) {
             throw new NotFoundHttpException(Yii::t('app', 'The requested screen does not exist.'));
         }
-
         $content = [
             'name' => $screen->name,
             'screenCss' => $screen->template->css,

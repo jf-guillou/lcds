@@ -194,7 +194,7 @@ class ContentType extends \yii\db\ActiveRecord
         if (\Yii::$app->params['proxy']) {
             $ctx = [
                 'http' => [
-                    'proxy' => 'tcp://vdebian:8080',
+                    'proxy' => str_replace('http://', 'tcp://', \Yii::$app->params['proxy']),
                     'request_fulluri' => true,
                 ],
             ];
