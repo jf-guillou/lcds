@@ -230,7 +230,7 @@ function Field($f) {
 /**
  * Retrieves contents from backend for this field
  */
-Field.prototype.getContents = function() {
+Field.prototype.fetchContents = function() {
   if (!this.canUpdate) {
     return;
   }
@@ -254,7 +254,7 @@ Field.prototype.getContents = function() {
  * Display error in field text
  */
 Field.prototype.setError = function(err) {
-  this.$field.text(err);
+  this.display(err);
 }
 
 /**
@@ -356,7 +356,7 @@ function onLoad() {
   // Init
   $('.field').each(function() {
     var f = new Field($(this));
-    f.getContents();
+    f.fetchContents();
     screen.fields.push(f);
   });
 
