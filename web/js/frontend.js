@@ -98,9 +98,11 @@ Screen.prototype.displaysData = function(data) {
  * @return {Boolean} has preloading content
  */
 Screen.prototype.hasPreloadingContent = function() {
-  for (var c in this.cache) {
-    if (this.cache[c].isPreloading()) {
-      return true;
+  for (var f in this.fields) {
+    for (var c in this.fields[f].contents) {
+      if (this.fields[f].contents[c].isPreloading()) {
+        return true;
+      }
     }
   }
 
@@ -111,9 +113,11 @@ Screen.prototype.hasPreloadingContent = function() {
  * Pick next content to preload from cache queue
  */
 Screen.prototype.nextPreloadQueue = function() {
-  for (var c in this.cache) {
-    if (this.cache[c].isInPreloadQueue()) {
-      this.cache[c].preload();
+  for (var f in this.fields) {
+    for (var c in this.fields[f].contents) {
+      if (this.fields[f].contents[c].isInPreloadQueue()) {
+        this.fields[f].contents[c].preload();
+      }
     }
   }
 }
@@ -263,6 +267,12 @@ Content.prototype.queuePreload = function() {
   }
 }
 
+
+/**
+ * Preload class constructor
+ * Mostly used to store constants
+ */
+function Preload() {}
 
 /**
  * Preload states
