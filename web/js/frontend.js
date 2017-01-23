@@ -23,6 +23,7 @@ Screen.prototype.checkUpdates = function() {
       if (s.lastChanges == null) {
         s.lastChanges = j.data.lastChanges;
       } else if (s.lastChanges != j.data.lastChanges) {
+        // Remote screen updated, we should reload
         s.reloadIn(0);
         s.nextUrl = null;
         return;
@@ -45,6 +46,11 @@ Screen.prototype.checkUpdates = function() {
 Screen.prototype.reloadIn = function(minDuration) {
   var endAt = Date.now() + minDuration;
   if (this.endAt != null && this.endAt < endAt) {
+    return;
+  }
+
+  if (this.hasPreloadingContent()) {
+    // Do not break preloading
     return;
   }
 
@@ -199,7 +205,9 @@ Content.prototype.isPreloaded = function() {
     return true;
   }
 
-  return screen.cache[this.getResource()] === Preload.state.OK;
+  var state = screen.cache[this.getResource()];
+
+  return state === Preload.state.OK || state === Preload.state.NO_EXPIRE_HEADER;
 }
 
 /**
