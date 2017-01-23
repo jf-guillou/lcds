@@ -360,16 +360,18 @@ function onLoad() {
     screen.fields.push(f);
   });
 
-  // Setup content updates loop
-  setInterval(function() {
-    for (var f in screen.fields) {
-      if (screen.fields.hasOwnProperty(f)) {
-        screen.fields[f].getContents();
+  if (screen.url) {
+    // Setup content updates loop
+    setInterval(function() {
+      for (var f in screen.fields) {
+        if (screen.fields.hasOwnProperty(f)) {
+          screen.fields[f].fetchContents();
+        }
       }
-    }
+      screen.checkUpdates();
+    }, 60000);
     screen.checkUpdates();
-  }, 60000);
-  screen.checkUpdates();
+  }
 }
 
 // Run
