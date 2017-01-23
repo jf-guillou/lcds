@@ -21,7 +21,7 @@
         "yiisoft/yii2-jui": "^2.0",
         "kartik-v/yii2-widget-datetimepicker": "*",
         "norkunas/youtube-dl-php": "^0.3.0",
-        "mhor/php-mediainfo": "^2.2",
+        "mhor/php-mediainfo": "^3.0",
         "johngrogg/ics-parser": "dev-master",
         "bower-asset/weather-icons": "^2.0",
         "bower-asset/jquery-file-upload": "^9.13",
