@@ -10,7 +10,6 @@ function Screen(updateScreenUrl) {
   this.lastChanges = null;
   this.endAt = null;
   this.nextUrl = null;
-  this.stopping = false;
   this.cache = {};
 }
 
@@ -24,18 +23,19 @@ Screen.prototype.checkUpdates = function() {
       if (s.lastChanges == null) {
         s.lastChanges = j.data.lastChanges;
       } else if (s.lastChanges != j.data.lastChanges) {
-        s.reload();
+        // Remote screen updated, we should reload
+        s.reloadIn(0);
         s.nextUrl = null;
         return;
       }
 
       if (j.data.duration > 0) {
         // Setup next screen
-        s.reload(j.data.duration * 1000);
+        s.reloadIn(j.data.duration * 1000);
         s.nextUrl = j.data.nextScreenUrl;
       }
     } else if (j.message == 'Unauthorized') {
-      screen.reload();
+      screen.reloadIn(0);
     }
   });
 }
@@ -43,33 +43,38 @@ Screen.prototype.checkUpdates = function() {
 /**
  * Start Screen reload procedure, checking for every field timeout
  */
-Screen.prototype.reload = function(minDuration) {
-  var endAt = Date.now() + (minDuration ? minDuration : 0);
-  if (this.stopping && this.endAt < endAt) {
+Screen.prototype.reloadIn = function(minDuration) {
+  var endAt = Date.now() + minDuration;
+  if (this.endAt != null && this.endAt < endAt) {
     return;
   }
 
-  this.endAt = minDuration ? Date.now() + minDuration : 0;
-  this.stopping = true;
+  if (this.hasPreloadingContent()) {
+    // Do not break preloading
+    return;
+  }
+
+  this.endAt = Date.now() + minDuration;
   for (var i in this.fields) {
     if (!this.fields.hasOwnProperty(i)) {
       continue;
     }
     var f = this.fields[i];
     if (f.timeout && f.endAt > this.endAt) {
+      // Always wait for content display end
       this.endAt = f.endAt;
     }
   }
 
-  if (this.endAt === 0) {
-    this.doReload();
+  if (this.endAt <= Date.now()) {
+    this.reloadNow();
   }
 }
 
 /**
  * Actual Screen reload action
  */
-Screen.prototype.doReload = function() {
+Screen.prototype.reloadNow = function() {
   if (this.nextUrl) {
     window.location = this.nextUrl;
   } else {
@@ -89,6 +94,36 @@ Screen.prototype.displaysData = function(data) {
 }
 
 /**
+ * Search in cache for current preloading content
+ * @return {Boolean} has preloading content
+ */
+Screen.prototype.hasPreloadingContent = function() {
+  for (var f in this.fields) {
+    for (var c in this.fields[f].contents) {
+      if (this.fields[f].contents[c].isPreloading()) {
+        return true;
+      }
+    }
+  }
+
+  return false;
+}
+
+/**
+ * Pick next content to preload from cache queue
+ */
+Screen.prototype.nextPreloadQueue = function() {
+  for (var f in this.fields) {
+    for (var c in this.fields[f].contents) {
+      if (this.fields[f].contents[c].isInPreloadQueue()) {
+        this.fields[f].contents[c].preload();
+      }
+    }
+  }
+}
+
+
+/**
  * Content class constructor
  * @param {array} c content attributes
  */
@@ -100,18 +135,9 @@ function Content(c) {
   this.src = null;
 
   if (this.shouldPreload()) {
-    this.preload();
+    this.queuePreload();
   }
 }
-
-Content.preload = {
-  PRELOADING: -2,
-  PRELOADING_QUEUE: -3,
-  HTTP_FAIL: -3,
-  NO_EXPIRE_HEADER: -4,
-  OK: -8,
-}
-
 
 /**
  * Check if content should be ajax preloaded
@@ -127,6 +153,14 @@ Content.prototype.shouldPreload = function() {
  */
 Content.prototype.canPreload = function() {
   return this.getResource() && this.type.search(/Video|Image|Agenda/) != -1;
+}
+
+/**
+ * Check if content is displayable (preloaded and not too long)
+ * @return {Boolean} can display
+ */
+Content.prototype.canDisplay = function() {
+  return (screen.endAt == null || this.duration + Date.now() > screen.endAt) && this.isPreloaded();
 }
 
 /**
@@ -160,10 +194,10 @@ Content.prototype.getResource = function() {
  */
 Content.prototype.setPreloadState = function(expires) {
   if (expires === null || expires == '') {
-    expires = Content.preload.NO_EXPIRE_HEADER;
+    expires = Preload.state.NO_EXPIRE_HEADER;
   }
 
-  screen.cache[this.getResource()] = expires < -1 ? expires : Content.preload.OK
+  screen.cache[this.getResource()] = expires < -1 ? expires : Preload.state.OK
 }
 
 /**
@@ -175,39 +209,82 @@ Content.prototype.isPreloaded = function() {
     return true;
   }
 
-  return screen.cache[this.getResource()] === Content.preload.OK
+  var state = screen.cache[this.getResource()];
+
+  return state === Preload.state.OK || state === Preload.state.NO_EXPIRE_HEADER;
 }
 
 /**
  * Check cache for in progress preloading
- * @return {Boolean}
+ * @return {Boolean} is preloading
  */
 Content.prototype.isPreloading = function() {
-  return screen.cache[this.getResource()] === Content.preload.PRELOADING;
+  return screen.cache[this.getResource()] === Preload.state.PRELOADING;
+}
+
+/**
+ * Check cache for queued preloading
+ * @return {Boolean} is in preload queue
+ */
+Content.prototype.isInPreloadQueue = function() {
+  return screen.cache[this.getResource()] === Preload.state.PRELOADING_QUEUE;
 }
 
 /**
  * Ajax call to preload content
- * @return {[type]} [description]
  */
 Content.prototype.preload = function() {
   var src = this.getResource();
   if (!src) {
     return;
   }
-  this.setPreloadState(Content.preload.PRELOADING);
+
+  this.setPreloadState(Preload.state.PRELOADING);
 
   var c = this;
   $.ajax(src).done(function(data, textStatus, jqXHR) {
     c.setPreloadState(jqXHR.getResponseHeader('Expires'));
   }).fail(function() {
-    c.setPreloadState(Content.preload.FAIL);
+    c.setPreloadState(Preload.state.HTTP_FAIL);
+  }).always(function() {
+    screen.nextPreloadQueue();
   });
 }
 
-Content.prototype.canDisplay = function(screen) {
-  return (screen.endAt == null || this.duration + Date.now() > screen.endAt) && this.isPreloaded();
+/**
+ * Preload content or add to preload queue
+ */
+Content.prototype.queuePreload = function() {
+  var src = this.getResource();
+  if (!src) {
+    return;
+  }
+
+  if (screen.hasPreloadingContent()) {
+    this.setPreloadState(Preload.state.PRELOADING_QUEUE);
+  } else {
+    this.preload();
+  }
 }
+
+
+/**
+ * Preload class constructor
+ * Mostly used to store constants
+ */
+function Preload() {}
+
+/**
+ * Preload states
+ */
+Preload.state = {
+  PRELOADING: -2,
+  PRELOADING_QUEUE: -3,
+  HTTP_FAIL: -4,
+  NO_EXPIRE_HEADER: -5,
+  OK: -6,
+}
+
 
 /**
  * Field class constructor
@@ -270,8 +347,8 @@ Field.prototype.randomizeSortContents = function() {
  * Loop through field contents to pick next displayable content
  */
 Field.prototype.pickNext = function() {
-  if (screen.stopping && screen.endAt < Date.now()) { // Stoping screen
-    screen.doReload();
+  if (screen.endAt != null && screen.endAt < Date.now()) { // Stoping screen
+    screen.reloadNow();
     return;
   }
 
@@ -284,7 +361,7 @@ Field.prototype.pickNext = function() {
   for (var i = 0; i < this.contents.length; i++) {
     var c = this.contents[i];
     // Skip too long or not preloaded content 
-    if (!c.canDisplay(screen)) {
+    if (!c.canDisplay()) {
       continue;
     }
 
@@ -311,8 +388,9 @@ Field.prototype.pickNext = function() {
   }
 
   if (this.next) {
-    this.display();
+    this.displayNext();
   } else {
+    this.display('X');
     setTimeout(function() {
       f.pickNext();
     }, 200);
@@ -320,20 +398,14 @@ Field.prototype.pickNext = function() {
 }
 
 /**
- * Display next content in field html
+ * Setup next content for field and display it
  */
-Field.prototype.display = function() {
+Field.prototype.displayNext = function() {
   var f = this;
   if (this.next && this.next.duration > 0) {
     this.current = this.next
     this.next = null;
-    this.$field.html(this.current.data);
-    this.$field.show();
-    if (this.$field.text() != '') {
-      this.$field.textfill({
-        maxFontPixels: 0,
-      });
-    }
+    this.display(this.current.data);
     if (this.timeout) {
       clearTimeout(this.timeout);
     }
@@ -345,12 +417,27 @@ Field.prototype.display = function() {
 }
 
 /**
+ * Display data in field HTML
+ * @param  {string} data 
+ */
+Field.prototype.display = function(data) {
+  this.$field.html(data);
+  this.$field.show();
+  if (this.$field.text() != '') {
+    this.$field.textfill({
+      maxFontPixels: 0,
+    });
+  }
+}
+
+// Global screen instance
+var screen = null;
+
+/**
  * jQuery.load event
  * Initialize Screen and Fields
  * Setup updates interval timeouts
  */
-var screen = null;
-
 function onLoad() {
   screen = new Screen(updateScreenUrl);
   // Init
