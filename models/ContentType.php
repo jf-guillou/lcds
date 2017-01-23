@@ -277,7 +277,7 @@ class ContentType extends \yii\db\ActiveRecord
     /**
      * Take a file instance and upload it to FS, also save in DB.
      *
-     * @param \yii\web\UploadedFile $fileInstance
+     * @param \yii\web\UploadedFile|null $fileInstance
      *
      * @return bool|array error or json success string
      */

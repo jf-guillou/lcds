@@ -38,7 +38,7 @@ class TemplateBackgroundUpload extends \yii\base\Model
     /**
      * Uploads a new background to storage and saves model.
      *
-     * @param \yii\web\UploadedFile $fileInstance
+     * @param \yii\web\UploadedFile|null $fileInstance
      *
      * @return bool success
      */
