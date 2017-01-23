@@ -6,6 +6,7 @@ apt update
 apt install -y apt-utils raspi-config
 raspi-config nonint do_memory_split 128
 raspi-config nonint do_change_timezone
+raspi-config nonint do_overscan
 apt install -y keyboard-configuration console-data
 apt upgrade -y
 apt install -y rpi-update nano sudo lightdm spectrwm xwit python python-tk lxterminal squid3

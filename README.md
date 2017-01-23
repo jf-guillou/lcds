@@ -210,6 +210,7 @@ A GUI will ask to configure the installed packages, mainly locales.
 ```bash
 raspi-config nonint do_memory_split 128
 raspi-config nonint do_change_timezone
+raspi-config nonint do_overscan
 ```
 
 - Change root password
