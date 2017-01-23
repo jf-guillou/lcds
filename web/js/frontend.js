@@ -160,7 +160,7 @@ Content.prototype.canPreload = function() {
  * @return {Boolean} can display
  */
 Content.prototype.canDisplay = function() {
-  return (screen.endAt == null || this.duration + Date.now() > screen.endAt) && this.isPreloaded();
+  return (screen.endAt == null || Date.now() + this.duration < screen.endAt) && this.isPreloaded();
 }
 
 /**
