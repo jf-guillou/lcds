@@ -24,18 +24,18 @@ Screen.prototype.checkUpdates = function() {
       if (s.lastChanges == null) {
         s.lastChanges = j.data.lastChanges;
       } else if (s.lastChanges != j.data.lastChanges) {
-        s.reload();
+        s.reloadIn(0);
         s.nextUrl = null;
         return;
       }
 
       if (j.data.duration > 0) {
         // Setup next screen
-        s.reload(j.data.duration * 1000);
+        s.reloadIn(j.data.duration * 1000);
         s.nextUrl = j.data.nextScreenUrl;
       }
     } else if (j.message == 'Unauthorized') {
-      screen.reload();
+      screen.reloadIn(0);
     }
   });
 }
@@ -43,13 +43,13 @@ Screen.prototype.checkUpdates = function() {
 /**
  * Start Screen reload procedure, checking for every field timeout
  */
-Screen.prototype.reload = function(minDuration) {
-  var endAt = Date.now() + (minDuration ? minDuration : 0);
+Screen.prototype.reloadIn = function(minDuration) {
+  var endAt = Date.now() + minDuration;
   if (this.stopping && this.endAt < endAt) {
     return;
   }
 
-  this.endAt = minDuration ? Date.now() + minDuration : 0;
+  this.endAt = Date.now() + minDuration;
   this.stopping = true;
   for (var i in this.fields) {
     if (!this.fields.hasOwnProperty(i)) {
@@ -57,11 +57,12 @@ Screen.prototype.reload = function(minDuration) {
     }
     var f = this.fields[i];
     if (f.timeout && f.endAt > this.endAt) {
+      // Always wait for content display end
       this.endAt = f.endAt;
     }
   }
 
-  if (this.endAt === 0) {
+  if (this.endAt <= Date.now()) {
     this.doReload();
   }
 }
