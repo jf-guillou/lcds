@@ -10,7 +10,7 @@ function Screen(updateScreenUrl) {
   this.lastChanges = null;
   this.endAt = null;
   this.nextUrl = null;
-  this.cache = {};
+  this.cache = new Preload();
   this.debugMode = false;
 }
 
@@ -50,7 +50,7 @@ Screen.prototype.reloadIn = function(minDuration) {
     return;
   }
 
-  if (this.hasPreloadingContent()) {
+  if (this.cache.hasPreloadingContent(true)) {
     // Do not break preloading
     return;
   }
@@ -94,44 +94,6 @@ Screen.prototype.displaysData = function(data) {
   }).length > 0;
 }
 
-/**
- * Search in cache for current preloading content
- * @return {Boolean} has preloading content
- */
-Screen.prototype.hasPreloadingContent = function() {
-  for (var f in this.fields) {
-    if (!this.fields.hasOwnProperty(f)) {
-      continue
-    }
-    for (var c in this.fields[f].contents) {
-      if (!this.fields[f].contents.hasOwnProperty(c)) {
-        continue
-      }
-      if (this.fields[f].contents[c].isPreloading()) {
-        return true;
-      }
-    }
-  }
-
-  return false;
-}
-
-/**
- * Pick next content to preload from cache queue
- */
-Screen.prototype.nextPreloadQueue = function() {
-  for (var f in this.fields) {
-    if (!this.fields.hasOwnProperty(f)) {
-      continue
-    }
-    for (var c in this.fields[f].contents) {
-      if (!this.fields[f].contents.hasOwnProperty(c)) {
-        continue
-      }
-      if (this.fields[f].contents[c].isInPreloadQueue()) {
-        this.fields[f].contents[c].preload();
-      }
-    }
 Screen.prototype.debug = function() {
   if (!this.debugMode) {
     return;
@@ -163,7 +125,7 @@ function Content(c) {
  * @return {boolean}
  */
 Content.prototype.shouldPreload = function() {
-  return this.canPreload() && !this.isPreloading() && !this.isPreloaded();
+  return this.canPreload() && !this.isPreloadingOrQueued() && !this.isPreloaded();
 }
 
 /**
@@ -207,16 +169,11 @@ Content.prototype.getResource = function() {
   return src;
 }
 
-/**
- * Set content cache status
+/** Set content cache status
  * @param {string} expires header
  */
 Content.prototype.setPreloadState = function(expires) {
-  if (expires === null || expires == '') {
-    expires = Preload.state.NO_EXPIRE_HEADER;
-  }
-
-  screen.cache[this.getResource()] = expires < -1 ? expires : Preload.state.OK
+  screen.cache.setState(this.getResource(), expires);
 }
 
 /**
@@ -228,9 +185,15 @@ Content.prototype.isPreloaded = function() {
     return true;
   }
 
-  var state = screen.cache[this.getResource()];
+  return screen.cache.isPreloaded(this.getResource());
+}
 
-  return state === Preload.state.OK || state === Preload.state.NO_EXPIRE_HEADER;
+/**
+ * Check cache for in progress or future preloading
+ * @return {Boolean} is preloading
+ */
+Content.prototype.isPreloadingOrQueued = function() {
+  return this.isPreloading() || this.isInPreloadQueue();
 }
 
 /**
@@ -238,7 +201,7 @@ Content.prototype.isPreloaded = function() {
  * @return {Boolean} is preloading
  */
 Content.prototype.isPreloading = function() {
-  return screen.cache[this.getResource()] === Preload.state.PRELOADING;
+  return screen.cache.isPreloading(this.getResource());
 }
 
 /**
@@ -246,7 +209,7 @@ Content.prototype.isPreloading = function() {
  * @return {Boolean} is in preload queue
  */
 Content.prototype.isInPreloadQueue = function() {
-  return screen.cache[this.getResource()] === Preload.state.PRELOADING_QUEUE;
+  return screen.cache.isInPreloadQueue(this.getResource());
 }
 
 /**
@@ -258,16 +221,7 @@ Content.prototype.preload = function() {
     return;
   }
 
-  this.setPreloadState(Preload.state.PRELOADING);
-
-  var c = this;
-  $.ajax(src).done(function(data, textStatus, jqXHR) {
-    c.setPreloadState(jqXHR.getResponseHeader('Expires'));
-  }).fail(function() {
-    c.setPreloadState(Preload.state.HTTP_FAIL);
-  }).always(function() {
-    screen.nextPreloadQueue();
-  });
+  screen.cache.preload(src);
 }
 
 /**
@@ -279,7 +233,8 @@ Content.prototype.queuePreload = function() {
     return;
   }
 
-  if (screen.hasPreloadingContent()) {
+  if (screen.cache.hasPreloadingContent(false)) {
+    screen.debug('queue', this.src);
     this.setPreloadState(Preload.state.PRELOADING_QUEUE);
   } else {
     this.preload();
@@ -291,7 +246,76 @@ Content.prototype.queuePreload = function() {
  * Preload class constructor
  * Mostly used to store constants
  */
-function Preload() {}
+function Preload() {
+  this.cache = {};
+}
+
+Preload.prototype.setState = function(res, expires) {
+  if (expires === null || expires == '') {
+    expires = Preload.state.NO_EXPIRE_HEADER;
+  }
+
+  this.cache[res] = expires < -1 ? expires : Preload.state.OK
+}
+
+Preload.prototype.isPreloaded = function(res) {
+  var state = this.cache[res];
+
+  return state === Preload.state.OK || state === Preload.state.NO_EXPIRE_HEADER;
+}
+
+Preload.prototype.isPreloading = function(res) {
+  return this.cache[res] === Preload.state.PRELOADING;
+}
+
+Preload.prototype.isInPreloadQueue = function(res) {
+  return this.cache[res] === Preload.state.PRELOADING_QUEUE;
+}
+
+Preload.prototype.hasPreloadingContent = function(withQueue) {
+  for (var res in this.cache) {
+    if (!this.cache.hasOwnProperty(res)) {
+      continue;
+    }
+
+    if (this.isPreloading(res) || (withQueue && this.isInPreloadQueue(res))) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+Preload.prototype.preload = function(res) {
+  screen.debug('preloading', res)
+  screen.cache.setState(res, Preload.state.PRELOADING);
+
+  $.ajax(res).done(function(data, textStatus, jqXHR) {
+    screen.cache.setState(res, jqXHR.getResponseHeader('Expires'));
+    screen.debug('preloaded', res);
+  }).fail(function() {
+    screen.cache.setPreloadState(res, Preload.state.HTTP_FAIL);
+    screen.debug('failed', res);
+  }).always(function() {
+    var res = screen.cache.next();
+    if (res) {
+      screen.debug('next', res);
+      screen.cache.preload(res);
+    }
+  });
+}
+
+Preload.prototype.next = function() {
+  for (var res in this.cache) {
+    if (!this.cache.hasOwnProperty(res)) {
+      continue;
+    }
+
+    if (this.isInPreloadQueue(res)) {
+      return res;
+    }
+  }
+}
 
 /**
  * Preload states
