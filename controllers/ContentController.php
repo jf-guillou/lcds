@@ -289,7 +289,7 @@ class ContentController extends BaseController
      * If the user has not enough rights, a 403 HTTP exception will be thrown
      *
      * @param int $id
-     * @param \app\models\User $user
+     * @param \yii\web\User $user
      *
      * @return Content the loaded model
      *

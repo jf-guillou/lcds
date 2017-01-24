@@ -50,7 +50,6 @@ foreach ($fields as $field) :
     $isSelfUpdate = count($field->contentTypes) > 0 && $field->contentTypes[0]->selfUpdate;
     $selfHtml = $isSelfUpdate ? $field->contentTypes[0]->html : ''
 ?>
-<div id="debug"></div>
 <div
     id="field_<?= $field->id ?>"
     class="field <?= implode(' ', $classes) ?>"

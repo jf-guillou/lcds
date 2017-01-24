@@ -89,7 +89,7 @@ class Content extends \yii\db\ActiveRecord
     /**
      * Build a query for a specific user, allowing to see only authorized contents.
      *
-     * @param \app\models\User $user
+     * @param \yii\web\User $user
      *
      * @return \yii\db\ActiveQuery
      */
@@ -105,7 +105,7 @@ class Content extends \yii\db\ActiveRecord
     /**
      * Check if a specific user is allowed to see this content.
      *
-     * @param \app\models\User $user
+     * @param \yii\web\User $user
      *
      * @return bool can see
      */
