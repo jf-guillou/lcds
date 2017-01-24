@@ -244,12 +244,17 @@ Content.prototype.queuePreload = function() {
 
 /**
  * Preload class constructor
- * Mostly used to store constants
+ * Build cache map
  */
 function Preload() {
   this.cache = {};
 }
 
+/**
+ * Set resource cache state
+ * @param {string} res     resource url
+ * @param {string|int} expires header or preload state
+ */
 Preload.prototype.setState = function(res, expires) {
   if (expires === null || expires == '') {
     expires = Preload.state.NO_EXPIRE_HEADER;
@@ -258,20 +263,40 @@ Preload.prototype.setState = function(res, expires) {
   this.cache[res] = expires < -1 ? expires : Preload.state.OK
 }
 
+/**
+ * Check resource cache for readyness state
+ * @param  {string}  res resource url
+ * @return {Boolean}     is preloaded
+ */
 Preload.prototype.isPreloaded = function(res) {
   var state = this.cache[res];
 
   return state === Preload.state.OK || state === Preload.state.NO_EXPIRE_HEADER;
 }
 
+/**
+ * Check resource cache for preloading state
+ * @param  {string}  res resource url
+ * @return {Boolean}     is currently preloading
+ */
 Preload.prototype.isPreloading = function(res) {
   return this.cache[res] === Preload.state.PRELOADING;
 }
 
+/**
+ * Check resource cache for queued preloading state
+ * @param  {string}  res resource url
+ * @return {Boolean}     is in preload queue
+ */
 Preload.prototype.isInPreloadQueue = function(res) {
   return this.cache[res] === Preload.state.PRELOADING_QUEUE;
 }
 
+/**
+ * Scan resource cache for preloading resources
+ * @param  {Boolean}  withQueue also check preload queue
+ * @return {Boolean}           has any resource preloading/in preload queue
+ */
 Preload.prototype.hasPreloadingContent = function(withQueue) {
   for (var res in this.cache) {
     if (!this.cache.hasOwnProperty(res)) {
@@ -286,6 +311,11 @@ Preload.prototype.hasPreloadingContent = function(withQueue) {
   return false;
 }
 
+/**
+ * Preload a resource by ajax get on the url
+ * Check HTTP return state to validate proper cache
+ * @param  {string} res resource url
+ */
 Preload.prototype.preload = function(res) {
   screen.debug('preloading', res)
   screen.cache.setState(res, Preload.state.PRELOADING);
@@ -305,6 +335,10 @@ Preload.prototype.preload = function(res) {
   });
 }
 
+/**
+ * Get next resource to preload from queue
+ * @return {string|null} next resource url
+ */
 Preload.prototype.next = function() {
   for (var res in this.cache) {
     if (!this.cache.hasOwnProperty(res)) {
@@ -315,6 +349,7 @@ Preload.prototype.next = function() {
       return res;
     }
   }
+  return null;
 }
 
 /**
