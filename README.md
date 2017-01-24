@@ -4,7 +4,7 @@
 
 There are already dozens of digital signage managers. But no easy to use open-source CMS based projects.
 
-Now there's this one.
+Now there's this one. **Early beta** though. Expect a lot of updates on master branch, there is no STABLE release yet.
 
 Based on the [Yii2 framework](http://www.yiiframework.com/).
 See [https://github.com/jf-guillou/lcds/blob/master/composer.json](composer.json) for the complete list of extensions used in this project.
