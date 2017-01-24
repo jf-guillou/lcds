@@ -274,10 +274,7 @@ class ContentController extends BaseController
      */
     public function actionToggle($id)
     {
-        $model = $this->findModel($id);
-
-        if (!$model->canView(Yii::$app->user)) {
-        }
+        $model = $this->findViewableModel($id);
 
         $model->enabled = !$model->enabled;
 
