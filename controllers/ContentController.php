@@ -76,10 +76,7 @@ class ContentController extends BaseController
      */
     public function actionView($id)
     {
-        $model = $this->findModel($id);
-        if (!$model->canView(Yii::$app->user)) {
-            throw new \yii\web\ForbiddenHttpException(Yii::t('app', 'You do not have enough rights to view this content.'));
-        }
+        $model = $this->findViewableModel($id, Yii::$app->user);
 
         return $this->render('view', [
             'model' => $model,
@@ -239,11 +236,7 @@ class ContentController extends BaseController
      */
     public function actionUpdate($id)
     {
-        $model = $this->findModel($id);
-
-        if (!$model->canView(Yii::$app->user)) {
-            throw new \yii\web\ForbiddenHttpException(Yii::t('app', 'You do not have enough rights to view this content.'));
-        }
+        $model = $this->findViewableModel($id, Yii::$app->user);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);
@@ -265,11 +258,7 @@ class ContentController extends BaseController
      */
     public function actionDelete($id)
     {
-        $model = $this->findModel($id);
-
-        if (!$model->canView(Yii::$app->user)) {
-            throw new \yii\web\ForbiddenHttpException(Yii::t('app', 'You do not have enough rights to view this content.'));
-        }
+        $model = $this->findViewableModel($id, Yii::$app->user);
 
         $model->delete();
 
@@ -288,7 +277,6 @@ class ContentController extends BaseController
         $model = $this->findModel($id);
 
         if (!$model->canView(Yii::$app->user)) {
-            throw new \yii\web\ForbiddenHttpException(Yii::t('app', 'You do not have enough rights to view this content.'));
         }
 
         $model->enabled = !$model->enabled;
@@ -296,6 +284,29 @@ class ContentController extends BaseController
         $model->save();
 
         return $this->smartGoBack();
+    }
+
+    /**
+     * Finds the Content model based on its primary key value.
+     * If the model is not found, a 404 HTTP exception will be thrown.
+     * If the user has not enough rights, a 403 HTTP exception will be thrown
+     *
+     * @param int $id
+     * @param \app\models\User $user
+     *
+     * @return Content the loaded model
+     *
+     * @throws NotFoundHttpException if the model cannot be found
+     * @throws ForbiddenHttpException if the model cannot be accessed
+     */
+    protected function findViewableModel($id, $user)
+    {
+        $model = $this->findModel($id);
+        if ($model->canView($user)) {
+            return $model;
+        }
+
+        throw new \yii\web\ForbiddenHttpException(Yii::t('app', 'You do not have enough rights to view this content.'));
     }
 
     /**
