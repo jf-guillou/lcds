@@ -350,7 +350,7 @@ Preload.prototype.preload = function(res) {
     screen.newContentTrigger();
   }).fail(function() {
     // Preload failure
-    screen.cache.setPreloadState(res, Preload.state.HTTP_FAIL);
+    screen.cache.setState(res, Preload.state.HTTP_FAIL);
   }).always(function() {
     var res = screen.cache.next();
     if (res) {
@@ -468,7 +468,6 @@ Field.prototype.pickNext = function() {
     return;
   }
 
-  var f = this;
   this.previous = this.current;
   this.current = null;
   var previousData = this.previous && this.previous.data;
@@ -531,6 +530,7 @@ Field.prototype.pickRandomContent = function(previousData, anyUsable) {
     // Nice content. Display it.
     return c;
   }
+  return null;
 }
 
 /**

@@ -127,7 +127,7 @@ class Flow extends \yii\db\ActiveRecord
     /**
      * Build a query for a specific user, allowing to see only authorized flows.
      *
-     * @param \User $user
+     * @param \app\models\User $user
      *
      * @return \yii\db\ActiveQuery
      */
@@ -143,7 +143,7 @@ class Flow extends \yii\db\ActiveRecord
     /**
      * Check if a specific user is allowed to see this flow.
      *
-     * @param \User $user
+     * @param \app\models\User $user
      *
      * @return bool can see
      */
