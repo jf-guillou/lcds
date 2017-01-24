@@ -274,7 +274,7 @@ class ContentController extends BaseController
      */
     public function actionToggle($id)
     {
-        $model = $this->findViewableModel($id);
+        $model = $this->findViewableModel($id, Yii::$app->user);
 
         $model->enabled = !$model->enabled;
 
