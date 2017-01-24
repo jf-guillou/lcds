@@ -11,6 +11,7 @@ function Screen(updateScreenUrl) {
   this.endAt = null;
   this.nextUrl = null;
   this.cache = {};
+  this.debugMode = false;
 }
 
 /**
@@ -131,7 +132,13 @@ Screen.prototype.nextPreloadQueue = function() {
         this.fields[f].contents[c].preload();
       }
     }
+Screen.prototype.debug = function() {
+  if (!this.debugMode) {
+    return;
   }
+  var d = $('#debug').html();
+  d += Array.prototype.slice.call(arguments) + '<br />';
+  $('#debug').html(d);
 }
 
 
@@ -432,6 +439,9 @@ Field.prototype.displayNext = function() {
  * @param  {string} data 
  */
 Field.prototype.display = function(data) {
+  if (screen.debugMode) {
+    return;
+  }
   this.$field.html(data);
   this.$field.show();
   if (this.$field.text() != '') {
