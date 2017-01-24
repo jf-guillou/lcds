@@ -99,7 +99,13 @@ Screen.prototype.displaysData = function(data) {
  */
 Screen.prototype.hasPreloadingContent = function() {
   for (var f in this.fields) {
+    if (!this.fields.hasOwnProperty(f)) {
+      continue
+    }
     for (var c in this.fields[f].contents) {
+      if (!this.fields[f].contents.hasOwnProperty(c)) {
+        continue
+      }
       if (this.fields[f].contents[c].isPreloading()) {
         return true;
       }
@@ -114,7 +120,13 @@ Screen.prototype.hasPreloadingContent = function() {
  */
 Screen.prototype.nextPreloadQueue = function() {
   for (var f in this.fields) {
+    if (!this.fields.hasOwnProperty(f)) {
+      continue
+    }
     for (var c in this.fields[f].contents) {
+      if (!this.fields[f].contents.hasOwnProperty(c)) {
+        continue
+      }
       if (this.fields[f].contents[c].isInPreloadQueue()) {
         this.fields[f].contents[c].preload();
       }
