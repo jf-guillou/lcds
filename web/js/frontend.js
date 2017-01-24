@@ -404,7 +404,7 @@ Field.prototype.pickNext = function() {
   } else {
     setTimeout(function() {
       f.pickNext();
-    }, 200);
+    }, 600);
   }
 }
 
