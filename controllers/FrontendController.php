@@ -191,6 +191,7 @@ class FrontendController extends BaseController
             ->andWhere(['enabled' => true])
             ->andWhere(['or', ['start_ts' => null], ['<', 'start_ts', new Expression('NOW()')]])
             ->andWhere(['or', ['end_ts' => null], ['>', 'end_ts', new Expression('NOW()')]])
+            ->orderBy('duration ASC')
             ->all();
 
         $next = array_map(function ($c) use ($field) {
