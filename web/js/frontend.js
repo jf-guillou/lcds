@@ -66,7 +66,7 @@ Screen.prototype.reloadIn = function(minDuration) {
     }
   }
 
-  if (this.endAt <= Date.now()) {
+  if (Date.now() >= this.endAt) {
     this.reloadNow();
   }
 }
@@ -347,7 +347,7 @@ Field.prototype.randomizeSortContents = function() {
  * Loop through field contents to pick next displayable content
  */
 Field.prototype.pickNext = function() {
-  if (screen.endAt != null && screen.endAt < Date.now()) { // Stoping screen
+  if (screen.endAt != null && Date.now() >= screen.endAt) { // Stoping screen
     screen.reloadNow();
     return;
   }
@@ -390,7 +390,6 @@ Field.prototype.pickNext = function() {
   if (this.next) {
     this.displayNext();
   } else {
-    this.display('X');
     setTimeout(function() {
       f.pickNext();
     }, 200);
@@ -409,10 +408,10 @@ Field.prototype.displayNext = function() {
     if (this.timeout) {
       clearTimeout(this.timeout);
     }
+    this.endAt = Date.now() + this.current.duration;
     this.timeout = setTimeout(function() {
       f.pickNext();
     }, this.current.duration);
-    this.endAt = this.current.duration + Date.now()
   }
 }
 
@@ -456,7 +455,7 @@ function onLoad() {
         }
       }
       screen.checkUpdates();
-    }, 60000);
+    }, 30000);
     screen.checkUpdates();
   }
 }
