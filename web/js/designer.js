@@ -33,7 +33,7 @@ function createField(field) {
     }).join(' - ') : ''
   );
   r.text = t.attr('text-anchor', 'start');
-  r.drag(handleMove, handleMoveStart, handleMoveEnd)
+  r.drag(handleMove, handleMoveStart, handleMoveEnd);
 }
 
 // Create a new field and store it
@@ -117,7 +117,6 @@ function handleMove(dx, dy, x, y) {
   var oY = this.oy;
   var oH = this.oh;
   var oW = this.ow;
-  this.moved = true;
 
   switch (this.resizing) {
     case 'TOP':
@@ -161,6 +160,10 @@ function handleMove(dx, dy, x, y) {
     default:
       oX = Math.max(0, Math.min(oX + dx, pW - oW));
       oY = Math.max(0, Math.min(oY + dy, pH - oH));
+  }
+
+  if (oX != this.ox || oY != this.oy || oH != this.oh || oW != this.ow) {
+    this.moved = true;
   }
 
   var pos = {
