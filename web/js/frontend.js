@@ -11,7 +11,6 @@ function Screen(updateScreenUrl) {
   this.endAt = null;
   this.nextUrl = null;
   this.cache = new Preload();
-  this.debugMode = false;
 }
 
 /**
@@ -24,7 +23,7 @@ Screen.prototype.checkUpdates = function() {
       if (s.lastChanges == null) {
         s.lastChanges = j.data.lastChanges;
       } else if (s.lastChanges != j.data.lastChanges) {
-        // Remote screen updated, we should reload
+        // Remote screen updated, we should reload as soon as possible
         s.reloadIn(0);
         s.nextUrl = null;
         return;
@@ -36,6 +35,7 @@ Screen.prototype.checkUpdates = function() {
         s.nextUrl = j.data.nextScreenUrl;
       }
     } else if (j.message == 'Unauthorized') {
+      // Cookie/session gone bad, try to refresh with full screen reload
       screen.reloadIn(0);
     }
   });
@@ -47,6 +47,7 @@ Screen.prototype.checkUpdates = function() {
 Screen.prototype.reloadIn = function(minDuration) {
   var endAt = Date.now() + minDuration;
   if (this.endAt != null && this.endAt < endAt) {
+    // Already going to reload sooner than asked
     return;
   }
 
@@ -68,12 +69,13 @@ Screen.prototype.reloadIn = function(minDuration) {
   }
 
   if (Date.now() >= this.endAt) {
+    // No content to delay reload, do it now
     this.reloadNow();
   }
 }
 
 /**
- * Actual Screen reload action
+ * Actual Screen reload/change screen action
  */
 Screen.prototype.reloadNow = function() {
   if (this.nextUrl) {
@@ -94,13 +96,35 @@ Screen.prototype.displaysData = function(data) {
   }).length > 0;
 }
 
-Screen.prototype.debug = function() {
-  if (!this.debugMode) {
-    return;
+/**
+ * Trigger pickNext on all fields
+ */
+Screen.prototype.newContentTrigger = function() {
+  for (var f in this.fields) {
+    if (!this.fields.hasOwnProperty(f)) {
+      continue;
+    }
+
+    this.fields[f].pickNextIfNecessary();
   }
-  var d = $('#debug').html();
-  d += Array.prototype.slice.call(arguments) + '<br />';
-  $('#debug').html(d);
+}
+
+/**
+ * Loop through all fields for stuckiness state
+ * @return {Boolean} are all fields stuck
+ */
+Screen.prototype.isAllFieldsStuck = function() {
+  for (var f in this.fields) {
+    if (!this.fields.hasOwnProperty(f)) {
+      continue;
+    }
+
+    if (!this.fields[f].stuck && this.fields[f].canUpdate) {
+      return false;
+    }
+  }
+
+  return true;
 }
 
 
@@ -154,6 +178,7 @@ Content.prototype.getResource = function() {
   }
   var srcMatch = this.data.match(/src="([^"]+)"/);
   if (!srcMatch) {
+    // All preloadable content comes with a src attribute
     return false;
   }
   var src = srcMatch[1];
@@ -163,6 +188,7 @@ Content.prototype.getResource = function() {
   if (src.indexOf('http') !== 0) {
     return false;
   }
+  // Get rid of fragment
   src = src.replace(/#.*/g, '');
 
   this.src = src;
@@ -234,7 +260,6 @@ Content.prototype.queuePreload = function() {
   }
 
   if (screen.cache.hasPreloadingContent(false)) {
-    screen.debug('queue', this.src);
     this.setPreloadState(Preload.state.PRELOADING_QUEUE);
   } else {
     this.preload();
@@ -317,20 +342,24 @@ Preload.prototype.hasPreloadingContent = function(withQueue) {
  * @param  {string} res resource url
  */
 Preload.prototype.preload = function(res) {
-  screen.debug('preloading', res)
-  screen.cache.setState(res, Preload.state.PRELOADING);
+  this.setState(res, Preload.state.PRELOADING);
 
   $.ajax(res).done(function(data, textStatus, jqXHR) {
+    // Preload success
     screen.cache.setState(res, jqXHR.getResponseHeader('Expires'));
-    screen.debug('preloaded', res);
+    screen.newContentTrigger();
   }).fail(function() {
+    // Preload failure
     screen.cache.setPreloadState(res, Preload.state.HTTP_FAIL);
-    screen.debug('failed', res);
   }).always(function() {
     var res = screen.cache.next();
     if (res) {
-      screen.debug('next', res);
+      // Preload ended, next resource
       screen.cache.preload(res);
+    } else {
+      // We've gone through all queued resources
+      // Trigger another update to calculate a proper screen.endAt value
+      screen.checkUpdates();
     }
   });
 }
@@ -380,6 +409,7 @@ function Field($f) {
   this.next = null;
   this.timeout = null;
   this.endAt = null;
+  this.stuck = false;
 }
 
 /**
@@ -396,9 +426,7 @@ Field.prototype.fetchContents = function() {
       f.contents = j.next.map(function(c) {
         return new Content(c);
       });
-      if (!f.timeout && f.contents.length) {
-        f.pickNext();
-      }
+      f.pickNextIfNecessary();
     } else {
       f.setError(j.message || 'Error');
     }
@@ -422,10 +450,20 @@ Field.prototype.randomizeSortContents = function() {
 }
 
 /**
+ * PickNext if no content currently displayed and content is available
+ */
+Field.prototype.pickNextIfNecessary = function() {
+  if (!this.timeout && this.contents.length) {
+    this.pickNext();
+  }
+}
+
+/**
  * Loop through field contents to pick next displayable content
  */
 Field.prototype.pickNext = function() {
-  if (screen.endAt != null && Date.now() >= screen.endAt) { // Stoping screen
+  if (screen.endAt != null && Date.now() >= screen.endAt) {
+    // Currently trying to reload, we're past threshold: reload now
     screen.reloadNow();
     return;
   }
@@ -433,8 +471,32 @@ Field.prototype.pickNext = function() {
   var f = this;
   this.previous = this.current;
   this.current = null;
-  var pData = this.previous && this.previous.data;
-  // Avoid repeat & other field same content
+  var previousData = this.previous && this.previous.data;
+
+  this.next = this.pickRandomContent(previousData) || this.pickRandomContent(previousData, true);
+
+  if (this.next) {
+    // Overwrite field with newly picked content
+    this.displayNext();
+    this.stuck = false;
+  } else {
+    // I am stuck, don't know what to display
+    this.stuck = true;
+    // Check other fields for stuckiness state
+    if (screen.isAllFieldsStuck() && !screen.cache.hasPreloadingContent(true)) {
+      // Nothing to do. Give up, reload now
+      screen.reloadNow();
+    }
+  }
+}
+
+/**
+ * Loop through field contents for any displayable content
+ * @param  {string}  previousData previous content data
+ * @param {Boolean} anyUsable ignore constraints
+ * @return {Content} random usable content
+ */
+Field.prototype.pickRandomContent = function(previousData, anyUsable) {
   this.randomizeSortContents();
   for (var i = 0; i < this.contents.length; i++) {
     var c = this.contents[i];
@@ -443,34 +505,31 @@ Field.prototype.pickNext = function() {
       continue;
     }
 
-    if (c.data == pData) {
-      // Will repeat, avoid if enough content
+    if (anyUsable) {
+      // Ignore repeat & same content constraints if necessary
+      return c;
+    }
+
+    // Avoid repeat same content
+    if (c.data == previousData) {
+      // Not enough content, display anyway
       if (this.contents.length < 2) {
-        this.next = c;
-        break;
+        return c;
       }
       continue;
     }
 
+    // Avoid same content than already displayed on other fields
     if (screen.displaysData(c.data)) {
-      // Same content already displayed on other field, avoid if enough content
+      // Not enough content, display anyway
       if (this.contents.length < 3) {
-        this.next = c;
-        break;
+        return c;
       }
       continue;
     }
 
-    this.next = c;
-    break
-  }
-
-  if (this.next) {
-    this.displayNext();
-  } else {
-    setTimeout(function() {
-      f.pickNext();
-    }, 600);
+    // Nice content. Display it.
+    return c;
   }
 }
 
@@ -498,9 +557,6 @@ Field.prototype.displayNext = function() {
  * @param  {string} data 
  */
 Field.prototype.display = function(data) {
-  if (screen.debugMode) {
-    return;
-  }
   this.$field.html(data);
   this.$field.show();
   if (this.$field.text() != '') {
@@ -523,8 +579,8 @@ function onLoad() {
   // Init
   $('.field').each(function() {
     var f = new Field($(this));
-    f.fetchContents();
     screen.fields.push(f);
+    f.fetchContents();
   });
 
   if (screen.url) {
@@ -536,7 +592,7 @@ function onLoad() {
         }
       }
       screen.checkUpdates();
-    }, 30000);
+    }, 60000); // 1 minute is enough alongside preload queue end trigger
     screen.checkUpdates();
   }
 }
