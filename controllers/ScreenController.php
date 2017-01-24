@@ -102,7 +102,7 @@ class ScreenController extends BaseController
                 $a[$t->id] = $t->name;
 
                 return $a;
-            });
+            }, []);
 
             return $this->render('create', [
                 'model' => $model,
@@ -131,7 +131,7 @@ class ScreenController extends BaseController
                 $a[$t->id] = $t->name;
 
                 return $a;
-            });
+            }, []);
 
             return $this->render('update', [
                 'model' => $model,
