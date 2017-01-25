@@ -24,15 +24,15 @@ Screen.prototype.checkUpdates = function() {
         s.lastChanges = j.data.lastChanges;
       } else if (s.lastChanges != j.data.lastChanges) {
         // Remote screen updated, we should reload as soon as possible
-        s.reloadIn(0);
         s.nextUrl = null;
+        s.reloadIn(0);
         return;
       }
 
       if (j.data.duration > 0) {
         // Setup next screen
-        s.reloadIn(j.data.duration * 1000);
         s.nextUrl = j.data.nextScreenUrl;
+        s.reloadIn(j.data.duration * 1000);
       }
     } else if (j.message == 'Unauthorized') {
       // Cookie/session gone bad, try to refresh with full screen reload
@@ -68,10 +68,21 @@ Screen.prototype.reloadIn = function(minDuration) {
     }
   }
 
-  if (Date.now() >= this.endAt) {
+  this.reloadOnTimeout();
+}
+
+/**
+ * Check if we're past the screen.endAt timeout and reload if necessary
+ * @return {boolean} going to reload
+ */
+Screen.prototype.reloadOnTimeout = function() {
+  if (this.endAt != null && Date.now() >= this.endAt) {
     // No content to delay reload, do it now
     this.reloadNow();
+    return true;
   }
+
+  return false;
 }
 
 /**
@@ -358,6 +369,10 @@ Preload.prototype.preload = function(res) {
       screen.cache.preload(res);
     } else {
       // We've gone through all queued resources
+      // Check if we should reload early
+      if (screen.reloadOnTimeout()) {
+        return;
+      }
       // Trigger another update to calculate a proper screen.endAt value
       screen.checkUpdates();
     }
@@ -462,9 +477,8 @@ Field.prototype.pickNextIfNecessary = function() {
  * Loop through field contents to pick next displayable content
  */
 Field.prototype.pickNext = function() {
-  if (screen.endAt != null && Date.now() >= screen.endAt) {
+  if (screen.reloadOnTimeout()) {
     // Currently trying to reload, we're past threshold: reload now
-    screen.reloadNow();
     return;
   }
 
