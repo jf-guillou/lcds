@@ -13,7 +13,7 @@ class Image extends Media
     const TYPE_PATH = 'images/';
 
     public $html = '<img src="%data%" class="image" />';
-    public $css = '%field% { text-align: center; vertical-align: middle; } %field% img { max-height: 100%; max-width: 100%; }';
+    public $css = '%field% { text-align: center; } %field% img { position: absolute; top: 0; left: 0; bottom: 0; right: 0; margin: auto; max-height: 100%; max-width: 100%; }';
     public $input = 'url';
     public $output = 'url';
     public $usable = true;
