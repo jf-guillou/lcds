@@ -135,7 +135,7 @@ class Flow extends \yii\db\ActiveRecord
     {
         if ($user->can('setFlowContent')) {
             return self::find();
-        } elseif ($user->can('setOwnFlowContent')) {
+        } elseif ($user->can('setOwnFlowContent') && $user->identity instanceof \app\models\User) {
             return self::find()->joinWith(['users'])->where(['username' => $user->identity->username]);
         }
     }

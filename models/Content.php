@@ -97,7 +97,7 @@ class Content extends \yii\db\ActiveRecord
     {
         if ($user->can('setFlowContent')) {
             return self::find()->joinWith(['type']);
-        } elseif ($user->can('setOwnFlowContent')) {
+        } elseif ($user->can('setOwnFlowContent') && $user->identity instanceof \app\models\User) {
             return self::find()->joinWith(['type', 'flow.users'])->where(['username' => $user->identity->username]);
         }
     }
