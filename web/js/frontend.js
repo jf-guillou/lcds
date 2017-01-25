@@ -207,10 +207,10 @@ Content.prototype.getResource = function() {
 }
 
 /** Set content cache status
- * @param {string} expires header
+ * @param {string} state preload state
  */
-Content.prototype.setPreloadState = function(expires) {
-  screen.cache.setState(this.getResource(), expires);
+Content.prototype.setPreloadState = function(state) {
+  screen.cache.setState(this.getResource(), state);
 }
 
 /**
@@ -250,7 +250,7 @@ Content.prototype.isInPreloadQueue = function() {
 }
 
 /**
- * Ajax call to preload content
+ * Call to preload content
  */
 Content.prototype.preload = function() {
   var src = this.getResource();
@@ -291,12 +291,8 @@ function Preload() {
  * @param {string} res     resource url
  * @param {string|int} expires header or preload state
  */
-Preload.prototype.setState = function(res, expires) {
-  if (expires === null || expires == '') {
-    expires = Preload.state.NO_EXPIRE_HEADER;
-  }
-
-  this.cache[res] = expires < -1 ? expires : Preload.state.OK
+Preload.prototype.setState = function(res, state) {
+  this.cache[res] = state;
 }
 
 /**
@@ -305,9 +301,7 @@ Preload.prototype.setState = function(res, expires) {
  * @return {Boolean}     is preloaded
  */
 Preload.prototype.isPreloaded = function(res) {
-  var state = this.cache[res];
-
-  return state === Preload.state.OK || state === Preload.state.NO_EXPIRE_HEADER;
+  return this.cache[res] === Preload.state.OK;
 }
 
 /**
@@ -357,26 +351,33 @@ Preload.prototype.preload = function(res) {
 
   $.ajax(res).done(function(data, textStatus, jqXHR) {
     // Preload success
-    screen.cache.setState(res, jqXHR.getResponseHeader('Expires'));
+    screen.cache.setState(res, Preload.state.OK);
     screen.newContentTrigger();
   }).fail(function() {
     // Preload failure
     screen.cache.setState(res, Preload.state.HTTP_FAIL);
   }).always(function() {
-    var res = screen.cache.next();
-    if (res) {
-      // Preload ended, next resource
-      screen.cache.preload(res);
-    } else {
-      // We've gone through all queued resources
-      // Check if we should reload early
-      if (screen.reloadOnTimeout()) {
-        return;
-      }
-      // Trigger another update to calculate a proper screen.endAt value
-      screen.checkUpdates();
-    }
+    screen.cache.preloadNext();
   });
+}
+
+/**
+ * Try to preload next resource or trigger preload end event
+ */
+Preload.prototype.preloadNext = function() {
+  var res = screen.cache.next();
+  if (res) {
+    // Preload ended, next resource
+    screen.cache.preload(res);
+    return;
+  }
+  // We've gone through all queued resources
+  // Check if we should reload early
+  if (screen.reloadOnTimeout()) {
+    return;
+  }
+  // Trigger another update to calculate a proper screen.endAt value
+  screen.checkUpdates();
 }
 
 /**
