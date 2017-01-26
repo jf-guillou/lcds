@@ -36,11 +36,14 @@ class HostedVideo extends Video
             return false;
         }
 
-        $dl = new YoutubeDl([
+        $youtubeParams = [
             'restrict-filenames' => true,
-            'proxy' => Yii::$app->params['proxy'],
             'format' => 'best[ext=mp4]/best[ext=flv]',
-        ]);
+        ];
+        if (Yii::$app->params['proxy']) {
+            $youtubeParams['proxy'] = Yii::$app->params['proxy'];
+        }
+        $dl = new YoutubeDl($youtubeParams);
         $dl->setDownloadPath(sys_get_temp_dir());
 
         try {

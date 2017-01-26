@@ -94,7 +94,9 @@ abstract class Media extends ContentType
 
         $curl = curl_init($url);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($curl, CURLOPT_PROXY, Yii::$app->params['proxy']);
+        if (Yii::$app->params['proxy']) {
+            curl_setopt($curl, CURLOPT_PROXY, Yii::$app->params['proxy']);
+        }
         curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
         curl_setopt($curl, CURLOPT_HEADERFUNCTION, [&$this, 'readHeaderFilename']);
         $fileContent = curl_exec($curl);
