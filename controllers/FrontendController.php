@@ -89,7 +89,7 @@ class FrontendController extends BaseController
     public function actionScreen($id, $preview = false)
     {
         // Session auth
-        if (!$this->isClientAuth() && !Yii::$app->user->can('previewScreen')) {
+        if (!$this->isClientAuth() && !($preview && Yii::$app->user->can('previewScreen'))) {
             return $this->redirect(['index']);
         }
 
