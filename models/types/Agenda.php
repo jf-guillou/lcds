@@ -13,16 +13,19 @@ use yii\helpers\Url;
 class Agenda extends ContentType
 {
     const BASE_CACHE_TIME = 7200; // 2 hours
-    const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
-    const HOURS = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18];
+    const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+    const HOUR_MIN = 8;
+    const HOUR_MAX = 18;
+    //const HOURS = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18];
 
-    public $html = '<img class="agenda" src="%data%" />';
-    public $css = '%field% { text-align: center; vertical-align: middle; } %field% img { height: 100%; width: 100%; object-fit: contain; }';
+    public $html = '<div class="agenda">%data%</div>';
+    public $css = '%field% .agenda-contents { width: 100%; height: 100%; display: table; table-layout: fixed; } %field% .agenda-day { display: table-cell; text-align: center; } %field% .event { position: absolute; }';
     public $input = 'url';
-    public $output = 'url';
+    public $output = 'raw';
     public $usable = true;
     public $preview = '@web/images/agenda.preview.jpg';
 
+    private static $translit;
     private $opts;
     private $img;
     private $font = 3;
@@ -51,14 +54,111 @@ class Agenda extends ContentType
      */
     public function processData($data)
     {
-        $filename = $this->name.md5($data).'.png';
-        if (self::hasCache($data)) {
-            return Url::to(Media::getWebPath().$filename);
+        $agenda = self::fromCache($data);
+        if (!$agenda) {
+            $agenda = $this->genAgenda($data);
+            if ($agenda) {
+                //self::toCache($data, $agenda);
+            }
         }
 
-        $this->genImage($data, $filename);
+        return $agenda;
+    }
 
-        return Url::to(Media::getWebPath().$filename);
+    public function parseIcal($data)
+    {
+        // Init ICal parser
+        $ical = new ICal();
+        $ical->initString($data);
+
+        // Retrieve event for this week only
+        $events = $ical->eventsFromRange(self::DAYS[0].' this week', self::DAYS[count(self::DAYS) - 1].' this week 23:59');
+
+        if (!is_array($events) || !count($events)) {
+            return null;
+        }
+
+        $tz = new \DateTimeZone(ini_get('date.timezone'));
+        self::$translit = \Transliterator::create('Latin-ASCII');
+        if (!self::$translit) {
+            return null;
+        }
+
+        $format = [
+            'minHour' => self::HOUR_MIN,
+            'maxHour' => self::HOUR_MAX,
+            'title' => '???',
+        ];
+
+        $blocks = [];
+
+        foreach ($events as $e) {
+            // Convert timezones
+            $start = (new \DateTime($e->dtstart))->setTimeZone($tz);
+            $end = (new \DateTime($e->dtend))->setTimeZone($tz);
+            
+            // Event info
+            $b = [
+                'dow' => $start->format('w') - 1,
+                'start' => $start->format('G') + ($start->format('i') / 60.0),
+                'end' => $end->format('G') + ($end->format('i') / 60.0),
+                'name' =>self::filter($e->summary, 'name'),
+                'locations' => self::filter($e->location, 'location'),
+                'desc' => array_values(array_filter(array_map('self::filter', explode(PHP_EOL, $e->description)))),
+            ];
+            $b['duration'] = $b['end'] - $b['start'];
+
+            if ($b['start'] < $format['minHour']) {
+                $format['minHour'] = $b['start'];
+            }
+            if ($b['end'] > $format['maxHour']) {
+                $format['maxHour'] = $b['end'];
+            }
+
+            if (!array_key_exists($b['dow'], $blocks)) {
+                $blocks[$b['dow']] = [];
+            }
+
+            $blocks[$b['dow']][] = $b;
+        }
+
+        $format['dayLen'] = $format['maxHour'] - $format['minHour'];
+
+        return ['format' => $format, 'events' => $blocks];
+    }
+
+    public function render($agenda)
+    {
+        $h = '<div class="agenda-header"></div><div class="agenda-contents">';
+
+        foreach ($agenda['events'] as $day => $events) {
+            $h .= '<div class="agenda-day" id="day-'.$day.'">'.
+                '<div class="day-header">'.\Yii::t('app', self::DAYS[$day]).'</div>'.
+                '<div class="day-contents">';
+
+
+            foreach ($events as $e) {
+                $topRel = (($e['start'] - $agenda['format']['minHour']) / $agenda['format']['dayLen']) * 100;
+                $h .= '<div class="event" style="top: '.$topRel.'%">'.$e['name'].'</div>';
+            }
+
+            $h .= '</div></div>';
+        }
+
+        $h .= '</div>';
+
+        return $h;
+    }
+
+    public function genAgenda($url)
+    {
+        $this->opts = \Yii::$app->params['agenda'];
+
+        $content = self::downloadContent($url);
+
+        $agenda = $this->parseIcal($content);
+
+        return $this->render($agenda);
     }
 
     /**
@@ -69,51 +169,13 @@ class Agenda extends ContentType
      */
     public function genImage($url, $filename)
     {
-        // Fetch content from cache if possible
-        $content = self::fromCache($url);
-        if (!$content) {
-            $content = self::downloadContent($url);
-            self::toCache($url, $content);
-        }
-
-        $this->opts = \Yii::$app->params['agenda'];
-
-        // Init ICal parser
-        $ical = new ICal();
-        $ical->initString($content);
-
-        // Retrieve event for this week only
-        $events = $ical->eventsFromRange(self::DAYS[0].' this week', self::DAYS[count(self::DAYS) - 1].' this week 23:59');
-        if (!is_array($events) || !count($events)) {
-            return;
-        }
-
-        // Draw base calendar structure
-        $this->initCalendar();
-
         // Init timezone converter
-        $utcTz = new \DateTimeZone($this->opts['calendarTimezone']);
-        $localTz = new \DateTimeZone(ini_get('date.timezone'));
-        $hasMultipleLocations = false;
+        //$hasMultipleLocations = false;
 
         $blocks = [];
         $prevLocation = null;
         // Build event blocks array
         foreach ($events as $e) {
-            // Convert timezones
-            $start = new \DateTime('@'.$e->dtstart_array[2], $utcTz);
-            $start->setTimeZone($localTz);
-            $end = new \DateTime('@'.$e->dtend_array[2], $utcTz);
-            $end->setTimeZone($localTz);
-
-            // Event info
-            $dow = $start->format('w') - 1;
-            $startHour = $start->format('G') + ($start->format('i') / 60.0) - self::HOURS[0];
-            $endHour = $end->format('G') + ($end->format('i') / 60.0) - self::HOURS[0];
-            $duration = $endHour - $startHour;
-            $name = self::filter(html_entity_decode($e->summary, ENT_QUOTES), 'name');
-            $location = self::filter(html_entity_decode($e->location, ENT_QUOTES), 'location');
-            $desc = array_values(array_filter(array_map('self::filter', explode('\n', html_entity_decode($e->description, ENT_QUOTES)))));
             $teachers = [];
             $groups = [];
 
@@ -134,18 +196,6 @@ class Agenda extends ContentType
                 $group,
                 count($teachers) && $this->opts['displayTeachers'] ? implode(', ', $teachers) : null,
             ];
-
-            // Create colors based on group name
-            // %160 + 95 make colors brighter
-            if (!array_key_exists($group, $this->color)) {
-                $groupHash = md5($group);
-                $this->color[$group] = imagecolorallocate(
-                    $this->img,
-                    hexdec(substr($groupHash, 0, 2)) % 160 + 95,
-                    hexdec(substr($groupHash, 2, 2)) % 160 + 95,
-                    hexdec(substr($groupHash, 4, 2)) % 160 + 95
-                );
-            }
 
             // Sets global multiple locations, to enable width divisers
             // A single location cannot be used by multiple groups at the same time
@@ -515,19 +565,22 @@ class Agenda extends ContentType
      */
     private static function filter($str, $type = 'desc')
     {
+        $str = html_entity_decode($str);
+
+        if (self::$translit) {
+            $str = self::$translit->transliterate($str);
+        }
+
         $str = preg_replace([
             '/\s{2,}/',
             '/\s*\\\,\s*/',
-            '/ï/',
-            '/è/',
             '/\s*\([^\)]*\)/',
         ], [
             ' ',
             ', ',
-            'i',
-            'e',
             '',
         ], trim($str));
+
         switch ($type) {
             case 'name':
                 return preg_replace([
@@ -578,5 +631,23 @@ class Agenda extends ContentType
         }
 
         return $res;
+    }
+
+    private function getColor($str)
+    {
+        if (array_key_exists($str, $this->color)) {
+            return $this->color[$str];
+        }
+        
+        // %160 + 95 make colors brighter
+        $hash = md5($str);
+        $this->color[$str] = sprintf(
+            '#%X%X%X',
+            hexdec(substr($hash, 0, 2)) % 160 + 95,
+            hexdec(substr($hash, 2, 2)) % 160 + 95,
+            hexdec(substr($hash, 4, 2)) % 160 + 95
+        );
+
+        return $this->color[$str];
     }
 }
