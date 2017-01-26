@@ -9,7 +9,7 @@ raspi-config nonint do_change_timezone
 raspi-config nonint do_overscan 1
 apt install -y keyboard-configuration console-data
 apt upgrade -y
-apt install -y rpi-update nano sudo lightdm spectrwm xwit python python-tk lxterminal squid3
+apt install -y rpi-update nano sudo lightdm spectrwm xserver-xorg xwit python python-tk lxterminal squid3
 
 echo "Create autorun user"
 useradd -m -s /bin/bash -G sudo -G video pi

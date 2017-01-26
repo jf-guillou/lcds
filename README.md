@@ -202,7 +202,7 @@ Below are the complete explanations for the commands used in the auto-install sc
 ```bash
 apt update
 apt upgrade -y
-apt install -y apt-utils raspi-config keyboard-configuration console-data rpi-update nano sudo lightdm spectrwm xwit python python-tk lxterminal squid3
+apt install -y apt-utils raspi-config keyboard-configuration console-data rpi-update nano sudo lightdm spectrwm xwit xserver-xorg python python-tk lxterminal squid3
 ```
 A GUI will ask to configure the installed packages, mainly locales.
 
@@ -210,7 +210,7 @@ A GUI will ask to configure the installed packages, mainly locales.
 ```bash
 raspi-config nonint do_memory_split 128
 raspi-config nonint do_change_timezone
-raspi-config nonint do_overscan
+raspi-config nonint do_overscan 1
 ```
 
 - Change root password
