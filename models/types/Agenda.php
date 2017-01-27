@@ -19,25 +19,29 @@ class Agenda extends ContentType
     //const HOURS = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18];
 
     public $html = '<div class="agenda">%data%</div>';
-    public $css = '%field% .agenda-contents { width: 100%; height: 100%; display: table; table-layout: fixed; } %field% .agenda-day { display: table-cell; text-align: center; } %field% .event { position: absolute; }';
+    public $css = <<<EO1
+%field% .agenda { width: 100%; height: 100%; text-align: center; background-color: white; }
+%field% .agenda-header { }
+%field% .agenda-contents { width: 100%; height: calc(100% - 1.3em); display: table; table-layout: fixed; border-collapse: collapse; }
+%field% .agenda-time-wrapper { display: table-cell; width: 2.2em; }
+%field% .agenda-time { position: relative; top: 1.5em; /*height: calc(100% - 3em);*/}
+%field% .agenda-time-h { position: absolute; border-top: solid 1px black; width: 100%; }
+%field% .agenda-time-m { position: absolute; border-top: dotted 1px black; right: 0; }
+%field% .agenda-day { display: table-cell; }
+%field% .agenda-day-header { border-style: solid; border-color: red; border-width: 1px 0 1px 1px; }
+%field% .agenda-day:last-child .agenda-day-header { border-width: 1px 1px 1px 1px; }
+%field% .agenda-day-contents { border-style: solid; border-color: green; border-width: 1px 0 1px 1px; width: 100%; height: calc(100% - 1.3em); display: table; position: relative; }
+%field% .agenda-day:last-child .agenda-day-contents { border-width: 1px 1px 1px 1px; }
+%field% .agenda-event { position: absolute; overflow: hidden; border-style: solid; border-color: blue; border-width: 1px 0 1px 0; }
+EO1;
     public $input = 'url';
     public $output = 'raw';
     public $usable = true;
     public $preview = '@web/images/agenda.preview.jpg';
 
     private static $translit;
+    private $color = [];
     private $opts;
-    private $img;
-    private $font = 3;
-    private $fontSize = 20;
-    private $fontFile = 'arial';
-    private $strW;
-    private $strH;
-    private $color;
-    private $dayStep;
-    private $hourStep;
-    private $headerHeight;
-    private $leftBlockWidth;
 
     /**
      * {@inheritdoc}
@@ -87,24 +91,25 @@ class Agenda extends ContentType
         $format = [
             'minHour' => self::HOUR_MIN,
             'maxHour' => self::HOUR_MAX,
-            'title' => '???',
         ];
 
-        $blocks = [];
+        $parsedEvents = [];
 
         foreach ($events as $e) {
             // Convert timezones
             $start = (new \DateTime($e->dtstart))->setTimeZone($tz);
             $end = (new \DateTime($e->dtend))->setTimeZone($tz);
-            
+
             // Event info
             $b = [
                 'dow' => $start->format('w') - 1,
                 'start' => $start->format('G') + ($start->format('i') / 60.0),
+                'startStr' => $start->format('G:i'),
                 'end' => $end->format('G') + ($end->format('i') / 60.0),
+                'endStr' => $end->format('G:i'),
                 'name' =>self::filter($e->summary, 'name'),
-                'locations' => self::filter($e->location, 'location'),
-                'desc' => array_values(array_filter(array_map('self::filter', explode(PHP_EOL, $e->description)))),
+                'locations' => self::arrayFilter(explode(',', $e->location), 'location'),
+                'desc' => self::arrayFilter(explode(PHP_EOL, $e->description), 'description'),
             ];
             $b['duration'] = $b['end'] - $b['start'];
 
@@ -115,31 +120,214 @@ class Agenda extends ContentType
                 $format['maxHour'] = $b['end'];
             }
 
-            if (!array_key_exists($b['dow'], $blocks)) {
-                $blocks[$b['dow']] = [];
+            if (!array_key_exists($b['dow'], $parsedEvents)) {
+                $parsedEvents[$b['dow']] = [];
             }
 
-            $blocks[$b['dow']][] = $b;
+            $parsedEvents[$b['dow']][] = $b;
         }
 
         $format['dayLen'] = $format['maxHour'] - $format['minHour'];
 
-        return ['format' => $format, 'events' => $blocks];
+        return ['info' => $format, 'events' => $parsedEvents];
+    }
+
+    public function blockize($agenda)
+    {
+        $scanOffset = 0.1;
+
+        $blocks = [];
+
+        foreach ($agenda['events'] as $day => $events) {
+            usort($events, function ($a, $b) {
+                //return $a['desc'][0] - $b['desc'][0];
+                return strcmp($a['desc'][0], $b['desc'][0]);
+            });
+
+            for ($i = $agenda['info']['minHour']; $i <= $agenda['info']['maxHour']; $i += $scanOffset) {
+                $overlap = [];
+                foreach ($events as $k => $e) {
+                    if ($e['start'] < $i && $i < $e['end']) {
+                        $overlap[] = $k;
+                    }
+                }
+
+                $overlaps = count($overlap);
+
+                foreach ($events as $k => $e) {
+                    if ($e['start'] < $i && $i < $e['end']) {
+                        if (!array_key_exists('overlaps', $e)) {
+                            $e['overlaps'] = $overlaps;
+                            $e['overlap'] = $overlap;
+                        } else {
+                            if ($overlaps >= $e['overlaps']) {
+                                $e['overlaps'] = $overlaps;
+                            }
+                            $e['overlap'] = array_unique(array_merge($e['overlap'], $overlap));
+                        }
+
+                        $events[$k] = $e;
+                    }
+                }
+            }
+
+            foreach ($events as $k => $e) {
+                if ($e['overlaps'] < 2) {
+                    $e['position'] = 0;
+                    $events[$k] = $e;
+                    continue;
+                }
+
+                if (array_key_exists('position', $e)) {
+                    continue;
+                }
+
+                $spots = range(0, $e['overlaps'] - 1);
+                for ($i = 0; $i < count($e['overlap']); $i++) {
+                    $overlaped = $events[$e['overlap'][$i]];
+                    if (array_key_exists('position', $overlaped)) {
+                        unset($spots[$overlaped['position']]);
+                    }
+                }
+
+                $e['spots'] = $spots;
+
+                $e['position'] = array_shift($spots);
+
+                $events[$k] = $e;
+            }
+
+            $blocks[$day] = $events;
+        }
+
+        return $blocks;
+    }
+
+    private static function locations($agenda)
+    {
+        $locations = [];
+        foreach ($agenda['events'] as $events) {
+            foreach ($events as $e) {
+                if (!array_key_exists('locations', $e)) {
+                    continue;
+                }
+
+                foreach ($e['locations'] as $l) {
+                    if (!array_key_exists($l, $locations)) {
+                        $locations[$l] = 0;
+                    }
+                    $locations[$l]++;
+                }
+            }
+        }
+
+        arsort($locations);
+
+        return $locations;
+    }
+
+    private static function descriptions($agenda)
+    {
+        $descriptions = [];
+        foreach ($agenda['events'] as $events) {
+            foreach ($events as $e) {
+                if (!array_key_exists('desc', $e)) {
+                    continue;
+                }
+
+                foreach ($e['desc'] as $d) {
+                    if (!array_key_exists($d, $descriptions)) {
+                        $descriptions[$d] = 0;
+                    }
+                    $descriptions[$d] += 1/($e['overlaps']*2);
+                    break;
+                }
+            }
+        }
+
+        arsort($descriptions);
+
+        return $descriptions;
+    }
+
+    private static function hasOverlaps($agenda)
+    {
+        foreach ($agenda['events'] as $events) {
+            foreach ($events as $e) {
+                if ($e['overlaps'] > 1) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private static function genTitle($agenda)
+    {
+        if (!self::hasOverlaps($agenda)) {
+            $locations = self::locations($agenda);
+            if ($locations < 3) {
+                reset($locations);
+                return key($locations);
+            }
+        }
+
+        $descriptions = self::descriptions($agenda);
+        reset($descriptions);
+        return key($descriptions);
+    }
+
+    public function finalize($agenda)
+    {
+        $info = $agenda['info'];
+
+        $info['title'] = self::genTitle($agenda);
+
+        return $info;
     }
 
     public function render($agenda)
     {
-        $h = '<div class="agenda-header"></div><div class="agenda-contents">';
+        $h = '<div class="agenda-header">'.$agenda['info']['title'].'</div><div class="agenda-contents">';
+
+        $timeTraces = 0.25;
+        $h .= '<div class="agenda-time-wrapper"><div class="agenda-time">';
+        for ($i = ceil($agenda['info']['minHour']); $i < floor($agenda['info']['maxHour']); $i += $timeTraces) {
+            if (fmod($i, 1) == 0) {
+                $h .= '<div class="agenda-time-h" style="top: '.((($i - $agenda['info']['minHour']) / $agenda['info']['dayLen']) * 100).'%;">'.$i.'h</div>';
+            } else {
+                $h .= '<div class="agenda-time-m" style="top: '.((($i - $agenda['info']['minHour']) / $agenda['info']['dayLen']) * 100).'%; width: '.(fmod($i, 0.5) == 0 ? 40 : 20).'%;"></div>';
+            }
+        }
+        $h .= '</div></div>';
 
         foreach ($agenda['events'] as $day => $events) {
             $h .= '<div class="agenda-day" id="day-'.$day.'">'.
-                '<div class="day-header">'.\Yii::t('app', self::DAYS[$day]).'</div>'.
-                '<div class="day-contents">';
-
+                '<div class="agenda-day-header">'.\Yii::t('app', self::DAYS[$day]).'</div>'.
+                '<div class="agenda-day-contents">';
 
             foreach ($events as $e) {
-                $topRel = (($e['start'] - $agenda['format']['minHour']) / $agenda['format']['dayLen']) * 100;
-                $h .= '<div class="event" style="top: '.$topRel.'%">'.$e['name'].'</div>';
+                $style = [
+                    'top' => ((($e['start'] - $agenda['info']['minHour']) / $agenda['info']['dayLen']) * 100).'%',
+                    'bottom' => ((($agenda['info']['maxHour'] - $e['end']) / $agenda['info']['dayLen']) * 100).'%',
+                    'left' => ($e['position'] / $e['overlaps'] * 100).'%',
+                    'right' => ((1 - ($e['position'] + 1) / $e['overlaps']) * 100).'%',
+                    'background-color' => $this->getColor($e['desc'][0]),
+                ];
+                $styleStr = implode('; ', array_map(function ($k, $v) {
+                    return $k.':'.$v;
+                }, array_keys($style), $style));
+
+                $content = [
+                    //$e['overlaps'],
+                    //$e['position'],
+                    $e['name'],
+                    implode(',', $e['locations']),
+                    $e['desc'][0],
+                    //$e['startStr'].' - '.$e['endStr'],
+                ];
+
+                $h .= '<div class="agenda-event" style="'.$styleStr.'">'.implode('<br />', $content).'</div>';
             }
 
             $h .= '</div></div>';
@@ -157,402 +345,25 @@ class Agenda extends ContentType
         $content = self::downloadContent($url);
 
         $agenda = $this->parseIcal($content);
+        if (!$agenda) {
+            return null;
+        }
+
+        $agenda['events'] = $this->blockize($agenda);
+
+        $agenda['info'] = $this->finalize($agenda);
 
         return $this->render($agenda);
     }
 
-    /**
-     * Render an image based on Agenda feed.
-     *
-     * @param string $url      feed url
-     * @param string $filename storage file name
-     */
-    public function genImage($url, $filename)
+    private static function arrayFilter(array $arr, $type)
     {
-        // Init timezone converter
-        //$hasMultipleLocations = false;
-
-        $blocks = [];
-        $prevLocation = null;
-        // Build event blocks array
-        foreach ($events as $e) {
-            $teachers = [];
-            $groups = [];
-
-            // Guess groups and teachers names from description
-            foreach ($desc as $l) {
-                if ((strlen($l) >= 8 || strpos($l, '.') !== false) && preg_match('/\d|LP/', $l) == 0) {
-                    $teachers[] = $l;
-                } elseif (strlen($l) < 20 || preg_match('/LP/', $l) == 1) {
-                    $groups[] = $l;
-                }
-            }
-            sort($groups);
-            $group = implode(', ', $groups);
-
-            $text = [
-                $name,
-                $location,
-                $group,
-                count($teachers) && $this->opts['displayTeachers'] ? implode(', ', $teachers) : null,
-            ];
-
-            // Sets global multiple locations, to enable width divisers
-            // A single location cannot be used by multiple groups at the same time
-            if ($prevLocation !== null && $location != $prevLocation) {
-                $hasMultipleLocations = true;
-            }
-            $prevLocation = $location;
-
-            // Init event block
-            $blocks[] = [
-                'uid' => $e->uid,
-                'day' => $dow,
-                'startHour' => $startHour,
-                'endHour' => $endHour,
-                'duration' => $duration,
-                'text' => $text,
-                'group' => $group,
-                'groups' => $groups,
-                'bgColor' => $group,
-                'borderColor' => 'black',
-                'textColor' => 'black',
-                'diviser' => 1,
-                'position' => 0,
-            ];
+        $res = [];
+        foreach ($arr as $v) {
+            $res[] = self::filter($v, $type);
         }
 
-        // Sort blocks by day and group
-        usort($blocks, function ($a, $b) {
-            if ($a['day'] != $b['day']) {
-                return $a['day'] - $b['day'];
-            }
-
-            return $a['group'] > $b['group'] ? 1 : -1;
-        });
-
-        // Lookup groups and assign them weights used for block width division
-        $diviserWeight = [];
-        foreach ($blocks as $b) {
-            foreach ($b['groups'] as $g) {
-                $w = 1;
-                if (preg_match('/\s[a-d]\ss?\d-s?\d$/i', $g)) { // Groupe A S1-S2
-                    $w = 2;
-                } elseif (preg_match('/s?\d-s?\d$/i', $g)) { // S1-S2
-                    $w = 1;
-                } elseif (preg_match('/[\s\d][a-d]$/i', $g)) { // Groupe A
-                    $w = 2;
-                } elseif (preg_match('/^\d{2}$/i', $g)) { // 12
-                    $w = 2;
-                } elseif (preg_match('/groupe?\s\d$/i', $g)) { // Groupe 1
-                    $w = 2;
-                } elseif (preg_match('/\d$/i', $g)) { // 123
-                    $w = 3;
-                }
-                if (!array_key_exists($w, $diviserWeight)) {
-                    $diviserWeight[$w] = [];
-                }
-                if (!in_array($g, $diviserWeight[$w])) {
-                    $diviserWeight[$w][] = $g;
-                    sort($diviserWeight[$w]);
-                }
-            }
-        }
-
-        // Weights 2nd filter pass
-        // Uses names to guess group children
-        while (true) {
-            $hasMoved = false;
-            // Check weights
-            foreach ($diviserWeight as $weight => $groups) {
-                $shortestName = min($groups);
-                $thisHasMoved = false;
-                foreach ($groups as $i => $g) {
-                    if ($shortestName != $g && preg_match('/'.$shortestName.'/', $g)) {
-                        unset($diviserWeight[$weight][$i]);
-                        $diviserWeight[$weight + 1][] = $g;
-                        $hasMoved = true;
-                        $thisHasMoved = true;
-                    }
-                }
-                if ($thisHasMoved) {
-                    break;
-                }
-            }
-            if (!$hasMoved) {
-                break;
-            }
-        }
-
-        ksort($diviserWeight);
-
-        // Check if room planning (never overlaps) to allow full width on different groups
-        if (($forceSingleDiv = !$hasMultipleLocations)) {
-            $blocksCount = count($blocks);
-            foreach ($blocks as $i => $b) {
-                for ($j = $i + 1; $j < $blocksCount; ++$j) {
-                    if (self::overlap($b, $blocks[$j])) {
-                        $forceSingleDiv = false;
-                        break 2;
-                    }
-                }
-            }
-        }
-
-        // Set block width diviser and position based on weights
-        $divisers = [];
-        $positions = [];
-        $parentDiv = null;
-        foreach ($diviserWeight as $weight => $groups) {
-            $weightPos = 0;
-            if ($forceSingleDiv) {
-                // Room planning, always full width
-                $div = 1;
-            } else {
-                // Divide width by count of groups using this weight
-                $div = count($groups);
-                if ($parentDiv != null && $div < $parentDiv * 2) {
-                    // Subgroups should always have at least half the parent group width
-                    $div = $parentDiv * 2;
-                }
-            }
-
-            // Assign divisers and positions
-            foreach ($groups as $group) {
-                $divisers[$group] = $div;
-
-                // Position catchup mecanic
-                // Assume last char is pos identifier on known group string paterns
-                if (preg_match('/([1-4]{2,3}|[\sa-d][1-4]|[\s1-4][a-d])$/i', $group)) {
-                    $lChar = substr($group, -1);
-                    if ((int) $lChar) {
-                        $lChar = (int) $lChar - 1;
-                    } else {
-                        $lChar = ord(strtolower($lChar)) - 97; // 97 is a
-                    }
-
-                    // Make sure we don't go full ham
-                    if ($lChar > $weightPos && $lChar < $div) {
-                        $weightPos = $lChar;
-                    }
-                }
-
-                $positions[$group] = $weightPos;
-                ++$weightPos;
-                // Reset pos if overflowing diviser
-                // Can happen on full width blocks
-                if ($weightPos % $div === 0) {
-                    $weightPos = 0;
-                }
-            }
-            $parentDiv = $div;
-        }
-
-        // Draw event blocks on image
-        foreach ($blocks as $b) {
-            $diviser = 0;
-            $position = 0;
-
-            // Addup divisers
-            foreach ($b['groups'] as $g) {
-                if (array_key_exists($g, $divisers)) {
-                    $diviser += 1 / $divisers[$g];
-                }
-            }
-
-            // Invert divisers after addition
-            $diviser = $diviser ? 1 / $diviser : 1;
-
-            // Get position from first group and adjust based on group count
-            if (count($b['groups'])) {
-                $defaultGroup = $b['groups'][0];
-                if (array_key_exists($defaultGroup, $positions)) {
-                    $position = $positions[$defaultGroup];
-                }
-                if (count($b['groups']) > 1) {
-                    $position /= count($b['groups']);
-                }
-            }
-
-            // Real draw
-            $this->drawEvent(
-                $b['day'],
-                $b['startHour'],
-                $b['duration'],
-                $b['text'],
-                $b['bgColor'],
-                $b['borderColor'],
-                $b['textColor'],
-                $diviser,
-                $position
-            );
-        }
-
-        // Save .png
-        imagepng($this->img, Media::getRealPath().$filename, -1, PNG_NO_FILTER);
-        imagedestroy($this->img);
-    }
-
-    /**
-     * Creates calendar base structure (hours & days lines).
-     */
-    private function initCalendar()
-    {
-        $this->img = imagecreate($this->opts['width'], $this->opts['height']);
-
-        $this->color['white'] = imagecolorallocate($this->img, 255, 255, 255);
-        $this->color['black'] = imagecolorallocate($this->img, 0, 0, 0);
-        $this->color['grey'] = imagecolorallocate($this->img, 150, 150, 150);
-        $this->color['lightgrey'] = imagecolorallocate($this->img, 220, 220, 220);
-        $this->color['red'] = imagecolorallocate($this->img, 255, 0, 0);
-        $this->color['green'] = imagecolorallocate($this->img, 0, 255, 0);
-        $this->color['blue'] = imagecolorallocate($this->img, 0, 0, 255);
-        $this->color['orange'] = imagecolorallocate($this->img, 150, 20, 20);
-
-        $this->strW = imagefontwidth($this->font);
-        $this->strH = imagefontheight($this->font);
-
-        // Header margin
-        $this->headerHeight = 4 + $this->strH + 3;
-        // Left block margin
-        $this->leftBlockWidth = 2 + $this->strW * 2 + 2;
-
-        // Draw hours
-        $hoursCount = count(self::HOURS);
-        $this->hourStep = ($this->opts['height'] - $this->headerHeight) / $hoursCount;
-        for ($i = 0; $i < $hoursCount; ++$i) {
-            $offset = $this->headerHeight + $this->hourStep * $i;
-            imageline($this->img, 0, $offset, $this->opts['width'] - 1, $offset, $this->color['grey']);
-
-            imagesetstyle($this->img, [$this->color['lightgrey'], $this->color['white'], $this->color['white'], $this->color['white']]);
-
-            imageline($this->img, $this->leftBlockWidth / 1.2, $offset + $this->hourStep / 4, $this->opts['width'] - 1, $offset + $this->hourStep / 4, IMG_COLOR_STYLED);
-
-            imageline($this->img, $this->leftBlockWidth / 1.2, $offset + $this->hourStep / 1.3333, $this->opts['width'] - 1, $offset + $this->hourStep / 1.3333, IMG_COLOR_STYLED);
-
-            imagesetstyle($this->img, [$this->color['grey'], $this->color['white'], $this->color['white']]);
-
-            imageline($this->img, $this->leftBlockWidth / 1.6, $offset + $this->hourStep / 2, $this->opts['width'] - 1, $offset + $this->hourStep / 2, IMG_COLOR_STYLED);
-
-            imagestring(
-                $this->img,
-                $this->font,
-                2,
-                $offset + 4,
-                self::HOURS[$i],
-                $this->color['black']
-            );
-        }
-
-        // Draw days
-        $daysCount = count(self::DAYS);
-        $this->dayStep = ($this->opts['width'] - $this->leftBlockWidth) / $daysCount;
-        for ($i = 0; $i < $daysCount; ++$i) {
-            $offset = $this->leftBlockWidth + $this->dayStep * $i;
-            imagestring(
-                $this->img,
-                $this->font,
-                $offset + ($this->dayStep / 2) - ($this->strW * strlen(\Yii::t('app', self::DAYS[$i])) / 2),
-                4,
-                \Yii::t('app', self::DAYS[$i]),
-                $this->color['black']
-            );
-
-            imageline($this->img, $offset, 0, $offset, $this->opts['height'] - 1, $this->color['black']);
-        }
-    }
-
-    /**
-     * Draws an event block on calendar image.
-     *
-     * @param int      $day         day index
-     * @param int      $hour        hour index
-     * @param int      $duration    duration in hours
-     * @param string[] $text        event content text
-     * @param string   $bgColor     background color
-     * @param string   $borderColor border color
-     * @param string   $textColor   text color
-     * @param int      $diviser     event width diviser
-     * @param int      $position    position inside day column
-     */
-    private function drawEvent($day = 0, $hour = 0, $duration = 1, $text = [], $bgColor = 'white', $borderColor = 'black', $textColor = 'black', $diviser = 1, $position = 0)
-    {
-        // Setup x, y, width and height
-        $x1 = $this->leftBlockWidth + $this->dayStep * $day + ($this->dayStep / $diviser * $position);
-        $x2 = $x1 + ($this->dayStep / $diviser);
-        $y1 = $this->headerHeight + $this->hourStep * $hour;
-        $y2 = $y1 + $this->hourStep * $duration;
-        // Fill rectangle with border color
-        imagefilledrectangle($this->img, $x1, $y1, $x2, $y2, $this->color[$borderColor]);
-        // Then fill 1px smaller rectangle with background color
-        imagefilledrectangle($this->img, $x1 + 1, $y1 + 1, $x2 - 1, $y2 - 1, $this->color[$bgColor]);
-
-        // Prepare text content for imagestring()
-        $text = self::trimArray($text);
-
-        // Setup text position
-        $xCenter = ($x1 + ($x2 - $x1) / 2);
-        $yCenter = ($y1 + ($y2 - $y1) / 2);
-        $availChars = floor(($x2 - $x1) / $this->strW);
-        $availLines = floor(($y2 - $y1) / $this->strH);
-        $overLines = $availLines - count($text);
-
-        // Remove text going over block height
-        while (count($text) > $availLines) {
-            array_pop($text);
-        }
-
-        $dispText = [];
-        foreach ($text as $i => $t) {
-            // Try to cut too long lines
-            if (strlen($t) > $availChars) {
-                $dispText[] = trim(substr($t, 0, $availChars));
-                // Wrap the rest on line bellow if possible
-                while ($overLines > 0) {
-                    --$overLines;
-                    $t = substr($t, $availChars);
-                    if (strlen($t) > 1) { // Cut single char alone on a line
-                        $dispText[] = trim(substr($t, 0, $availChars));
-                    } else {
-                        break;
-                    }
-                }
-            } else {
-                $dispText[] = trim($t);
-            }
-            // Add a blank line under title if possible
-            if ($i === 0 && $overLines > 0) {
-                $dispText[] = '';
-            }
-        }
-
-        // Draw text
-        foreach ($dispText as $i => $t) {
-            imagestring(
-                $this->img,
-                $this->font,
-                $xCenter - (strlen($t) * $this->strW) / 2,
-                $yCenter - (count($dispText) * $this->strH) / 2 + ($this->strH * $i),
-                $t,
-                $this->color[$textColor]
-            );
-        }
-    }
-
-    /**
-     * Checks for event overlap.
-     *
-     * @param array $a first event
-     * @param array $b second event
-     *
-     * @return bool overlaps
-     */
-    private static function overlap($a, $b)
-    {
-        return $a['day'] == $b['day'] && $a != $b && (
-            ($a['startHour'] >= $b['startHour'] && $a['startHour'] < $b['endHour']) ||
-            ($a['endHour'] > $b['startHour'] && $a['endHour'] <= $b['endHour'])
-            );
+        return array_values(array_filter($res));
     }
 
     /**
@@ -563,7 +374,7 @@ class Agenda extends ContentType
      *
      * @return string filtered string
      */
-    private static function filter($str, $type = 'desc')
+    private static function filter($str, $type)
     {
         $str = html_entity_decode($str);
 
@@ -596,7 +407,7 @@ class Agenda extends ContentType
                 ], [
                     '\\1-\\2',
                 ], trim(explode(',', $str)[0]));
-            case 'desc':
+            case 'description':
                 return preg_replace([
                     '/(modif).*/',
                 ], [
@@ -607,45 +418,19 @@ class Agenda extends ContentType
         }
     }
 
-    /**
-     * Trim and decode array content.
-     *
-     * @param string[] $arr input array
-     *
-     * @return string[] trimed array
-     */
-    private static function trimArray($arr)
-    {
-        $res = [];
-
-        if (!is_array($arr)) {
-            $arr = [$arr];
-        }
-
-        foreach ($arr as $text) {
-            $decodedText = utf8_decode(trim($text));
-            if (!$decodedText) {
-                continue;
-            }
-            $res[] = $decodedText;
-        }
-
-        return $res;
-    }
-
     private function getColor($str)
     {
         if (array_key_exists($str, $this->color)) {
             return $this->color[$str];
         }
-        
+
         // %160 + 95 make colors brighter
         $hash = md5($str);
         $this->color[$str] = sprintf(
             '#%X%X%X',
-            hexdec(substr($hash, 0, 2)) % 160 + 95,
-            hexdec(substr($hash, 2, 2)) % 160 + 95,
-            hexdec(substr($hash, 4, 2)) % 160 + 95
+            hexdec(substr($hash, 0, 2)) % 140 + 115,
+            hexdec(substr($hash, 2, 2)) % 140 + 115,
+            hexdec(substr($hash, 4, 2)) % 140 + 115
         );
 
         return $this->color[$str];
