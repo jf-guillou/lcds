@@ -134,7 +134,7 @@ function handleMove(dx, dy, x, y) {
         dy = resizeMin - oH;
       }
       if (oY + oH + dy > pH) {
-        dy = pH - oY - oH; // oY + oH + dY = pH -> dY = 
+        dy = pH - oY - oH;
       }
       oH = oH + dy;
       break;

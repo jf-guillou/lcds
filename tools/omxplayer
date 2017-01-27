@@ -8,7 +8,7 @@ import urlparse
 
 def getScreenDimensions():
   if not os.environ.has_key('SCREEN_WIDTH_PX') or not os.environ.has_key('SCREEN_HEIGHT_PX'):
-    w, h = (int(v) for v in 
+    w, h = (int(v) for v in
       subprocess.Popen(
         'DISPLAY=:0 xrandr | grep "\*" | cut -d" " -f4',
         shell=True,

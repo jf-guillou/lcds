@@ -26,8 +26,6 @@ use kartik\datetime\DateTimePicker;
 
     <?= $form->field($model, 'data')->textarea(['rows' => 6]) ?>
 
-    
-
     <div class="row">
         <div class="col-lg-2">
             <?= $form->field($model, 'duration')->textInput() ?>

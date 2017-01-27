@@ -98,7 +98,7 @@ Screen.prototype.reloadNow = function() {
 
 /**
  * Check every field for content
- * @param  {Content} data 
+ * @param  {Content} data
  * @return {boolean} content is displayed
  */
 Screen.prototype.displaysData = function(data) {
@@ -122,7 +122,7 @@ Screen.prototype.newContentTrigger = function() {
 
 /**
  * Loop through all fields for stuckiness state
- * @return {Boolean} are all fields stuck
+ * @return {boolean} are all fields stuck
  */
 Screen.prototype.isAllFieldsStuck = function() {
   for (var f in this.fields) {
@@ -157,7 +157,7 @@ function Content(c) {
 
 /**
  * Check if content should be ajax preloaded
- * @return {boolean}
+ * @return {boolean} shoud preload
  */
 Content.prototype.shouldPreload = function() {
   return this.canPreload() && !this.isPreloadingOrQueued() && !this.isPreloaded();
@@ -165,7 +165,7 @@ Content.prototype.shouldPreload = function() {
 
 /**
  * Check if content has pre-loadable material
- * @return {boolean} 
+ * @return {boolean} can preload
  */
 Content.prototype.canPreload = function() {
   return this.getResource() && this.type.search(/Video|Image|Agenda/) != -1;
@@ -173,7 +173,7 @@ Content.prototype.canPreload = function() {
 
 /**
  * Check if content is displayable (preloaded and not too long)
- * @return {Boolean} can display
+ * @return {boolean} can display
  */
 Content.prototype.canDisplay = function() {
   return (screen.endAt == null || Date.now() + this.duration < screen.endAt) && this.isPreloaded();
@@ -215,7 +215,7 @@ Content.prototype.setPreloadState = function(state) {
 
 /**
  * Check cache for preload status of content
- * @return {Boolean} 
+ * @return {boolean} is preloaded
  */
 Content.prototype.isPreloaded = function() {
   if (!this.canPreload()) {
@@ -227,7 +227,7 @@ Content.prototype.isPreloaded = function() {
 
 /**
  * Check cache for in progress or future preloading
- * @return {Boolean} is preloading
+ * @return {boolean} is preloading
  */
 Content.prototype.isPreloadingOrQueued = function() {
   return this.isPreloading() || this.isInPreloadQueue();
@@ -235,7 +235,7 @@ Content.prototype.isPreloadingOrQueued = function() {
 
 /**
  * Check cache for in progress preloading
- * @return {Boolean} is preloading
+ * @return {boolean} is preloading
  */
 Content.prototype.isPreloading = function() {
   return screen.cache.isPreloading(this.getResource());
@@ -243,7 +243,7 @@ Content.prototype.isPreloading = function() {
 
 /**
  * Check cache for queued preloading
- * @return {Boolean} is in preload queue
+ * @return {boolean} is in preload queue
  */
 Content.prototype.isInPreloadQueue = function() {
   return screen.cache.isInPreloadQueue(this.getResource());
@@ -288,8 +288,8 @@ function Preload() {
 
 /**
  * Set resource cache state
- * @param {string} res     resource url
- * @param {string|int} expires header or preload state
+ * @param {string} res   resource url
+ * @param {int}    state preload state
  */
 Preload.prototype.setState = function(res, state) {
   this.cache[res] = state;
@@ -298,7 +298,7 @@ Preload.prototype.setState = function(res, state) {
 /**
  * Check resource cache for readyness state
  * @param  {string}  res resource url
- * @return {Boolean}     is preloaded
+ * @return {boolean}     is preloaded
  */
 Preload.prototype.isPreloaded = function(res) {
   return this.cache[res] === Preload.state.OK;
@@ -307,7 +307,7 @@ Preload.prototype.isPreloaded = function(res) {
 /**
  * Check resource cache for preloading state
  * @param  {string}  res resource url
- * @return {Boolean}     is currently preloading
+ * @return {boolean}     is currently preloading
  */
 Preload.prototype.isPreloading = function(res) {
   return this.cache[res] === Preload.state.PRELOADING;
@@ -316,7 +316,7 @@ Preload.prototype.isPreloading = function(res) {
 /**
  * Check resource cache for queued preloading state
  * @param  {string}  res resource url
- * @return {Boolean}     is in preload queue
+ * @return {boolean}     is in preload queue
  */
 Preload.prototype.isInPreloadQueue = function(res) {
   return this.cache[res] === Preload.state.PRELOADING_QUEUE;
@@ -324,8 +324,8 @@ Preload.prototype.isInPreloadQueue = function(res) {
 
 /**
  * Scan resource cache for preloading resources
- * @param  {Boolean}  withQueue also check preload queue
- * @return {Boolean}           has any resource preloading/in preload queue
+ * @param  {boolean} withQueue also check preload queue
+ * @return {boolean}           has any resource preloading/in preload queue
  */
 Preload.prototype.hasPreloadingContent = function(withQueue) {
   for (var res in this.cache) {
@@ -344,12 +344,12 @@ Preload.prototype.hasPreloadingContent = function(withQueue) {
 /**
  * Preload a resource by ajax get on the url
  * Check HTTP return state to validate proper cache
- * @param  {string} res resource url
+ * @param {string} res resource url
  */
 Preload.prototype.preload = function(res) {
   this.setState(res, Preload.state.PRELOADING);
 
-  $.ajax(res).done(function(data, textStatus, jqXHR) {
+  $.ajax(res).done(function() {
     // Preload success
     screen.cache.setState(res, Preload.state.OK);
     screen.newContentTrigger();
@@ -507,14 +507,14 @@ Field.prototype.pickNext = function() {
 /**
  * Loop through field contents for any displayable content
  * @param  {string}  previousData previous content data
- * @param {Boolean} anyUsable ignore constraints
- * @return {Content} random usable content
+ * @param  {boolean} anyUsable    ignore constraints
+ * @return {Content}              random usable content
  */
 Field.prototype.pickRandomContent = function(previousData, anyUsable) {
   this.randomizeSortContents();
   for (var i = 0; i < this.contents.length; i++) {
     var c = this.contents[i];
-    // Skip too long or not preloaded content 
+    // Skip too long or not preloaded content
     if (!c.canDisplay()) {
       continue;
     }
@@ -569,7 +569,7 @@ Field.prototype.displayNext = function() {
 
 /**
  * Display data in field HTML
- * @param  {string} data 
+ * @param {string} data
  */
 Field.prototype.display = function(data) {
   this.$field.html(data);
