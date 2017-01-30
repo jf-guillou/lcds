@@ -351,7 +351,11 @@ Preload.prototype.preload = function(res) {
 
   $.ajax(res).done(function() {
     // Preload success
-    screen.cache.setState(res, Preload.state.OK);
+    if (data === '') {
+      screen.cache.setState(res, Preload.state.NO_CONTENT);
+    } else {
+      screen.cache.setState(res, Preload.state.OK);
+    }
     screen.newContentTrigger();
   }).fail(function() {
     // Preload failure
@@ -406,6 +410,7 @@ Preload.state = {
   HTTP_FAIL: -4,
   NO_EXPIRE_HEADER: -5,
   OK: -6,
+  NO_CONTENT: -7,
 }
 
 
@@ -574,7 +579,7 @@ Field.prototype.displayNext = function() {
 Field.prototype.display = function(data) {
   this.$field.html(data);
   this.$field.show();
-  $bt = this.$field.find('.bigtext');
+  var $bt = this.$field.find('.bigtext');
   // Only first data-min/max per field is respected
   var minPx = $bt.attr('data-min-px') || 4;
   var maxPx = $bt.attr('data-max-px') || 0;

@@ -5,7 +5,6 @@ namespace app\models\types;
 use Yii;
 use ICal\ICal;
 use app\models\ContentType;
-use yii\helpers\Url;
 
 /**
  * This is the model class for Agenda content type.
@@ -214,7 +213,8 @@ EO1;
 
                 // Find available spots for this event
                 $spots = range(0, $e['overlaps'] - 1);
-                for ($i = 0; $i < count($e['overlap']); ++$i) {
+                $overlapCount = count($e['overlap']);
+                for ($i = 0; $i < $overlapCount; ++$i) {
                     $overlaped = $events[$e['overlap'][$i]];
                     if (array_key_exists('position', $overlaped)) {
                         unset($spots[$overlaped['position']]);
@@ -424,7 +424,7 @@ EO1;
      *
      * @param string $url ical url
      *
-     * @return string HTML agenda
+     * @return string|null HTML agenda
      */
     public function genAgenda($url)
     {

@@ -137,7 +137,7 @@ class Content extends \yii\db\ActiveRecord
      * Retrieve data for content
      * Transforming it if necessary (mostly urls).
      *
-     * @return string usable data
+     * @return string|null usable data
      */
     public function getData()
     {
@@ -147,6 +147,9 @@ class Content extends \yii\db\ActiveRecord
         }
 
         $data = $this->processData($data);
+        if ($data === null) {
+            return null;
+        }
 
         if ($this->type->html) {
             return str_replace('%data%', $data, $this->type->html);
