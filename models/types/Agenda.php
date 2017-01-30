@@ -235,128 +235,6 @@ EO1;
     }
 
     /**
-     * Scan agenda events for distinct locations, count them and sort desc.
-     *
-     * @param array $agenda
-     *
-     * @return array locations
-     */
-    private static function locations($agenda)
-    {
-        $locations = [];
-        foreach ($agenda['events'] as $events) {
-            foreach ($events as $e) {
-                if (!array_key_exists('locations', $e)) {
-                    continue;
-                }
-
-                foreach ($e['locations'] as $l) {
-                    if (!array_key_exists($l, $locations)) {
-                        $locations[$l] = 0;
-                    }
-                    ++$locations[$l];
-                }
-            }
-        }
-
-        arsort($locations);
-
-        return $locations;
-    }
-
-    /**
-     * Scan agenda events for distinct descriptions, count them (with overlap weight) and sort desc.
-     *
-     * @param array $agenda
-     *
-     * @return array descriptions
-     */
-    private static function descriptions($agenda)
-    {
-        $descriptions = [];
-        foreach ($agenda['events'] as $events) {
-            foreach ($events as $e) {
-                if (!array_key_exists('desc', $e)) {
-                    continue;
-                }
-
-                foreach ($e['desc'] as $d) {
-                    if (!array_key_exists($d, $descriptions)) {
-                        $descriptions[$d] = 0;
-                    }
-                    $descriptions[$d] += 1 / ($e['overlaps'] * 2);
-                    break;
-                }
-            }
-        }
-
-        arsort($descriptions);
-
-        return $descriptions;
-    }
-
-    /**
-     * Scan agenda events for overlaps.
-     *
-     * @param array $agenda
-     *
-     * @return bool has overlaps
-     */
-    private static function hasOverlaps($agenda)
-    {
-        foreach ($agenda['events'] as $events) {
-            foreach ($events as $e) {
-                if ($e['overlaps'] > 1) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Scan agenda and guess best title based on locations and descriptions.
-     *
-     * @param array $agenda
-     *
-     * @return string title
-     */
-    private static function genTitle($agenda)
-    {
-        if (!self::hasOverlaps($agenda)) {
-            $locations = self::locations($agenda);
-            if ($locations < 3) {
-                reset($locations);
-
-                return key($locations);
-            }
-        }
-
-        $descriptions = self::descriptions($agenda);
-        reset($descriptions);
-
-        return key($descriptions);
-    }
-
-    /**
-     * Last processing before render
-     * Generate title.
-     *
-     * @param array $agenda
-     *
-     * @return array agenga info
-     */
-    public function finalize($agenda)
-    {
-        $info = $agenda['info'];
-
-        $info['title'] = self::genTitle($agenda);
-
-        return $info;
-    }
-
-    /**
      * Render agenda events block to HTML.
      *
      * @param array $agenda
@@ -365,7 +243,7 @@ EO1;
      */
     public function render($agenda)
     {
-        $h = '<div class="agenda-header">'.$agenda['info']['title'].'</div><div class="agenda-contents">';
+        $h = '<div class="agenda-header">%name%</div><div class="agenda-contents">';
 
         $timeTraces = 0.25;
         $h .= '<div class="agenda-time"><div class="agenda-time-header">&nbsp;</div><div class="agenda-time-contents">';
@@ -439,8 +317,6 @@ EO1;
         }
 
         $agenda['events'] = $this->blockize($agenda);
-
-        $agenda['info'] = $this->finalize($agenda);
 
         return $this->render($agenda);
     }

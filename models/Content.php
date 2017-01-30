@@ -151,6 +151,9 @@ class Content extends \yii\db\ActiveRecord
             return null;
         }
 
+        $data = str_replace('%name%', $this->name, $data);
+        $data = str_replace('%description%', $this->description, $data);
+
         if ($this->type->html) {
             return str_replace('%data%', $data, $this->type->html);
         }
