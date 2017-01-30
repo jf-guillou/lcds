@@ -26,10 +26,11 @@ class Agenda extends ContentType
 %field% .agenda-time-contents { width: 100%; height: calc(100% - 1.3em); display: table; position: relative; }
 %field% .agenda-time-h { position: absolute; border-top: solid 1px black; width: 100%; }
 %field% .agenda-time-m { position: absolute; border-top: dotted 1px black; right: 0; }
+%field% .agenda-time-trace { position: absolute; border-top: dotted 1px gray; width: 100%; }
 %field% .agenda-day { display: table-cell; border: solid 1px black; }
 %field% .agenda-day-header { border-bottom: solid 1px black; }
 %field% .agenda-day-contents { width: 100%; height: calc(100% - 1.3em); display: table; position: relative; }
-%field% .agenda-event { position: absolute; overflow: hidden; border-bottom: solid 1px black; }
+%field% .agenda-event { position: absolute; overflow: hidden; border-bottom: solid 1px black; z-index: 10; }
 %field% .agenda-event-desc { font-weight: bold; font-size: 1.1em; }
 %field% .agenda-event-location { font-size: 1.1em; white-space: nowrap; }
 %field% .agenda-event-name { word-break: break-all; display: block; }
@@ -235,19 +236,17 @@ EO1;
     }
 
     /**
-     * Render agenda events block to HTML.
+     * Render agenda left column with hours.
      *
      * @param array $agenda
      *
-     * @return string HTML result
+     * @return string HTML column
      */
-    public function render($agenda)
+    private function renderHoursColumn($agenda)
     {
-        $h = '<div class="agenda-header">%name%</div><div class="agenda-contents">';
-
-        $timeTraces = 0.25;
-        $h .= '<div class="agenda-time"><div class="agenda-time-header">&nbsp;</div><div class="agenda-time-contents">';
-        for ($i = floor($agenda['info']['minHour']); $i < ceil($agenda['info']['maxHour']); $i += $timeTraces) {
+        $hourColumnIntervals = 0.25;
+        $h = '<div class="agenda-time"><div class="agenda-time-header">&nbsp;</div><div class="agenda-time-contents">';
+        for ($i = floor($agenda['info']['minHour']); $i < ceil($agenda['info']['maxHour']); $i += $hourColumnIntervals) {
             if (fmod($i, 1) == 0) {
                 $h .= '<div class="agenda-time-h" style="top: '.((($i - $agenda['info']['minHour']) / $agenda['info']['dayLen']) * 100).'%;">'.$i.'h</div>';
             } else {
@@ -256,6 +255,21 @@ EO1;
         }
         $h .= '</div></div>';
 
+        return $h;
+    }
+
+    /**
+     * Render agenda events blocks columns.
+     *
+     * @param array $agenda
+     *
+     * @return string HTML blocks columns
+     */
+    private function renderEvents($agenda)
+    {
+        $hourIntervals = 1;
+
+        $h = '';
         foreach ($agenda['events'] as $day => $events) {
             $h .= '<div class="agenda-day" id="day-'.$day.'">'.
                 '<div class="agenda-day-header">'.\Yii::t('app', self::DAYS[$day]).' '.$agenda['info']['days'][$day].'</div>'.
@@ -290,8 +304,30 @@ EO1;
                 $h .= '<div class="agenda-event" style="'.$styleStr.'">'.implode('', $content).'</div>';
             }
 
+            for ($i = floor($agenda['info']['minHour']) + 1; $i < ceil($agenda['info']['maxHour']); $i += $hourIntervals) {
+                $h .= '<div class="agenda-time-trace" style="top: '.((($i - $agenda['info']['minHour']) / $agenda['info']['dayLen']) * 100).'%;"></div>';
+            }
+
             $h .= '</div></div>';
         }
+
+        return $h;
+    }
+
+    /**
+     * Render agenda to HTML.
+     *
+     * @param array $agenda
+     *
+     * @return string HTML result
+     */
+    public function render($agenda)
+    {
+        $h = '<div class="agenda-header">%name%</div><div class="agenda-contents">';
+
+        $h .= $this->renderHoursColumn($agenda);
+
+        $h .= $this->renderEvents($agenda);
 
         $h .= '</div>';
 
