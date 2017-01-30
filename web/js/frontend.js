@@ -574,11 +574,14 @@ Field.prototype.displayNext = function() {
 Field.prototype.display = function(data) {
   this.$field.html(data);
   this.$field.show();
-  if (this.$field.text() != '') {
-    this.$field.textfill({
-      maxFontPixels: 0,
-    });
-  }
+  $bt = this.$field.find('.bigtext');
+  // Only first data-min/max per field is respected
+  var minPx = $bt.attr('data-min-px') || 4;
+  var maxPx = $bt.attr('data-max-px') || 0;
+  $bt.parent().textfill({
+    minFontPixels: minPx,
+    maxFontPixels: maxPx,
+ });
 }
 
 // Global screen instance

@@ -11,7 +11,7 @@ use yii\helpers\Html;
  */
 class Text extends ContentType
 {
-    public $html = '<span class="text">%data%</span>';
+    public $html = '<span class="text bigtext">%data%</span>';
     public $css = '%field% { text-align: center; vertical-align: middle; }';
     public $input = 'text';
     public $output = 'text';

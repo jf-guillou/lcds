@@ -104,7 +104,7 @@ class Weather extends ContentType
         $tUnit = Yii::t('app', '°F');
 
         return <<<EOD
-<span class="weather-content">
+<span class="weather-content bigtext">
     <span class="weather-summary">{$summary}</span>
     <span class="wi $icon" />
     <span class="weather-temp">{$temp}{$tUnit}</span>

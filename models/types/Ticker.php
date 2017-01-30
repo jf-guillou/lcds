@@ -9,7 +9,7 @@ use Yii;
  */
 class Ticker extends Text
 {
-    public $html = '<span class="ticker">%data%</span>';
+    public $html = '<span class="ticker bigtext">%data%</span>';
     public $css = '%field% { text-align: center; vertical-align: middle; }';
     public $usable = true;
     public $preview = '@web/images/ticker.preview.jpg';
