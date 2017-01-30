@@ -61,7 +61,7 @@ EO1;
         $agenda = self::fromCache($data);
         if (!$agenda) {
             $agenda = $this->genAgenda($data);
-            if ($agenda) {
+            if ($agenda !== null) {
                 self::toCache($data, $agenda);
             }
         }

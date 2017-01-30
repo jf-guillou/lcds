@@ -349,7 +349,7 @@ Preload.prototype.hasPreloadingContent = function(withQueue) {
 Preload.prototype.preload = function(res) {
   this.setState(res, Preload.state.PRELOADING);
 
-  $.ajax(res).done(function() {
+  $.ajax(res).done(function(data) {
     // Preload success
     if (data === '') {
       screen.cache.setState(res, Preload.state.NO_CONTENT);
