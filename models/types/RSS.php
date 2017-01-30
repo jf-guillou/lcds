@@ -14,7 +14,7 @@ class RSS extends ContentType
     public $input = 'url';
     public $output = 'text';
     public $usable = false;
-    public $preview = null;
+    public $exemple = null;
 
     /**
      * {@inheritdoc}

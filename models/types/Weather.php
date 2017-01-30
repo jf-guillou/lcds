@@ -19,7 +19,8 @@ class Weather extends ContentType
     public $input = 'latlong';
     public $output = 'text';
     public $usable = true;
-    public $preview = '@web/images/weather.preview.jpg';
+    public $exemple = '@web/images/weather.preview.jpg';
+    public $canPreview = true;
 
     private $opts;
 

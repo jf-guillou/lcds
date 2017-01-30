@@ -266,6 +266,23 @@ class ContentController extends BaseController
     }
 
     /**
+     * Renders specific content for preview.
+     *
+     * @param int $id content id
+     *
+     * @return string HTML render
+     */
+    public function actionPreview($id)
+    {
+        $model = $this->findViewableModel($id, Yii::$app->user);
+
+        return $this->renderPartial('preview', [
+                'type' => $model->type,
+                'data' => $model->getData(),
+            ]);
+    }
+
+    /**
      * Enables or disable a specific content.
      *
      * @param int $id content id
@@ -286,14 +303,14 @@ class ContentController extends BaseController
     /**
      * Finds the Content model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
-     * If the user has not enough rights, a 403 HTTP exception will be thrown
+     * If the user has not enough rights, a 403 HTTP exception will be thrown.
      *
-     * @param int $id
+     * @param int           $id
      * @param \yii\web\User $user
      *
      * @return Content the loaded model
      *
-     * @throws NotFoundHttpException if the model cannot be found
+     * @throws NotFoundHttpException  if the model cannot be found
      * @throws ForbiddenHttpException if the model cannot be accessed
      */
     protected function findViewableModel($id, $user)

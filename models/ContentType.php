@@ -28,7 +28,7 @@ class ContentType extends \yii\db\ActiveRecord
     public $input;
     public $output;
     public $usable;
-    public $preview;
+    public $exemple;
     public $canPreview;
 
     const KINDS = [

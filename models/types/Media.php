@@ -118,7 +118,7 @@ abstract class Media extends ContentType
         $tmpFilepath = tempnam(sys_get_temp_dir(), 'LCDS_');
 
         $file = fopen($tmpFilepath, 'w+');
-        fputs($file, $fileContent);
+        fwrite($file, $fileContent);
         fclose($file);
 
         $fileInstance = new UploadedFile();

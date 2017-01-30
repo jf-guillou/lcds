@@ -23,6 +23,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'method' => 'post',
             ],
         ]) ?>
+        <?= Html::a(Yii::t('app', 'Preview'), ['preview', 'id' => $model->id], ['class' => 'btn btn-success']) ?>
     </p>
 
     <?= DetailView::widget([
@@ -40,13 +41,4 @@ $this->params['breadcrumbs'][] = $this->title;
             'enabled:boolean',
         ],
     ]) ?>
-
-    <?php if (is_subclass_of($model, 'app\models\types\Media')) : ?>
-    <div class="text-center">
-        <h3><?= Yii::t('app', 'Preview'); ?></h3>
-        <div class="media-preview">
-            <?= $model->getData() ?>
-        </div>
-    </div>
-    <?php endif; ?>
 </div>

@@ -18,7 +18,7 @@ class Video extends Media
     public $usable = true;
     public $input = 'url';
     public $output = 'url';
-    public $preview = '@web/images/video.preview.jpg';
+    public $exemple = '@web/images/video.preview.jpg';
 
     /**
      * {@inheritdoc}

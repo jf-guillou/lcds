@@ -37,7 +37,8 @@ EO1;
     public $input = 'url';
     public $output = 'raw';
     public $usable = true;
-    public $preview = '@web/images/agenda.preview.jpg';
+    public $exemple = '@web/images/agenda.preview.jpg';
+    public $canPreview = true;
 
     private static $translit;
     private $color = [];

@@ -16,7 +16,8 @@ class Text extends ContentType
     public $input = 'text';
     public $output = 'text';
     public $usable = true;
-    public $preview = '@web/images/text.preview.jpg';
+    public $exemple = '@web/images/text.preview.jpg';
+    public $canPreview = true;
 
     /**
      * {@inheritdoc}

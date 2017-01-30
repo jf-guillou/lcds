@@ -22,8 +22,8 @@ $this->params['breadcrumbs'][] = $this->title;
             <h3><?= $t->name ?></h3>
             <p>
                 <?php
-                if ($t->preview) : ?>
-                <img src="<?= Url::to($t->preview) ?>" alt="<?= $t->name ?>" class="img-full" />
+                if ($t->exemple) : ?>
+                <img src="<?= Url::to($t->exemple) ?>" alt="<?= $t->name ?>" class="img-full" />
                 <?php
                 endif; ?>
             </p>

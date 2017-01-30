@@ -50,6 +50,13 @@ $this->params['breadcrumbs'][] = $this->title;
             'description',
             'type.name',
             [
+                'label' => Yii::t('app', 'Preview'),
+                'format' => 'raw',
+                'content' => function ($model, $key, $index, $column) {
+                    return Html::a(Yii::t('app', 'Preview'), ['content/preview', 'id' => $model->id], ['class' => 'btn btn-primary']);
+                },
+            ],
+            [
                 'class' => 'yii\grid\ActionColumn',
                 'controller' => 'content',
                 'template' => '{view} {update} {delete} {toggle}',

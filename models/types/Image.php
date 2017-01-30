@@ -17,7 +17,7 @@ class Image extends Media
     public $input = 'url';
     public $output = 'url';
     public $usable = true;
-    public $preview = '@web/images/image.preview.jpg';
+    public $exemple = '@web/images/image.preview.jpg';
 
     /**
      * {@inheritdoc}
