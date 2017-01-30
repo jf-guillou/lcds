@@ -519,8 +519,8 @@ Field.prototype.pickRandomContent = function(previousData, anyUsable) {
   this.randomizeSortContents();
   for (var i = 0; i < this.contents.length; i++) {
     var c = this.contents[i];
-    // Skip too long or not preloaded content
-    if (!c.canDisplay()) {
+    // Skip too long, not preloaded or empty content
+    if (!c.canDisplay() || !c.data) {
       continue;
     }
 
