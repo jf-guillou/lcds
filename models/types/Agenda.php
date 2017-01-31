@@ -177,12 +177,7 @@ EO1;
         // Scan each 0.1h for overlapping events
         for ($i = $from; $i <= $to; $i += $this->overlapScanOffset) {
             // $overlap is every overlapping event
-            $overlap = [];
-            foreach ($events as $k => $e) {
-                if ($e['start'] < $i && $i < $e['end']) {
-                    $overlap[] = $k;
-                }
-            }
+            $overlap = $this->scanOverlap($events, $i);
 
             // $overlaps is maximum concurrent overlappings
             // Used to fix block width
@@ -208,6 +203,26 @@ EO1;
         }
 
         return $events;
+    }
+
+    /**
+     * Scan for overlap at precise time.
+     *
+     * @param array $events
+     * @param int   $at     scan hour
+     *
+     * @return array overlap
+     */
+    private function scanOverlap($events, $at)
+    {
+        $overlap = [];
+        foreach ($events as $k => $e) {
+            if ($e['start'] < $at && $at < $e['end']) {
+                $overlap[] = $k;
+            }
+        }
+
+        return $overlap;
     }
 
     /**
