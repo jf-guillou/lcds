@@ -52,7 +52,7 @@ $this->params['breadcrumbs'][] = $this->title;
             [
                 'label' => Yii::t('app', 'Preview'),
                 'format' => 'raw',
-                'content' => function ($model, $key, $index, $column) {
+                'content' => function ($model) {
                     return Html::a(Yii::t('app', 'Preview'), ['content/preview', 'id' => $model->id], ['class' => 'btn btn-primary']);
                 },
             ],

@@ -89,6 +89,7 @@ EO1;
         // Event info
         $event = [
             'dow' => $start->format('w') - 1,
+            'dayMonth' => $start->format('d/m'),
             'start' => $start->format('G') + ($start->format('i') / 60.0),
             'startStr' => $start->format('G:i'),
             'end' => $end->format('G') + ($end->format('i') / 60.0),
@@ -100,11 +101,6 @@ EO1;
         $event['duration'] = $event['end'] - $event['start'];
 
         return $event;
-    }
-
-    private function parseEvents($events)
-    {
-        return $parsedEvents;
     }
 
     /**
@@ -158,7 +154,7 @@ EO1;
             // Only add days with events
             if (!array_key_exists($e['dow'], $parsedEvents)) {
                 $parsedEvents[$e['dow']] = [];
-                $info['days'][$e['dow']] = $start->info('d/m');
+                $info['days'][$e['dow']] = $e['dayMonth'];
             }
 
             $parsedEvents[$e['dow']][] = $e;
