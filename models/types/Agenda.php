@@ -44,6 +44,8 @@ EO1;
     private static $translit;
     private $color = [];
     private $opts;
+    private $overlapScanOffset = 0.1;
+    private $tz;
 
     /**
      * {@inheritdoc}
@@ -72,11 +74,45 @@ EO1;
     }
 
     /**
+     * Extract data from ical event.
+     *
+     * @param array $e ical event
+     *
+     * @return array parsed event
+     */
+    private function parseEvent($e)
+    {
+        // Convert timezones
+        $start = (new \DateTime($e->dtstart))->setTimeZone($this->tz);
+        $end = (new \DateTime($e->dtend))->setTimeZone($this->tz);
+
+        // Event info
+        $event = [
+            'dow' => $start->format('w') - 1,
+            'start' => $start->format('G') + ($start->format('i') / 60.0),
+            'startStr' => $start->format('G:i'),
+            'end' => $end->format('G') + ($end->format('i') / 60.0),
+            'endStr' => $end->format('G:i'),
+            'name' => self::filter($e->summary, 'name'),
+            'locations' => self::arrayFilter(explode(',', $e->location), 'location'),
+            'desc' => self::arrayFilter(explode(PHP_EOL, $e->description), 'description'),
+        ];
+        $event['duration'] = $event['end'] - $event['start'];
+
+        return $event;
+    }
+
+    private function parseEvents($events)
+    {
+        return $parsedEvents;
+    }
+
+    /**
      * Read .ical data and parse to day-based array.
      *
      * @param string $data ical raw data
      *
-     * @return array events
+     * @return array agenda
      */
     public function parseIcal($data)
     {
@@ -92,7 +128,7 @@ EO1;
         }
 
         // Use own timezone to display
-        $tz = new \DateTimeZone(ini_get('date.timezone'));
+        $this->tz = new \DateTimeZone(ini_get('date.timezone'));
         // Always transliterate text contents
         self::$translit = \Transliterator::create('Latin-ASCII');
         if (!self::$translit) {
@@ -100,7 +136,7 @@ EO1;
         }
 
         // Base agenda format info
-        $format = [
+        $info = [
             'minHour' => self::HOUR_MIN,
             'maxHour' => self::HOUR_MAX,
             'days' => [],
@@ -108,44 +144,115 @@ EO1;
 
         $parsedEvents = [];
 
-        foreach ($events as $e) {
-            // Convert timezones
-            $start = (new \DateTime($e->dtstart))->setTimeZone($tz);
-            $end = (new \DateTime($e->dtend))->setTimeZone($tz);
-
-            // Event info
-            $b = [
-                'dow' => $start->format('w') - 1,
-                'start' => $start->format('G') + ($start->format('i') / 60.0),
-                'startStr' => $start->format('G:i'),
-                'end' => $end->format('G') + ($end->format('i') / 60.0),
-                'endStr' => $end->format('G:i'),
-                'name' => self::filter($e->summary, 'name'),
-                'locations' => self::arrayFilter(explode(',', $e->location), 'location'),
-                'desc' => self::arrayFilter(explode(PHP_EOL, $e->description), 'description'),
-            ];
-            $b['duration'] = $b['end'] - $b['start'];
+        foreach ($events as $event) {
+            $e = $this->parseEvent($event);
 
             // Adjust agenda format based on events
-            if ($b['start'] < $format['minHour']) {
-                $format['minHour'] = $b['start'];
+            if ($e['start'] < $info['minHour']) {
+                $info['minHour'] = $e['start'];
             }
-            if ($b['end'] > $format['maxHour']) {
-                $format['maxHour'] = $b['end'];
+            if ($e['end'] > $info['maxHour']) {
+                $info['maxHour'] = $e['end'];
             }
 
             // Only add days with events
-            if (!array_key_exists($b['dow'], $parsedEvents)) {
-                $parsedEvents[$b['dow']] = [];
-                $format['days'][$b['dow']] = $start->format('d/m');
+            if (!array_key_exists($e['dow'], $parsedEvents)) {
+                $parsedEvents[$e['dow']] = [];
+                $info['days'][$e['dow']] = $start->info('d/m');
             }
 
-            $parsedEvents[$b['dow']][] = $b;
+            $parsedEvents[$e['dow']][] = $e;
         }
 
-        $format['dayLen'] = $format['maxHour'] - $format['minHour'];
+        return ['info' => $info, 'events' => $parsedEvents];
+    }
 
-        return ['info' => $format, 'events' => $parsedEvents];
+    /**
+     * Loop through day events and tag with overlaps.
+     *
+     * @param array $events
+     * @param int   $from   start hour
+     * @param int   $to     end hour
+     *
+     * @return array tagged events
+     */
+    private function tagOverlaps($events, $from, $to)
+    {
+        // Scan each 0.1h for overlapping events
+        for ($i = $from; $i <= $to; $i += $this->overlapScanOffset) {
+            // $overlap is every overlapping event
+            $overlap = [];
+            foreach ($events as $k => $e) {
+                if ($e['start'] < $i && $i < $e['end']) {
+                    $overlap[] = $k;
+                }
+            }
+
+            // $overlaps is maximum concurrent overlappings
+            // Used to fix block width
+            $overlaps = count($overlap);
+
+            foreach ($events as $k => $e) {
+                if ($e['start'] < $i && $i < $e['end']) {
+                    if (!array_key_exists('overlaps', $e)) {
+                        $e['overlaps'] = $overlaps;
+                        $e['overlap'] = $overlap;
+                    } else {
+                        if ($overlaps >= $e['overlaps']) {
+                            $e['overlaps'] = $overlaps;
+                        }
+                        // Merge overlap to always get full range of overlapping events
+                        // Used to calculate block position
+                        $e['overlap'] = array_unique(array_merge($e['overlap'], $overlap));
+                    }
+
+                    $events[$k] = $e;
+                }
+            }
+        }
+
+        return $events;
+    }
+
+    /**
+     * Loop through day events and scan for open position.
+     *
+     * @param array $events
+     *
+     * @return array positionned blocks
+     */
+    private function positionBlocks($events)
+    {
+        foreach ($events as $k => $e) {
+            if ($e['overlaps'] < 2) {
+                // No overlap, easy mode
+                $e['position'] = 0;
+                $events[$k] = $e;
+                continue;
+            }
+
+            if (array_key_exists('position', $e)) {
+                // Position already set, don't touch
+                continue;
+            }
+
+            // Find available spots for this event
+            $spots = range(0, $e['overlaps'] - 1);
+            $overlapCount = count($e['overlap']);
+            for ($i = 0; $i < $overlapCount; ++$i) {
+                $overlaped = $events[$e['overlap'][$i]];
+                if (array_key_exists('position', $overlaped)) {
+                    unset($spots[$overlaped['position']]);
+                }
+            }
+
+            // Take first one
+            $e['position'] = array_shift($spots);
+
+            $events[$k] = $e;
+        }
+
+        return $events;
     }
 
     /**
@@ -157,8 +264,6 @@ EO1;
      */
     public function blockize($agenda)
     {
-        $scanOffset = 0.1;
-
         $blocks = [];
 
         foreach ($agenda['events'] as $day => $events) {
@@ -167,69 +272,9 @@ EO1;
                 return strcmp($a['desc'][0], $b['desc'][0]);
             });
 
-            // Scan each 0.1h for overlapping events
-            for ($i = $agenda['info']['minHour']; $i <= $agenda['info']['maxHour']; $i += $scanOffset) {
-                // $overlap is every overlapping event
-                $overlap = [];
-                foreach ($events as $k => $e) {
-                    if ($e['start'] < $i && $i < $e['end']) {
-                        $overlap[] = $k;
-                    }
-                }
+            $events = $this->tagOverlaps($events, $agenda['info']['minHour'], $agenda['info']['maxHour']);
 
-                // $overlaps is maximum concurrent overlappings
-                // Used to fix block width
-                $overlaps = count($overlap);
-
-                foreach ($events as $k => $e) {
-                    if ($e['start'] < $i && $i < $e['end']) {
-                        if (!array_key_exists('overlaps', $e)) {
-                            $e['overlaps'] = $overlaps;
-                            $e['overlap'] = $overlap;
-                        } else {
-                            if ($overlaps >= $e['overlaps']) {
-                                $e['overlaps'] = $overlaps;
-                            }
-                            // Merge overlap to always get full range of overlapping events
-                            // Used to calculate block position
-                            $e['overlap'] = array_unique(array_merge($e['overlap'], $overlap));
-                        }
-
-                        $events[$k] = $e;
-                    }
-                }
-            }
-
-            foreach ($events as $k => $e) {
-                if ($e['overlaps'] < 2) {
-                    // No overlap, easy mode
-                    $e['position'] = 0;
-                    $events[$k] = $e;
-                    continue;
-                }
-
-                if (array_key_exists('position', $e)) {
-                    // Position already set, don't touch
-                    continue;
-                }
-
-                // Find available spots for this event
-                $spots = range(0, $e['overlaps'] - 1);
-                $overlapCount = count($e['overlap']);
-                for ($i = 0; $i < $overlapCount; ++$i) {
-                    $overlaped = $events[$e['overlap'][$i]];
-                    if (array_key_exists('position', $overlaped)) {
-                        unset($spots[$overlaped['position']]);
-                    }
-                }
-
-                // Take first one
-                $e['position'] = array_shift($spots);
-
-                $events[$k] = $e;
-            }
-
-            $blocks[$day] = $events;
+            $blocks[$day] = $this->positionBlocks($events);
         }
 
         return $blocks;
@@ -245,12 +290,17 @@ EO1;
     private function renderHoursColumn($agenda)
     {
         $hourColumnIntervals = 0.25;
+        $min = $agenda['info']['minHour'];
+        $max = $agenda['info']['maxHour'];
+        $len = $max - $min;
+
         $h = '<div class="agenda-time"><div class="agenda-time-header">&nbsp;</div><div class="agenda-time-contents">';
-        for ($i = floor($agenda['info']['minHour']); $i < ceil($agenda['info']['maxHour']); $i += $hourColumnIntervals) {
+        for ($i = floor($min); $i < ceil($max); $i += $hourColumnIntervals) {
             if (fmod($i, 1) == 0) {
-                $h .= '<div class="agenda-time-h" style="top: '.((($i - $agenda['info']['minHour']) / $agenda['info']['dayLen']) * 100).'%;">'.$i.'h</div>';
+                $h .= '<div class="agenda-time-h" style="top: '.((($i - $min) / $len) * 100).'%;">'.$i.'h</div>';
             } else {
-                $h .= '<div class="agenda-time-m" style="top: '.((($i - $agenda['info']['minHour']) / $agenda['info']['dayLen']) * 100).'%; width: '.(fmod($i, 0.5) == 0 ? 40 : 20).'%;"></div>';
+                $width = fmod($i, 0.5) == 0 ? 40 : 20;
+                $h .= '<div class="agenda-time-m" style="top: '.((($i - $$min) / $len) * 100).'%; width: '.$width.'%;"></div>';
             }
         }
         $h .= '</div></div>';
@@ -268,17 +318,22 @@ EO1;
     private function renderEvents($agenda)
     {
         $hourIntervals = 1;
+        $min = $agenda['info']['minHour'];
+        $max = $agenda['info']['maxHour'];
+        $len = $max - $min;
 
         $h = '';
         foreach ($agenda['events'] as $day => $events) {
+            // Draw day header
             $h .= '<div class="agenda-day" id="day-'.$day.'">'.
                 '<div class="agenda-day-header">'.\Yii::t('app', self::DAYS[$day]).' '.$agenda['info']['days'][$day].'</div>'.
                 '<div class="agenda-day-contents">';
 
+            // Draw events
             foreach ($events as $e) {
                 $style = [
-                    'top' => ((($e['start'] - $agenda['info']['minHour']) / $agenda['info']['dayLen']) * 100).'%',
-                    'bottom' => ((($agenda['info']['maxHour'] - $e['end']) / $agenda['info']['dayLen']) * 100).'%',
+                    'top' => ((($e['start'] - $min) / $len) * 100).'%',
+                    'bottom' => ((($max - $e['end']) / $len) * 100).'%',
                     'left' => ($e['position'] / $e['overlaps'] * 100).'%',
                     'right' => ((1 - ($e['position'] + 1) / $e['overlaps']) * 100).'%',
                     'background-color' => $this->getColor($e['desc'][0]),
@@ -304,8 +359,9 @@ EO1;
                 $h .= '<div class="agenda-event" style="'.$styleStr.'">'.implode('', $content).'</div>';
             }
 
-            for ($i = floor($agenda['info']['minHour']) + 1; $i < ceil($agenda['info']['maxHour']); $i += $hourIntervals) {
-                $h .= '<div class="agenda-time-trace" style="top: '.((($i - $agenda['info']['minHour']) / $agenda['info']['dayLen']) * 100).'%;"></div>';
+            // Draw background hour traces
+            for ($i = floor($min) + 1; $i < ceil($max); $i += $hourIntervals) {
+                $h .= '<div class="agenda-time-trace" style="top: '.((($i - $min) / $len) * 100).'%;"></div>';
             }
 
             $h .= '</div></div>';
