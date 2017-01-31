@@ -410,9 +410,15 @@ EO1;
      */
     public function genAgenda($url)
     {
+        if (!$url) {
+            return null;
+        }
         $this->opts = \Yii::$app->params['agenda'];
 
         $content = self::downloadContent($url);
+        if (!$content) {
+            return null;
+        }
 
         $agenda = $this->parseIcal($content);
         if (!$agenda) {
