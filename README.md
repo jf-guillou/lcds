@@ -174,7 +174,8 @@ I recommend using the [minibian](https://minibianpi.wordpress.com/) OS. Trimmed 
 As of today, the latest version is [Minibian 2016-03-12](https://minibianpi.wordpress.com/2016/03/12/minibian-2016-03-12-is-out/), [direct download](https://sourceforge.net/projects/minibian/files/2016-03-12-jessie-minibian.tar.gz/download)
 
 - Burn this image on a 4Gb or more µSD card using the [appropriate tool](https://minibianpi.wordpress.com/setup/)
-- Login using root / raspberry
+- Connect RPi to a screen and network (DHCP)
+- Login by SSH using root / raspberry
 - Do not forget to change root password with
   `passwd`
 - Extend the partition to fill SD card
@@ -202,9 +203,8 @@ Below are the complete explanations for the commands used in the auto-install sc
 ```bash
 apt update
 apt upgrade -y
-apt install -y apt-utils raspi-config keyboard-configuration console-data rpi-update nano sudo lightdm spectrwm xwit xserver-xorg python python-tk lxterminal squid3
+apt install -y apt-utils raspi-config rpi-update nano sudo lightdm spectrwm xwit xserver-xorg python python-tk lxterminal squid3
 ```
-A GUI will ask to configure the installed packages, mainly locales.
 
 - Configure OS
 ```bash
