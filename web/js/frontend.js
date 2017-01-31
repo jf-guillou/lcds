@@ -176,7 +176,7 @@ Content.prototype.canPreload = function() {
  * @return {boolean} can display
  */
 Content.prototype.canDisplay = function() {
-  return (screen.endAt == null || Date.now() + this.duration < screen.endAt) && this.isPreloaded();
+  return (screen.endAt == null || Date.now() + this.duration < screen.endAt) && this.isPreloaded() && this.data;
 }
 
 /**
@@ -520,7 +520,7 @@ Field.prototype.pickRandomContent = function(previousData, anyUsable) {
   for (var i = 0; i < this.contents.length; i++) {
     var c = this.contents[i];
     // Skip too long, not preloaded or empty content
-    if (!c.canDisplay() || !c.data) {
+    if (!c.canDisplay()) {
       continue;
     }
 

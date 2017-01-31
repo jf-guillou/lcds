@@ -311,7 +311,7 @@ EO1;
                 $h .= '<div class="agenda-time-h" style="top: '.((($i - $min) / $len) * 100).'%;">'.$i.'h</div>';
             } else {
                 $width = fmod($i, 0.5) == 0 ? 40 : 20;
-                $h .= '<div class="agenda-time-m" style="top: '.((($i - $$min) / $len) * 100).'%; width: '.$width.'%;"></div>';
+                $h .= '<div class="agenda-time-m" style="top: '.((($i - $min) / $len) * 100).'%; width: '.$width.'%;"></div>';
             }
         }
         $h .= '</div></div>';
