@@ -474,7 +474,7 @@ Field.prototype.randomizeSortContents = function() {
  * PickNext if no content currently displayed and content is available
  */
 Field.prototype.pickNextIfNecessary = function() {
-  if (!this.timeout && this.contents.length) {
+  if (!this.timeout) {
     this.pickNext();
   }
 }
@@ -488,7 +488,10 @@ Field.prototype.pickNext = function() {
     return;
   }
 
-  this.previous = this.current;
+  // Keep track of true previous content
+  if (this.current != null) {
+    this.previous = this.current;
+  }
   this.current = null;
   var previousData = this.previous && this.previous.data;
 
