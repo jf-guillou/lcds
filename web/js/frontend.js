@@ -168,7 +168,7 @@ Content.prototype.shouldPreload = function() {
  * @return {boolean} can preload
  */
 Content.prototype.canPreload = function() {
-  return this.getResource() && this.type.search(/Video|Image|Agenda/) != -1;
+  return this.getResource() && this.type.search(/Video|Image/) != -1;
 }
 
 /**
