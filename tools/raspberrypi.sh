@@ -1,5 +1,6 @@
 #!/bin/bash
 LCDS_FRONTEND=$(whiptail --inputbox "Please input your webserver frontend address (ie: 'https://lcds-webserver/frontend')" 0 0 --nocancel 3>&1 1>&2 2>&3)
+whiptail --title "SECURITY WARNING" --msgbox "Remember to change root password with 'passwd' AND pi password with 'passwd pi' commands" 0 0 3>&1 1>&2 2>&3
 
 echo "Install and update packages"
 apt update
