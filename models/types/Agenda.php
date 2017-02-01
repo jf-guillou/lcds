@@ -18,7 +18,7 @@ class Agenda extends ContentType
 
     public $html = '<div class="agenda">%data%</div>';
     public $css = <<<'EO1'
-%field% .agenda { width: 100%; height: 100%; text-align: center; background-color: white; }
+%field% .agenda { width: 100%; height: 100%; text-align: center; background-color: white; color: black; }
 %field% .agenda-header { font-weight: bold; }
 %field% .agenda-contents { width: 100%; height: calc(100% - 1.3em); display: table; table-layout: fixed; border-collapse: collapse; }
 %field% .agenda-time { display: table-cell; width: 2.2em;  border: solid 1px black; }
