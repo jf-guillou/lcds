@@ -4,7 +4,7 @@ whiptail --title "SECURITY WARNING" --msgbox "Remember to change root password w
 
 echo "Install and update packages"
 apt update
-apt install -y apt-utils raspi-config
+apt install -y apt-utils raspi-config keyboard-configuration
 raspi-config nonint do_memory_split 128
 raspi-config nonint do_change_timezone
 raspi-config nonint do_overscan 1

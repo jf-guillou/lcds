@@ -203,7 +203,7 @@ Below are the complete explanations for the commands used in the auto-install sc
 ```bash
 apt update
 apt upgrade -y
-apt install -y apt-utils raspi-config rpi-update nano sudo lightdm spectrwm xwit xserver-xorg python python-tk lxterminal squid3
+apt install -y apt-utils raspi-config keyboard-configuration rpi-update nano sudo lightdm spectrwm xwit xserver-xorg python python-tk lxterminal squid3
 ```
 
 - Configure OS
