@@ -110,7 +110,7 @@ class UserController extends Controller
         $model = new UserLogin();
 
         if ($model->load(Yii::$app->request->post()) && $model->validate(['username'])) {
-            if (!User::findIdentity($model->username)) {
+            if (!User::findOne($model->username)) {
                 if (($user = User::findInLdap($model->username)) !== null) {
                     $user->save(false);
 
