@@ -91,6 +91,24 @@ class Device extends \yii\db\ActiveRecord
     }
 
     /**
+     * Check if device still has rights to view screen.
+     *
+     * @param int $id screen id
+     *
+     * @return bool can view screen
+     */
+    public function canViewScreen($id)
+    {
+        foreach ($this->screens as $s) {
+            if ($id === $s->id) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Get next screen for this device.
      *
      * @param int $currentScreenId
