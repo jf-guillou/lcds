@@ -495,12 +495,12 @@ Preload.prototype.next = function() {
  * Preload states
  */
 Preload.state = {
-  PRELOADING: -2,
-  PRELOADING_QUEUE: -3,
-  HTTP_FAIL: -4,
-  NO_EXPIRE_HEADER: -5,
-  OK: -6,
-  NO_CONTENT: -7,
+  WAIT_PRELOADER: 1
+  PRELOADING: 2,
+  PRELOADING_QUEUE: 3,
+  OK: 4,
+  NO_CONTENT: 5,
+  HTTP_FAIL: 6,
 }
 
 
