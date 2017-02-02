@@ -1,16 +1,18 @@
-/** global: updateScreenUrl */
+/** global: updateScreenUrl hasPreloader */
 
 /**
  * Screen class constructor
  * @param {string} updateScreenUrl global screen update checks url
  */
-function Screen(updateScreenUrl) {
+function Screen(updateScreenUrl, withPreloader) {
   this.fields = [];
   this.url = updateScreenUrl;
+  this.waitPreloader = withPreloader;
   this.lastChanges = null;
   this.endAt = null;
   this.nextUrl = null;
   this.cache = new Preload();
+  this.modern = navigator.userAgent.toLowerCase().indexOf('kweb') == -1;
 }
 
 /**
@@ -67,6 +69,8 @@ Screen.prototype.reloadIn = function(minDuration) {
       this.endAt = f.endAt;
     }
   }
+
+  console.log('Screen reload at', this.endAt);
 
   this.reloadOnTimeout();
 }
@@ -136,6 +140,10 @@ Screen.prototype.isAllFieldsStuck = function() {
   }
 
   return true;
+}
+
+Screen.prototype.newPreloader = function() {
+
 }
 
 
@@ -284,6 +292,18 @@ Content.prototype.queuePreload = function() {
  */
 function Preload() {
   this.cache = {};
+  this.initLag = true;
+  var ws = new WebSocket("ws://127.0.0.1:8089/ws");
+  ws.onopen = function(e) {
+    screen.cache.externalPreloader = ws;
+    screen.cache.preloadReady();
+  }
+  ws.onclose = function(e) {
+    screen.cache.externalPreloader = null;
+  }
+  ws.onmessage = function(e) {
+    screen.cache.externalOnMessage(e.data);
+  }
 }
 
 /**
@@ -342,13 +362,83 @@ Preload.prototype.hasPreloadingContent = function(withQueue) {
 }
 
 /**
- * Preload a resource by ajax get on the url
- * Check HTTP return state to validate proper cache
+ * Preload a resource
  * @param {string} res resource url
  */
 Preload.prototype.preload = function(res) {
   this.setState(res, Preload.state.PRELOADING);
 
+  if (!screen.waitPreloader) {
+    this.pickPreloaderAndPreload(res);
+  }
+}
+
+Preload.prototype.pickPreloaderAndPreload = function(res) {
+  if (this.externalPreloader) {
+    this.preloadExternal(res);
+  } else if (screen.modern) {
+    this.preloadPrefetch(res);
+  } else {
+    this.preloadAjax(res);
+  }
+}
+
+/**
+ * Preload a resource by calling external preloader
+ * @param {string} res resource url
+ */
+Preload.prototype.preloadExternal = function(res) {
+  this.externalPreloader.send(JSON.stringify({
+    res: res,
+  }));
+}
+
+/**
+ * Acknowledge resource preloading after external preloader report
+ * @param  {string} data preloader response
+ */
+Preload.prototype.externalOnMessage = function(data) {
+  var j = JSON.parse(data);
+  if (j.res) {
+    switch (j.state) {
+      case Preload.state.NO_CONTENT:
+      case Preload.state.HTTP_FAIL:
+      case Preload.state.OK:
+        screen.cache.setState(j.res, j.state);
+        if (j.state == Preload.state.OK) {
+          screen.newContentTrigger();
+        }
+        screen.cache.preloadNext();
+    }
+  }
+}
+
+/**
+ * Preload a resource by addinh a <link rel="prefetch"> tag
+ * @param {string} res resource url
+ */
+Preload.prototype.preloadPrefetch = function(res) {
+  $('body').append(
+    $('<link>', {
+      rel: 'prefetch',
+      href: res
+    }).load(function() {
+      screen.cache.setState(res, Preload.state.OK);
+      screen.newContentTrigger();
+      screen.cache.preloadNext();
+    }).error(function() {
+      screen.cache.setState(res, Preload.state.HTTP_FAIL);
+      screen.cache.preloadNext();
+    })
+  );
+}
+
+/**
+ * Preload a resource by ajax get on the url
+ * Check HTTP return state to validate proper cache
+ * @param {string} res resource url
+ */
+Preload.prototype.preloadAjax = function(res) {
   $.ajax(res).done(function(data) {
     // Preload success
     if (data === '') {
@@ -499,10 +589,12 @@ Field.prototype.pickNext = function() {
 
   if (this.next) {
     // Overwrite field with newly picked content
+    console.log('F', this.id, 'going to display C', this.next.id);
     this.displayNext();
     this.stuck = false;
   } else {
     // I am stuck, don't know what to display
+    console.log('F', this.id, 'is stuck');
     this.stuck = true;
     // Check other fields for stuckiness state
     if (screen.isAllFieldsStuck() && !screen.cache.hasPreloadingContent(true)) {
@@ -562,6 +654,7 @@ Field.prototype.pickRandomContent = function(previousData, anyUsable) {
 Field.prototype.displayNext = function() {
   var f = this;
   if (this.next && this.next.duration > 0) {
+    console.log('F', this.id, 'displaying C', this.next.id, 'for D', this.next.duration);
     this.current = this.next
     this.next = null;
     this.display(this.current.data);
@@ -589,7 +682,7 @@ Field.prototype.display = function(data) {
   $bt.parent().textfill({
     minFontPixels: minPx,
     maxFontPixels: maxPx,
- });
+  });
 }
 
 // Global screen instance
@@ -601,7 +694,7 @@ var screen = null;
  * Setup updates interval timeouts
  */
 function onLoad() {
-  screen = new Screen(updateScreenUrl);
+  screen = new Screen(updateScreenUrl, hasPreloader);
   // Init
   $('.field').each(function() {
     var f = new Field($(this));
