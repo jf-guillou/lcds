@@ -1,13 +1,12 @@
-/** global: updateScreenUrl hasPreloader */
+/** global: updateScreenUrl */
 
 /**
  * Screen class constructor
  * @param {string} updateScreenUrl global screen update checks url
  */
-function Screen(updateScreenUrl, withPreloader) {
+function Screen(updateScreenUrl) {
   this.fields = [];
   this.url = updateScreenUrl;
-  this.waitPreloader = withPreloader;
   this.lastChanges = null;
   this.endAt = null;
   this.nextUrl = null;
@@ -140,10 +139,6 @@ Screen.prototype.isAllFieldsStuck = function() {
   }
 
   return true;
-}
-
-Screen.prototype.newPreloader = function() {
-
 }
 
 
@@ -694,7 +689,7 @@ var screen = null;
  * Setup updates interval timeouts
  */
 function onLoad() {
-  screen = new Screen(updateScreenUrl, hasPreloader);
+  screen = new Screen(updateScreenUrl);
   // Init
   $('.field').each(function() {
     var f = new Field($(this));
