@@ -209,7 +209,8 @@ Content.prototype.getResource = function() {
   return src;
 }
 
-/** Set content cache status
+/**
+ * Set content cache status
  * @param {string} state preload state
  */
 Content.prototype.setPreloadState = function(state) {
@@ -287,17 +288,25 @@ Content.prototype.queuePreload = function() {
  */
 function Preload() {
   this.cache = {};
-  this.initLag = true;
-  var ws = new WebSocket("ws://127.0.0.1:8089/ws");
-  ws.onopen = function(e) {
-    screen.cache.externalPreloader = ws;
-    screen.cache.preloadReady();
-  }
-  ws.onclose = function(e) {
-    screen.cache.externalPreloader = null;
-  }
-  ws.onmessage = function(e) {
-    screen.cache.externalOnMessage(e.data);
+  if (screen.modern) {
+    this.preload = this.preloadPrefetch;
+
+    this.preloaderReady();
+  } else {
+    var ws = new WebSocket("ws://127.0.0.1:8089/ws");
+    ws.onopen = function(e) {
+      screen.cache.externalPreloader = ws;
+      screen.cache.preload = screen.cache.preloadExternal;
+      screen.cache.preloaderReady();
+    }
+    ws.onclose = function(e) {
+      screen.cache.externalPreloader = null;
+      screen.cache.preload = screen.cache.preloadAjax;
+      screen.cache.preloaderReady();
+    }
+    ws.onmessage = function(e) {
+      screen.cache.externalOnMessage(e.data);
+    }
   }
 }
 
@@ -338,6 +347,15 @@ Preload.prototype.isInPreloadQueue = function(res) {
 }
 
 /**
+ * Check resource cache for queued preloading state during preloader pick phase
+ * @param  {string}  res resource url
+ * @return {boolean}     is in preload queue
+ */
+Preload.prototype.isWaiting = function(res) {
+  return this.cache[res] === Preload.state.WAIT_PRELOADER;
+}
+
+/**
  * Scan resource cache for preloading resources
  * @param  {boolean} withQueue also check preload queue
  * @return {boolean}           has any resource preloading/in preload queue
@@ -348,7 +366,7 @@ Preload.prototype.hasPreloadingContent = function(withQueue) {
       continue;
     }
 
-    if (this.isPreloading(res) || (withQueue && this.isInPreloadQueue(res))) {
+    if (this.isPreloading(res) || this.isWaiting(res) || (withQueue && this.isInPreloadQueue(res))) {
       return true;
     }
   }
@@ -358,23 +376,26 @@ Preload.prototype.hasPreloadingContent = function(withQueue) {
 
 /**
  * Preload a resource
+ * Default implementation waits for preloader pick
  * @param {string} res resource url
  */
 Preload.prototype.preload = function(res) {
-  this.setState(res, Preload.state.PRELOADING);
-
-  if (!screen.waitPreloader) {
-    this.pickPreloaderAndPreload(res);
-  }
+  this.setState(res, Preload.state.WAIT_PRELOADER);
 }
 
-Preload.prototype.pickPreloaderAndPreload = function(res) {
-  if (this.externalPreloader) {
-    this.preloadExternal(res);
-  } else if (screen.modern) {
-    this.preloadPrefetch(res);
-  } else {
-    this.preloadAjax(res);
+/**
+ * Triggered on preloader picked
+ * Restarts preload queue processing
+ */
+Preload.prototype.preloaderReady = function() {
+  for (var res in this.cache) {
+    if (!this.cache.hasOwnProperty(res)) {
+      continue;
+    }
+
+    if (this.isWaiting(res)) {
+      this.preload(res);
+    }
   }
 }
 
@@ -383,6 +404,7 @@ Preload.prototype.pickPreloaderAndPreload = function(res) {
  * @param {string} res resource url
  */
 Preload.prototype.preloadExternal = function(res) {
+  this.setState(res, Preload.state.PRELOADING);
   this.externalPreloader.send(JSON.stringify({
     res: res,
   }));
@@ -405,6 +427,8 @@ Preload.prototype.externalOnMessage = function(data) {
         }
         screen.cache.preloadNext();
     }
+  } else {
+    this.preload = this.preloadAjax;
   }
 }
 
@@ -413,6 +437,7 @@ Preload.prototype.externalOnMessage = function(data) {
  * @param {string} res resource url
  */
 Preload.prototype.preloadPrefetch = function(res) {
+  this.setState(res, Preload.state.PRELOADING);
   $('body').append(
     $('<link>', {
       rel: 'prefetch',
@@ -434,6 +459,7 @@ Preload.prototype.preloadPrefetch = function(res) {
  * @param {string} res resource url
  */
 Preload.prototype.preloadAjax = function(res) {
+  this.setState(res, Preload.state.PRELOADING);
   $.ajax(res).done(function(data) {
     // Preload success
     if (data === '') {
