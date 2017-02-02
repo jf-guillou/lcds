@@ -2,9 +2,11 @@
 
 import os
 import sys
-import subprocess
+import signal
 import urllib
 import urlparse
+import subprocess
+from threading import Timer
 
 def getScreenDimensions():
   if not os.environ.has_key('SCREEN_WIDTH_PX') or not os.environ.has_key('SCREEN_HEIGHT_PX'):
@@ -19,6 +21,14 @@ def getScreenDimensions():
     return w, h
   else:
     return int(os.environ.get('SCREEN_WIDTH_PX')), int(os.environ.get('SCREEN_HEIGHT_PX'))
+
+def kill(pid):
+  p "Kill"
+  try:
+    #p.kill()
+    os.killpg(os.getpgid(pid), signal.SIGINT)
+  except OSError:
+    pass # ignore kill failure
 
 args = sys.argv
 url = urlparse.urlparse(args[-1])
@@ -39,11 +49,15 @@ for param in query:
 url = url._replace(fragment='')
 args[-1] = url.geturl()
 
+timeout = 0
 for (key, value) in params.items():
   if key == 'win':
     x1, y1, x2, y2 = (float(v) for v in value.split(','))
     w, h = getScreenDimensions()
     value = ','.join(str(int(round(v))) for v in [x1*w, y1*h, x2*w, y2*h])
+  if key == 'timeout':
+    timeout = int(value)
+    continue
 
   if value is '':
     args.insert(1, '--'+key)
@@ -51,4 +65,11 @@ for (key, value) in params.items():
     args.insert(1, '--'+key+'='+value)
 
 args[0] = '/usr/bin/omxplayer'
-subprocess.call(args)
+p = subprocess.Popen(args)
+if timeout > 0:
+  t = Timer(timeout, kill, [p.pid])
+  t.start()
+  p.wait()
+  t.cancel()
+else:
+  p.wait()
