@@ -14,7 +14,9 @@ for c in $CONFIG ; do
 done
 
 if [ $WIFI -eq 1 ] ; then
-  whiptail --title "Wifi information" --msgbox "Using Wifi for a display signage is not recommanded. This will also only install modules, you need to configure manually by editing the /etc/wpa_supplicant/wpa_supplicant-wlan0.conf file" 0 0 3>&1 1>&2 2>&3
+  whiptail --title "Wifi information" --msgbox "Using Wifi for a display signage is not recommanded. You may need to add configuration manually by editing the /etc/wpa_supplicant/wpa_supplicant-wlan0.conf file" 0 0 3>&1 1>&2 2>&3
+  SSID=$(whiptail --inputbox "Please input your wifi SSID" 0 0 --nocancel 3>&1 1>&2 2>&3)
+  PSK=$(whiptail --inputbox "Please input your wifi password" 0 0 --nocancel 3>&1 1>&2 2>&3)
 fi
 
 # Installer configuration
@@ -121,13 +123,12 @@ fi
 if [ $WIFI -eq 1 ] ; then
 echo "Configure WIFI"
 
+
 echo "ctrl_interface=/run/wpa_supplicant
 update_config=1
 
-# FILL THIS PART
-network={
-}
 " > /etc/wpa_supplicant/wpa_supplicant-wlan0.conf
+wpa_password $SSID $PSK >> /etc/wpa_supplicant/wpa_supplicant-wlan0.conf
 echo "
 auto wlan0
 allow-hotplug wlan0

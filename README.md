@@ -346,13 +346,14 @@ fi
 if [ $WIFI -eq 1 ] ; then
 apt install -y firmware-brcm80211 pi-bluetooth wpasupplicant
 
+SSID=$(whiptail --inputbox "Please input your wifi SSID" 0 0 --nocancel 3>&1 1>&2 2>&3)
+PSK=$(whiptail --inputbox "Please input your wifi password" 0 0 --nocancel 3>&1 1>&2 2>&3)
+
 echo "ctrl_interface=/run/wpa_supplicant
 update_config=1
 
-# FILL THIS PART
-network={
-}
 " > /etc/wpa_supplicant/wpa_supplicant-wlan0.conf
+wpa_password $SSID $PSK >> /etc/wpa_supplicant/wpa_supplicant-wlan0.conf
 echo "
 auto wlan0
 allow-hotplug wlan0
