@@ -516,7 +516,7 @@ Preload.prototype.next = function() {
  * Preload states
  */
 Preload.state = {
-  WAIT_PRELOADER: 1
+  WAIT_PRELOADER: 1,
   PRELOADING: 2,
   PRELOADING_QUEUE: 3,
   OK: 4,
