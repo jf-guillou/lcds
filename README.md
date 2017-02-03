@@ -349,7 +349,7 @@ if [ $WIFI -eq 1 ] ; then
 apt install -y firmware-brcm80211 pi-bluetooth wpasupplicant
 
 SSID=$(whiptail --inputbox "Please input your wifi SSID" 0 0 --nocancel 3>&1 1>&2 2>&3)
-PSK=$(whiptail --inputbox "Please input your wifi password" 0 0 --nocancel 3>&1 1>&2 2>&3)
+PSK=$(whiptail --passwordbox "Please input your wifi password" 0 0 --nocancel 3>&1 1>&2 2>&3)
 
 echo "ctrl_interface=/run/wpa_supplicant
 update_config=1
