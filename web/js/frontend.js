@@ -290,23 +290,8 @@ function Preload(isModernBrowser) {
   this.cache = {};
   if (isModernBrowser) {
     this.preload = this.preloadPrefetch;
-
-    this.preloaderReady();
   } else {
-    var ws = new WebSocket("ws://127.0.0.1:8089/ws");
-    ws.onopen = function(e) {
-      screen.cache.externalPreloader = ws;
-      screen.cache.preload = screen.cache.preloadExternal;
-      screen.cache.preloaderReady();
-    }
-    ws.onclose = function(e) {
-      screen.cache.externalPreloader = null;
-      screen.cache.preload = screen.cache.preloadAjax;
-      screen.cache.preloaderReady();
-    }
-    ws.onmessage = function(e) {
-      screen.cache.externalOnMessage(e.data);
-    }
+    this.preload = this.preloadExternal;
   }
 }
 
@@ -405,31 +390,27 @@ Preload.prototype.preloaderReady = function() {
  */
 Preload.prototype.preloadExternal = function(res) {
   this.setState(res, Preload.state.PRELOADING);
-  this.externalPreloader.send(JSON.stringify({
-    res: res,
-  }));
-}
-
-/**
- * Acknowledge resource preloading after external preloader report
- * @param  {string} data preloader response
- */
-Preload.prototype.externalOnMessage = function(data) {
-  var j = JSON.parse(data);
-  if (j.res) {
+  $.ajax("http://127.0.0.1:8089/pf?res=" + res).done(function(j) {
     switch (j.state) {
-      case Preload.state.NO_CONTENT:
-      case Preload.state.HTTP_FAIL:
       case Preload.state.OK:
-        screen.cache.setState(j.res, j.state);
-        if (j.state == Preload.state.OK) {
-          screen.newContentTrigger();
-        }
-        screen.cache.preloadNext();
+      case Preload.state.NO_CONTENT:
+        screen.cache.setState(res, j.state);
+        screen.newContentTrigger();
+        break;
+      case Preload.state.HTTP_FAIL:
+        screen.cache.setState(res, j.state);
+        break;
+      case Preload.state.ERR:
+        screen.cache.setState(res, Preload.state.HTTP_FAIL);
+        break;
+      default:
+        return;
     }
-  } else {
-    this.preload = this.preloadAjax;
-  }
+    screen.cache.preloadNext();
+  }).fail(function() {
+    screen.cache.preload = screen.cache.preloadAjax;
+    screen.cache.preload(res);
+  });
 }
 
 /**
@@ -516,6 +497,7 @@ Preload.prototype.next = function() {
  * Preload states
  */
 Preload.state = {
+  ERR: -1,
   WAIT_PRELOADER: 1,
   PRELOADING: 2,
   PRELOADING_QUEUE: 3,
