@@ -68,8 +68,6 @@ Screen.prototype.reloadIn = function(minDuration) {
     }
   }
 
-  console.log('Screen reload at', this.endAt);
-
   this.reloadOnTimeout();
 }
 
@@ -592,12 +590,10 @@ Field.prototype.pickNext = function() {
 
   if (this.next) {
     // Overwrite field with newly picked content
-    console.log('F', this.id, 'going to display C', this.next.id);
     this.displayNext();
     this.stuck = false;
   } else {
     // I am stuck, don't know what to display
-    console.log('F', this.id, 'is stuck');
     this.stuck = true;
     // Check other fields for stuckiness state
     if (screen.isAllFieldsStuck() && !screen.cache.hasPreloadingContent(true)) {
@@ -657,7 +653,6 @@ Field.prototype.pickRandomContent = function(previousData, anyUsable) {
 Field.prototype.displayNext = function() {
   var f = this;
   if (this.next && this.next.duration > 0) {
-    console.log('F', this.id, 'displaying C', this.next.id, 'for D', this.next.duration);
     this.current = this.next
     this.next = null;
     this.display(this.current.data);
