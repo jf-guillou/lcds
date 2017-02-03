@@ -1,4 +1,4 @@
-/** global: updateScreenUrl */
+/** global: updateScreenUrl, navigator */
 
 /**
  * Screen class constructor
@@ -294,6 +294,19 @@ function Preload(isModernBrowser) {
 }
 
 /**
+ * Preload states
+ */
+Preload.state = {
+  ERR: -1,
+  WAIT_PRELOADER: 1,
+  PRELOADING: 2,
+  PRELOADING_QUEUE: 3,
+  OK: 4,
+  NO_CONTENT: 5,
+  HTTP_FAIL: 6,
+}
+
+/**
  * Set resource cache state
  * @param {string} res   resource url
  * @param {int}    state preload state
@@ -489,19 +502,6 @@ Preload.prototype.next = function() {
     }
   }
   return null;
-}
-
-/**
- * Preload states
- */
-Preload.state = {
-  ERR: -1,
-  WAIT_PRELOADER: 1,
-  PRELOADING: 2,
-  PRELOADING_QUEUE: 3,
-  OK: 4,
-  NO_CONTENT: 5,
-  HTTP_FAIL: 6,
 }
 
 
