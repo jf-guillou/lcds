@@ -267,7 +267,7 @@ for c in $CONFIG ; do
   esac
 done
 
-echo '#!/bin/bash
+echo "#!/bin/bash
 # Logs storage
 LOGS="./logs"
 
@@ -281,14 +281,14 @@ WIFI=$WIFI # 1 or 0
 PREFETCHER=$PREFETCHER # 1 or 0
 
 # Brower for kiosk mode
-BROWSER="kweb3"
+BROWSER=\"kweb3\"
 
 # Video player binaries. Should not be modified
-VIDEO="omxplayer.bin"
+VIDEO=\"omxplayer.bin\"
 
 # Frontend
-LCDS="$LCDS"
-' > /home/$DISP_USER/config.sh
+LCDS=\"$LCDS\"
+" > /home/$DISP_USER/config.sh
 chown $DISP_USER: /home/$DISP_USER/config.sh
 chmod u+x /home/$DISP_USER/config.sh
 
