@@ -269,7 +269,7 @@ done
 
 echo "#!/bin/bash
 # Logs storage
-LOGS="./logs"
+LOGS=\"./logs\"
 
 # Enable Squid
 SQUID=$SQUID # 1 or 0

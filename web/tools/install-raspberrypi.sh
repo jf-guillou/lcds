@@ -58,7 +58,7 @@ chown $DISP_USER: /home/$DISP_USER/.spectrwm.conf
 echo "Setup scripts"
 echo "#!/bin/bash
 # Logs storage
-LOGS="./logs"
+LOGS=\"./logs\"
 
 # Enable Squid
 SQUID=$SQUID # 1 or 0
