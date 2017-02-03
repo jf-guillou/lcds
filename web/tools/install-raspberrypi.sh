@@ -3,7 +3,7 @@ LCDS=$(whiptail --inputbox "Please input your webserver address (ie: 'https://lc
 CONFIG=$(whiptail --title "Configuration" --separate-output --checklist "Select configuration options" 0 0 0 \
   "WIFI" "Install wifi modules" OFF \
   "SQUID" "Use internal Squid caching proxy (Recommended)" ON \
-  "PREFETCHER" "Use internal prefectcher instead of XHR (Recommended)" 3>&1 1>&2 2>&3)
+  "PREFETCHER" "Use internal prefectcher instead of XHR (Recommended)" ON 3>&1 1>&2 2>&3)
 WIFI=0
 SQUID=0
 PREFETCHER=0
