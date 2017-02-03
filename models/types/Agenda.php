@@ -43,7 +43,6 @@ EO1;
 
     private static $translit;
     private $color = [];
-    private $opts;
     private $overlapScanOffset = 0.1;
     private $tz;
 
@@ -413,7 +412,6 @@ EO1;
         if (!$url) {
             return null;
         }
-        $this->opts = \Yii::$app->params['agenda'];
 
         $content = self::downloadContent($url);
         if (!$content) {

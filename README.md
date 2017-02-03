@@ -86,9 +86,6 @@ Edit the app configuration file `config/params.php` :
 - `useLdap` - Use LDAP for authentication backend
 - `ldapOptions` - Common options for LDAP, default values should help you understand their meaning
 - `cookieDuration` - Cookie duration in seconds, 0 will disable cookies
-- `agenda` - Agenda image renderer configuration
-  - `calendarTimezone` - Timezone input from calendar feed
-  - `displayTeachers` - Display teachers name if space is not an issue
 - `weather` - Weather renderer configuration / See https://darksky.net/dev for more details
   - `language` - Summary text language
   - `units` - Temperature units

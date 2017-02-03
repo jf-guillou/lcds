@@ -28,13 +28,6 @@ return [
     'cookieDuration' => 60 * 60 * 24 * 7,
 
     // Content types
-    // Agenda renderer
-    'agenda' => [
-        'width' => 1260,
-        'height' => 880,
-        'calendarTimezone' => 'UTC',
-        'displayTeachers' => false,
-    ],
     // Weather widget
     'weather' => [ // Get an API key at https://darksky.net/dev
         'language' => 'en',
