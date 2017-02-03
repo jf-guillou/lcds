@@ -10,8 +10,7 @@ function Screen(updateScreenUrl) {
   this.lastChanges = null;
   this.endAt = null;
   this.nextUrl = null;
-  this.cache = new Preload();
-  this.modern = navigator.userAgent.toLowerCase().indexOf('kweb') == -1;
+  this.cache = new Preload(navigator.userAgent.toLowerCase().indexOf('kweb') == -1);
 }
 
 /**
@@ -285,10 +284,11 @@ Content.prototype.queuePreload = function() {
 /**
  * Preload class constructor
  * Build cache map
+ * @param {boolean} isModernBrowser does browser support modern tags
  */
-function Preload() {
+function Preload(isModernBrowser) {
   this.cache = {};
-  if (screen.modern) {
+  if (isModernBrowser) {
     this.preload = this.preloadPrefetch;
 
     this.preloaderReady();
