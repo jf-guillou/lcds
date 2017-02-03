@@ -149,7 +149,7 @@ iface wlan0 inet manual" >> /etc/network/interfaces
 fi
 
 echo "Configure network"
-sed -i s/iface eth0 inet dhcp/iface eth0 inet manual/ /etc/network/interfaces
+sed -i s/iface\ eth0\ inet\ dhcp/iface\ eth0\ inet\ manual/ /etc/network/interfaces
 
 echo "Configure auto-shutdown"
 echo "0 18 * * 1-5 $DISP_USER touch /tmp/turnoff_display >> /home/$DISP_USER/autorun.log 2>&1

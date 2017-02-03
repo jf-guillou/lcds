@@ -383,7 +383,7 @@ fi
 
 - Configure network
 ```bash
-sed -i s/iface eth0 inet dhcp/iface eth0 inet manual/ /etc/network/interfaces
+sed -i s/iface\ eth0\ inet\ dhcp/iface\ eth0\ inet\ manual/ /etc/network/interfaces
 ```
 
 - Configure auto shutdown
