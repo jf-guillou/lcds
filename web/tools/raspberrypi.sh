@@ -2,13 +2,16 @@
 LCDS=$(whiptail --inputbox "Please input your webserver address (ie: 'https://lcds-webserver')" 0 0 --nocancel 3>&1 1>&2 2>&3)
 CONFIG=$(whiptail --title "Configuration" --separate-output --checklist "Select configuration options" 0 0 0 \
   "WIFI" "Install wifi modules" OFF \
-  "SQUID" "Use internal Squid caching proxy" ON 3>&1 1>&2 2>&3)
+  "SQUID" "Use internal Squid caching proxy (Recommended)" ON \
+  "PREFETCHER" "Use internal prefectcher instead of XHR (Recommended)" 3>&1 1>&2 2>&3)
 WIFI=0
 SQUID=0
+PREFETCHER=0
 for c in $CONFIG ; do
   case $c in
     "WIFI") WIFI=1 ;;
     "SQUID") SQUID=1 ;;
+    "PREFETCHER") PREFETCHER=1 ;;
     *) ;;
   esac
 done
@@ -63,6 +66,9 @@ SQUID=$SQUID # 1 or 0
 # Enable Wifi
 WIFI=$WIFI # 1 or 0
 
+# Use prefetcher
+PREFETCHER=$PREFETCHER # 1 or 0
+
 # Frontend
 LCDS="$LCDS"
 ' > /home/$DISP_USER/config.sh
@@ -114,6 +120,10 @@ range_offset_limit none
 " >> /etc/squid3/squid.local.conf
   echo "include /etc/squid3/squid.local.conf" >> /etc/squid3/squid.conf
 fi
+
+echo "Configure prefetcher"
+sudo $DISP_USER wget https://github.com/jf-guillou/httpPrefetch/releases/download/v0.1.0/httpPrefetch -O /home/$DISP_USER/bin/httpPrefetch
+chmod u+x /home/$DISP_USER/bin/httpPrefetch
 
 if [ $WIFI -eq 1 ] ; then
 echo "Configure WIFI"
