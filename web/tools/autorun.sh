@@ -3,9 +3,6 @@
 # Load configuration
 . ./config.sh
 
-BROWSER="kweb3"
-VIDEO="omxplayer.bin"
-
 AR_LOG=$LOGS/autorun.log
 PF_LOG=$LOGS/prefetch.log
 TURNMEOFF=/tmp/turnoff_display

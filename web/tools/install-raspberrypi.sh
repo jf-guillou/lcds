@@ -69,6 +69,12 @@ WIFI=$WIFI # 1 or 0
 # Use prefetcher
 PREFETCHER=$PREFETCHER # 1 or 0
 
+# Brower for kiosk mode
+BROWSER="kweb3"
+
+# Video player binaries. Should not be modified
+VIDEO="omxplayer.bin"
+
 # Frontend
 LCDS="$LCDS"
 ' > /home/$DISP_USER/config.sh
@@ -77,6 +83,9 @@ chmod u+x /home/$DISP_USER/config.sh
 
 sudo -u $DISP_USER wget https://raw.githubusercontent.com/jf-guillou/lcds/master/web/tools/autorun.sh -O /home/$DISP_USER/autorun.sh
 chmod u+x /home/$DISP_USER/autorun.sh
+
+sudo -u $DISP_USER wget https://raw.githubusercontent.com/jf-guillou/lcds/master/web/tools/update-raspberrypi.sh -O /home/$DISP_USER/update-raspberrypi.sh
+chmod u+x /home/$DISP_USER/update-raspberrypi.sh
 
 sudo -u $DISP_USER mkdir /home/$DISP_USER/bin
 
