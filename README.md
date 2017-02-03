@@ -188,7 +188,7 @@ Configuration of the Raspberry Pi can be mostly automated, beside some prompts f
 This will install everything and configure most options at the beginning. This whole installation can take an hour.
 
 Please also note that by default, the screen will shutdown at 6pm and reboot at 7am every weekday.
-This can be modified using [crontab -e](https://help.ubuntu.com/community/CronHowto).
+This can be modified by editing the cron file [/etc/cron.d/display_manager](https://help.ubuntu.com/community/CronHowto#Two_Other_Types_of_Crontab).
 
 ### Manual Configuration
 
@@ -388,9 +388,9 @@ sed -i s/iface eth0 inet dhcp/iface eth0 inet manual/ /etc/network/interfaces
 
 - Configure auto shutdown
 ```bash
-echo "0 18 * * 1-5 touch /tmp/turnoff_display >> /home/pi/autorun.log 2>&1
-0 7 * * 1-5 /usr/bin/sudo /sbin/reboot >> /home/pi/autorun.log 2>&1
-" >> /var/spool/cron/crontabs/root
+echo "0 18 * * 1-5 $DISP_USER touch /tmp/turnoff_display >> /home/$DISP_USER/autorun.log 2>&1
+0 7  * * 1-5 $DISP_USER /usr/bin/sudo /sbin/reboot >> /home/$DISP_USER/autorun.log 2>&1
+" > /etc/cron.d/display_manager
 ```
 This will make the screen black after 6pm and reboot the pi at 7am.
 The reboot is not mandatory, but helps a lot with the general wonkyness of the RPi.
