@@ -203,7 +203,7 @@ Below are the complete explanations for the commands used in the auto-install sc
 ```bash
 apt update
 apt upgrade -y
-apt install -y apt-utils raspi-config keyboard-configuration rpi-update nano sudo lightdm spectrwm xwit xserver-xorg python python-tk lxterminal squid3
+apt install -y apt-utils raspi-config keyboard-configuration rpi-update nano sudo lightdm spectrwm xwit xserver-xorg python python-tk lxterminal
 ```
 
 - Configure OS
@@ -220,8 +220,9 @@ passwd
 
 - Create autostart user & set its password
 ```bash
-useradd -m -s /bin/bash -G sudo -G video pi
-passwd pi
+DISP_USER=pi
+useradd -m -s /bin/bash -G sudo -G video $DISP_USER
+passwd $DISP_USER
 ```
 
 - Install browser
@@ -234,81 +235,70 @@ apt install omxplayer kweb youtube-dl
 The kweb installer may prompt for suggested packages, you should always refuse them (N).
 
 - Configure display
-**Don't forget to edit LCDS_FRONTEND value !**
 ```bash
-# Light DM autologin on user pi
-sed -i s/#autologin-user=/autologin-user=pi/ /etc/lightdm/lightdm.conf
+# Light DM autologin on user
+sed -i s/#autologin-user=/autologin-user=$DISP_USER/ /etc/lightdm/lightdm.conf
 
 # Spectrwm autostart script
 echo "
 disable_border        = 1
 bar_enabled           = 0
-autorun               = ws[1]:/home/pi/autorun.sh
-" > /home/pi/.spectrwm.conf
-chown pi: /home/pi/.spectrwm.conf
+autorun               = ws[1]:/home/$DISP_USER/autorun.sh
+" > /home/$DISP_USER/.spectrwm.conf
+chown $DISP_USER: /home/$DISP_USER/.spectrwm.conf
 ```
 
 - Setup scripts
 ```bash
-mkdir /home/pi/bin
-# Autostart script
+# Configuration
+LCDS=$(whiptail --inputbox "Please input your webserver address (ie: 'https://lcds-webserver')" 0 0 --nocancel 3>&1 1>&2 2>&3)
+CONFIG=$(whiptail --title "Configuration" --separate-output --checklist "Select configuration options" 0 0 0 \
+  "WIFI" "Install wifi modules" OFF \
+  "SQUID" "Use internal Squid caching proxy" ON 3>&1 1>&2 2>&3)
+WIFI=0
+SQUID=0
+for c in $CONFIG ; do
+  case $c in
+    "WIFI") WIFI=1 ;;
+    "SQUID") SQUID=1 ;;
+    *) ;;
+  esac
+done
+
 echo '#!/bin/bash
+# Logs storage
+LOGS="./logs"
 
-###
-# Set this value according to your installation
-###
-LCDS_FRONTEND="https://lcds-webserver/frontend"
+# Enable Squid
+SQUID=$SQUID # 1 or 0
 
-# Move cursor out of the way
-xwit -root -warp $( cat /sys/module/*fb*/parameters/fbwidth ) $( cat /sys/module/*fb*/parameters/fbheight )
+# Enable Wifi
+WIFI=$WIFI # 1 or 0
 
-# Disable DPMS / Screen blanking
-xset s off
+# Frontend
+LCDS="$LCDS"
+' > /home/$DISP_USER/config.sh
+chown $DISP_USER: /home/$DISP_USER/config.sh
+chmod u+x /home/$DISP_USER/config.sh
 
-TURNMEOFF=/tmp/turnoff_display
-rm $TURNMEOFF
+# Load configuration
+. /home/$DISP_USER/config.sh
 
-export PATH="/home/pi/bin:$PATH"
-export http_proxy="http://localhost:3128"
+# Scripts
+sudo -u $DISP_USER wget https://raw.githubusercontent.com/jf-guillou/lcds/master/web/tools/autorun.sh -O /home/$DISP_USER/autorun.sh
+chmod u+x /home/$DISP_USER/autorun.sh
 
-BROWSER="kweb3"
-LOG=/home/pi/autorun.log
-VIDEO="omxplayer.bin"
-while true; do
-  if [ -f $TURNMEOFF ]
-  then
-    if pgrep $BROWSER
-    then
-      echo "$(date "+%F %T") : Killing $BROWSER now" >> $LOG
-      pgrep $VIDEO && kill -9 $(pidof $VIDEO) # Kill player first if necessary
-      kill -1 $(pidof $BROWSER) # Kill browser
-      xset dpms force off # Disable X
-      tvservice -o # Turn off screen
-    fi
-  else
-    if ! pgrep $BROWSER
-    then
-      echo "$(date "+%F %T") : Start $BROWSER now" >> $LOG
-      tvservice -p # Turn on screen
-      sleep 5
-      xset -dpms
-      sleep 5
-      $BROWSER $LCDS_FRONTEND & # Start browser on frontend
-    fi
-  fi
-  sleep 10
-done;
-' > /home/pi/autorun.sh
+sudo -u $DISP_USER mkdir /home/$DISP_USER/bin
 
-chown pi: /home/pi/autorun.sh
-chmod u+x /home/pi/autorun.sh
+sudo -u $DISP_USER wget https://raw.githubusercontent.com/jf-guillou/lcds/master/web/tools/connectivity.sh -O /home/$DISP_USER/bin/connectivity.sh
+chmod u+x /home/$DISP_USER/bin/connectivity.sh
 ```
 
 - Configure browser in kiosk mode
 ```bash
-echo "-JEKR+-zbhrqfpoklgtjneduwxyavcsmi#?!.," > /home/pi/.kweb.conf
+echo "-JEKR+-zbhrqfpoklgtjneduwxyavcsmi#?!.," > /home/$DISP_USER/.kweb.conf
 
-chown pi: /home/pi/.kweb.conf
+chown $DISP_USER: /home/$DISP_USER/.kweb.conf
 ```
 
 - Configure media player
@@ -320,14 +310,15 @@ useAudioplayer = False
 useVideoplayer = False
 " >> /usr/local/bin/kwebhelper_settings.py
 
-wget https://raw.githubusercontent.com/jf-guillou/lcds/master/tools/omxplayer -O /home/pi/bin/omxplayer
-
-chown pi: /home/pi/bin/omxplayer
-chmod u+x /home/pi/bin/omxplayer
+sudo $DISP_USER wget https://raw.githubusercontent.com/jf-guillou/lcds/master/web/tools/omxplayer -O /home/$DISP_USER/bin/omxplayer
+chmod u+x /home/$DISP_USER/bin/omxplayer
 ```
 
 - Configure local proxy
 ```bash
+if [ $SQUID -eq 1 ] ; then
+apt install -y squid3
+
 echo "http_port 127.0.0.1:3128
 
 acl localhost src 127.0.0.1
@@ -347,6 +338,31 @@ strip_query_terms off
 range_offset_limit none
 " >> /etc/squid3/squid.local.conf
 echo "include /etc/squid3/squid.local.conf" >> /etc/squid3/squid.conf
+fi
+```
+
+- Configure Wifi
+```bash
+if [ $WIFI -eq 1 ] ; then
+apt install -y firmware-brcm80211 pi-bluetooth wpasupplicant
+
+echo "ctrl_interface=/run/wpa_supplicant
+update_config=1
+
+# FILL THIS PART
+network={
+}
+" > /etc/wpa_supplicant/wpa_supplicant-wlan0.conf
+echo "
+auto wlan0
+allow-hotplug wlan0
+iface wlan0 inet manual" >> /etc/network/interfaces
+fi
+```
+
+- Configure network
+```bash
+sed -i s/iface eth0 inet dhcp/iface eth0 inet manual/ /etc/network/interfaces
 ```
 
 - Configure auto shutdown
@@ -364,4 +380,5 @@ rpi-update && reboot
 ```
 
 - Ready
+If 
 The browser should start, register with lcds server and display the authorization screen.
