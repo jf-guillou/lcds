@@ -18,8 +18,8 @@ done
 
 if [ $WIFI -eq 1 ] ; then
   whiptail --title "Wifi information" --msgbox "Using Wifi for a display signage is not recommanded. You may need to add configuration manually by editing the /etc/wpa_supplicant/wpa_supplicant-wlan0.conf file" 0 0 3>&1 1>&2 2>&3
-  SSID=$(whiptail --inputbox "Please input your wifi SSID" 0 0 --nocancel 3>&1 1>&2 2>&3)
-  PSK=$(whiptail --passwordbox "Please input your wifi password" 0 0 --nocancel 3>&1 1>&2 2>&3)
+  SSID=$(whiptail --inputbox "Please input your wifi SSID" 8 0 --nocancel 3>&1 1>&2 2>&3)
+  PSK=$(whiptail --passwordbox "Please input your wifi password" 8 0 --nocancel 3>&1 1>&2 2>&3)
 fi
 
 # Installer configuration
