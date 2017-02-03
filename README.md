@@ -318,9 +318,9 @@ chmod u+x /home/$DISP_USER/bin/omxplayer
 
 - Configure local proxy
 ```bash
-if [ $SQUID -eq 1 ] ; then
 apt install -y squid3
 
+if [ $SQUID -eq 1 ] ; then
 echo "http_port 127.0.0.1:3128
 
 acl localhost src 127.0.0.1
@@ -345,9 +345,9 @@ fi
 
 - Configure Wifi
 ```bash
-if [ $WIFI -eq 1 ] ; then
 apt install -y firmware-brcm80211 pi-bluetooth wpasupplicant
 
+if [ $WIFI -eq 1 ] ; then
 SSID=$(whiptail --inputbox "Please input your wifi SSID" 0 0 --nocancel 3>&1 1>&2 2>&3)
 PSK=$(whiptail --passwordbox "Please input your wifi password" 0 0 --nocancel 3>&1 1>&2 2>&3)
 

@@ -32,13 +32,7 @@ raspi-config nonint do_change_timezone
 raspi-config nonint do_overscan 1
 apt install -y keyboard-configuration console-data
 apt upgrade -y
-apt install -y rpi-update nano sudo lightdm spectrwm xserver-xorg xwit python python-tk lxterminal
-if [ $SQUID -eq 1 ] ; then
-  apt install -y squid3
-fi
-if [ $WIFI -eq 1 ] ; then
-  apt install -y firmware-brcm80211 pi-bluetooth wpasupplicant
-fi
+apt install -y rpi-update nano sudo lightdm spectrwm xserver-xorg xwit python python-tk lxterminal squid3 firmware-brcm80211 pi-bluetooth wpasupplicant
 
 echo "Create autorun user"
 useradd -m -s /bin/bash -G sudo -G video $DISP_USER
