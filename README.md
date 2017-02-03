@@ -186,7 +186,7 @@ As of today, the latest version is [Minibian 2016-03-12](https://minibianpi.word
 
 Configuration of the Raspberry Pi can be mostly automated, beside some prompts for specific details :
 
-`wget "https://raw.githubusercontent.com/jf-guillou/lcds/master/tools/raspberrypi.sh" -O - | bash -s -`
+`wget "https://raw.githubusercontent.com/jf-guillou/lcds/master/web/tools/raspberrypi.sh" -O - | bash -s -`
 
 This will install everything and configure most options at the beginning. This whole installation can take an hour.
 
@@ -353,7 +353,7 @@ echo "ctrl_interface=/run/wpa_supplicant
 update_config=1
 
 " > /etc/wpa_supplicant/wpa_supplicant-wlan0.conf
-wpa_password $SSID $PSK >> /etc/wpa_supplicant/wpa_supplicant-wlan0.conf
+wpa_password "$SSID" "$PSK" >> /etc/wpa_supplicant/wpa_supplicant-wlan0.conf
 echo "
 auto wlan0
 allow-hotplug wlan0

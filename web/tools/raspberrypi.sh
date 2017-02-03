@@ -123,12 +123,11 @@ fi
 if [ $WIFI -eq 1 ] ; then
 echo "Configure WIFI"
 
-
 echo "ctrl_interface=/run/wpa_supplicant
 update_config=1
 
 " > /etc/wpa_supplicant/wpa_supplicant-wlan0.conf
-wpa_password $SSID $PSK >> /etc/wpa_supplicant/wpa_supplicant-wlan0.conf
+wpa_password "$SSID" "$PSK" >> /etc/wpa_supplicant/wpa_supplicant-wlan0.conf
 echo "
 auto wlan0
 allow-hotplug wlan0
