@@ -23,7 +23,6 @@ def getScreenDimensions():
     return int(os.environ.get('SCREEN_WIDTH_PX')), int(os.environ.get('SCREEN_HEIGHT_PX'))
 
 def kill(pid):
-  p "Kill"
   try:
     #p.kill()
     os.killpg(os.getpgid(pid), signal.SIGINT)

@@ -67,7 +67,6 @@ if [ $# -gt 0 ] ; then
     done
   fi
 
-  ./connectivity.sh &
 else
 
   while true

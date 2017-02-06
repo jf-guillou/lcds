@@ -1,4 +1,5 @@
 #!/bin/bash
+cd "$(dirname "$0")"
 
 # Load configuration
 . ./config.sh
@@ -7,7 +8,13 @@ AR_LOG=$LOGS/autorun.log
 PF_LOG=$LOGS/prefetch.log
 TURNMEOFF=/tmp/turnoff_display
 
+echo "$(date "+%F %T") : Start" > $AR_LOG
+
+# Init network and wait for connectivity
 ./bin/connectivity.sh INIT
+
+# Continuous slow HTTP checks
+./bin/connectivity &
 
 if [ $PREFETCHER -eq 1 ]; then
   echo "$(date "+%F %T") : Starting prefetcher" >> $AR_LOG
@@ -32,7 +39,7 @@ while true; do
   then
     if pgrep $BROWSER
     then
-      echo "$(date "+%F %T") : Killing $BROWSER now" >> $LOG
+      echo "$(date "+%F %T") : Killing $BROWSER now" >> $AR_LOG
       pgrep $VIDEO && kill -9 $(pidof $VIDEO) # Kill player first if necessary
       kill -1 $(pidof $BROWSER) # Kill browser
       xset dpms force off # Disable X
@@ -41,7 +48,7 @@ while true; do
   else
     if ! pgrep $BROWSER
     then
-      echo "$(date "+%F %T") : Start $BROWSER now" >> $LOG
+      echo "$(date "+%F %T") : Start $BROWSER now" >> $AR_LOG
       tvservice -p # Turn on screen
       sleep 5
       xset -dpms

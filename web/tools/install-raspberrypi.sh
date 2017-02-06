@@ -24,6 +24,7 @@ fi
 
 # Installer configuration
 DISP_USER=pi
+LOGS="/home/$DISP_USER/logs"
 
 whiptail --title "SECURITY WARNING" --msgbox "Remember to change root password with 'passwd' AND $DISP_USER password with 'passwd $DISP_USER' commands" 0 0 3>&1 1>&2 2>&3
 
@@ -39,6 +40,7 @@ apt install -y rpi-update nano sudo lightdm spectrwm xserver-xorg xwit python py
 
 echo "Create autorun user"
 useradd -m -s /bin/bash -G sudo -G video $DISP_USER
+sudo -u $DISP_USER mkdir $LOGS
 
 echo "Install browser"
 wget -qO - "http://bintray.com/user/downloadSubjectPublicKey?username=bintray" | sudo apt-key add -
@@ -58,25 +60,25 @@ chown $DISP_USER: /home/$DISP_USER/.spectrwm.conf
 echo "Setup scripts"
 echo "#!/bin/bash
 # Logs storage
-LOGS=\"./logs\"
+export LOGS=\"$LOGS\"
 
 # Enable Squid
-SQUID=$SQUID # 1 or 0
+export SQUID=$SQUID # 1 or 0
 
 # Enable Wifi
-WIFI=$WIFI # 1 or 0
+export WIFI=$WIFI # 1 or 0
 
 # Use prefetcher
-PREFETCHER=$PREFETCHER # 1 or 0
+export PREFETCHER=$PREFETCHER # 1 or 0
 
 # Brower for kiosk mode
-BROWSER=\"kweb3\"
+export BROWSER=\"kweb3\"
 
 # Video player binaries. Should not be modified
-VIDEO=\"omxplayer.bin\"
+export VIDEO=\"omxplayer.bin\"
 
 # Frontend
-LCDS=\"$LCDS\"
+export LCDS=\"$LCDS\"
 " > /home/$DISP_USER/config.sh
 chown $DISP_USER: /home/$DISP_USER/config.sh
 chmod u+x /home/$DISP_USER/config.sh
@@ -141,7 +143,7 @@ echo "ctrl_interface=/run/wpa_supplicant
 update_config=1
 
 " > /etc/wpa_supplicant/wpa_supplicant-wlan0.conf
-wpa_password "$SSID" "$PSK" >> /etc/wpa_supplicant/wpa_supplicant-wlan0.conf
+wpa_passphrase "$SSID" "$PSK" >> /etc/wpa_supplicant/wpa_supplicant-wlan0.conf
 echo "
 auto wlan0
 allow-hotplug wlan0

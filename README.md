@@ -220,8 +220,10 @@ passwd
 - Create autostart user & set its password
 ```bash
 DISP_USER=pi
+LOGS="/home/$DISP_USER/logs"
 useradd -m -s /bin/bash -G sudo -G video $DISP_USER
 passwd $DISP_USER
+sudo -u $DISP_USER mkdir $LOGS
 ```
 
 - Install browser
@@ -269,25 +271,25 @@ done
 
 echo "#!/bin/bash
 # Logs storage
-LOGS=\"./logs\"
+export LOGS=\"$LOGS\"
 
 # Enable Squid
-SQUID=$SQUID # 1 or 0
+export SQUID=$SQUID # 1 or 0
 
 # Enable Wifi
-WIFI=$WIFI # 1 or 0
+export WIFI=$WIFI # 1 or 0
 
 # Use prefetcher
-PREFETCHER=$PREFETCHER # 1 or 0
+export PREFETCHER=$PREFETCHER # 1 or 0
 
 # Brower for kiosk mode
-BROWSER=\"kweb3\"
+export BROWSER=\"kweb3\"
 
 # Video player binaries. Should not be modified
-VIDEO=\"omxplayer.bin\"
+export VIDEO=\"omxplayer.bin\"
 
 # Frontend
-LCDS=\"$LCDS\"
+export LCDS=\"$LCDS\"
 " > /home/$DISP_USER/config.sh
 chown $DISP_USER: /home/$DISP_USER/config.sh
 chmod u+x /home/$DISP_USER/config.sh
@@ -373,7 +375,7 @@ echo "ctrl_interface=/run/wpa_supplicant
 update_config=1
 
 " > /etc/wpa_supplicant/wpa_supplicant-wlan0.conf
-wpa_password "$SSID" "$PSK" >> /etc/wpa_supplicant/wpa_supplicant-wlan0.conf
+wpa_passphrase "$SSID" "$PSK" >> /etc/wpa_supplicant/wpa_supplicant-wlan0.conf
 echo "
 auto wlan0
 allow-hotplug wlan0
