@@ -42,7 +42,7 @@ useradd -m -s /bin/bash -G sudo -G video $DISP_USER
 
 echo "Install browser"
 wget -qO - "http://bintray.com/user/downloadSubjectPublicKey?username=bintray" | sudo apt-key add -
-echo "deb http://dl.bintray.com/kusti8/chromium-rpi jessie main" | sudo tee -a /etc/apt/sources.list
+echo "deb http://dl.bintray.com/kusti8/chromium-rpi jessie main" > /etc/apt/sources.list.d/kweb.list
 apt update
 apt install -y omxplayer kweb youtube-dl
 
@@ -104,7 +104,7 @@ useAudioplayer = False
 useVideoplayer = False
 " >> /usr/local/bin/kwebhelper_settings.py
 
-sudo $DISP_USER wget https://raw.githubusercontent.com/jf-guillou/lcds/master/web/tools/omxplayer -O /home/$DISP_USER/bin/omxplayer
+sudo -u $DISP_USER wget https://raw.githubusercontent.com/jf-guillou/lcds/master/web/tools/omxplayer -O /home/$DISP_USER/bin/omxplayer
 chmod u+x /home/$DISP_USER/bin/omxplayer
 
 if [ $SQUID -eq 1 ] ; then
@@ -126,12 +126,12 @@ refresh_pattern -i (\.mp4|\.jpg|\.jpeg) 43200 100% 129600 reload-into-ims
 
 strip_query_terms off
 range_offset_limit none
-" >> /etc/squid3/squid.local.conf
-  echo "include /etc/squid3/squid.local.conf" >> /etc/squid3/squid.conf
+" > /etc/squid3/squid.local.conf
+echo "include /etc/squid3/squid.local.conf" >> /etc/squid3/squid.conf
 fi
 
 echo "Configure prefetcher"
-sudo $DISP_USER wget https://github.com/jf-guillou/httpPrefetch/releases/download/v0.1.0/httpPrefetch -O /home/$DISP_USER/bin/httpPrefetch
+sudo -u $DISP_USER wget https://github.com/jf-guillou/httpPrefetch/releases/download/v0.1.0/httpPrefetch -O /home/$DISP_USER/bin/httpPrefetch
 chmod u+x /home/$DISP_USER/bin/httpPrefetch
 
 if [ $WIFI -eq 1 ] ; then
