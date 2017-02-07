@@ -10,6 +10,11 @@ TURNMEOFF=/tmp/turnoff_display
 
 echo "$(date "+%F %T") : Start" > $AR_LOG
 
+export PATH="/home/pi/bin:$PATH"
+if [ $SQUID -eq 1 ]; then
+  export http_proxy="http://localhost:3128"
+fi
+
 # Init network and wait for connectivity
 ./bin/connectivity.sh INIT
 
@@ -28,11 +33,6 @@ xwit -root -warp $( cat /sys/module/*fb*/parameters/fbwidth ) $( cat /sys/module
 xset s off
 
 rm $TURNMEOFF
-
-export PATH="/home/pi/bin:$PATH"
-if [ $SQUID -eq 1 ]; then
-  export http_proxy="http://localhost:3128"
-fi
 
 while true; do
   if [ -f $TURNMEOFF ]
