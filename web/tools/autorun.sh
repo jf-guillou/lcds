@@ -16,7 +16,7 @@ if [ $SQUID -eq 1 ]; then
 fi
 
 # Init network and wait for connectivity
-./bin/connectivity.sh INIT
+./bin/connectivity.sh INIT &> $AR_LOG
 
 # Continuous slow HTTP checks
 ./bin/connectivity.sh &
