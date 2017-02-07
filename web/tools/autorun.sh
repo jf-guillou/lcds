@@ -19,7 +19,7 @@ fi
 ./bin/connectivity.sh INIT
 
 # Continuous slow HTTP checks
-./bin/connectivity &
+./bin/connectivity.sh &
 
 if [ $PREFETCHER -eq 1 ]; then
   echo "$(date "+%F %T") : Starting prefetcher" >> $AR_LOG
