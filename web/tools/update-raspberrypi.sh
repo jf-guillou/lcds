@@ -13,6 +13,12 @@ killall autorun.sh
 killall $BROWSER
 killall $VIDEO
 
+if [ $SQUID -eq 1 ] ; then
+  /bin/systemctl squid3 stop
+  rm -rf /var/spool/squid3/*
+  /usr/sbin/squid3 -Nz
+fi
+
 sudo -u $DISP_USER wget https://raw.githubusercontent.com/jf-guillou/lcds/master/web/tools/autorun.sh -O /home/$DISP_USER/autorun.sh
 chmod u+x /home/$DISP_USER/autorun.sh
 
