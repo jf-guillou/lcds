@@ -12,9 +12,10 @@ DISP_USER=pi
 killall autorun.sh
 killall $BROWSER
 killall $VIDEO
+killall httpPrefetch
 
 if [ $SQUID -eq 1 ] ; then
-  /bin/systemctl squid3 stop
+  /bin/systemctl stop squid3
   rm -rf /var/spool/squid3/*
   /usr/sbin/squid3 -Nz
 fi
