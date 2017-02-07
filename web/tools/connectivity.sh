@@ -20,7 +20,7 @@ if [ $# -gt 0 ] ; then
       sleep 10
       ((fails++))
       if [[ $fails -gt 60 ]] ; then
-        reboot
+        /usr/bin/sudo reboot
       fi
     done
 
@@ -32,7 +32,7 @@ if [ $# -gt 0 ] ; then
       sleep 10
       ((fails++))
       if [[ $fails -gt 60 ]] ; then
-        reboot
+        /usr/bin/sudo reboot
       fi
     done
 
@@ -42,7 +42,7 @@ if [ $# -gt 0 ] ; then
       sleep 10
       ((fails++))
       if [[ $fails -gt 60 ]] ; then
-        reboot
+        /usr/bin/sudo reboot
       fi
     done
   else
@@ -52,7 +52,7 @@ if [ $# -gt 0 ] ; then
       sleep 10
       ((fails++))
       if [[ $fails -gt 60 ]] ; then
-        reboot
+        /usr/bin/sudo reboot
       fi
     done
 
@@ -62,7 +62,7 @@ if [ $# -gt 0 ] ; then
       sleep 10
       ((fails++))
       if [[ $fails -gt 60 ]] ; then
-        reboot
+        /usr/bin/sudo reboot
       fi
     done
   fi
@@ -78,7 +78,7 @@ else
       sleep 10
       ((fails++))
       if [[ $fails -gt 60 ]] ; then
-        reboot
+        /usr/bin/sudo reboot
       fi
     done
 
