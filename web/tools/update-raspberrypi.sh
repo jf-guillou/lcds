@@ -25,4 +25,7 @@ chmod u+x /home/$DISP_USER/bin/omxplayer
 sudo -u $DISP_USER wget https://github.com/jf-guillou/httpPrefetch/releases/download/v0.1.0/httpPrefetch -O /home/$DISP_USER/bin/httpPrefetch
 chmod u+x /home/$DISP_USER/bin/httpPrefetch
 
+sudo -u $DISP_USER wget https://raw.githubusercontent.com/jf-guillou/lcds/master/web/tools/update-raspberrypi.sh -O /home/$DISP_USER/update-raspberrypi.sh
+chmod u+x /home/$DISP_USER/update-raspberrypi.sh
+
 reboot
