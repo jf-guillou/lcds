@@ -126,6 +126,8 @@ read_ahead_gap 1 MB
 
 refresh_pattern -i (\.mp4|\.jpg|\.jpeg) 43200 100% 129600 reload-into-ims
 
+request_timeout 30 minutes
+
 strip_query_terms off
 range_offset_limit none
 " > /etc/squid3/squid.local.conf
