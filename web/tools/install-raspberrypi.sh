@@ -144,6 +144,7 @@ update_config=1
 
 " > /etc/wpa_supplicant/wpa_supplicant-wlan0.conf
 wpa_passphrase "$SSID" "$PSK" >> /etc/wpa_supplicant/wpa_supplicant-wlan0.conf
+chmod 600 /etc/wpa_supplicant/wpa_supplicant-wlan0.conf
 echo "
 auto wlan0
 allow-hotplug wlan0
