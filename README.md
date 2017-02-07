@@ -390,8 +390,8 @@ sed -i s/iface\ eth0\ inet\ dhcp/iface\ eth0\ inet\ manual/ /etc/network/interfa
 
 - Configure auto shutdown
 ```bash
-echo "0 18 * * 1-5 $DISP_USER touch /tmp/turnoff_display >> /home/$DISP_USER/autorun.log 2>&1
-0 7  * * 1-5 $DISP_USER /usr/bin/sudo /sbin/reboot >> /home/$DISP_USER/autorun.log 2>&1
+echo "0 18 * * 1-5 $DISP_USER touch /tmp/turnoff_display >> $LOGS/autorun.log 2>&1
+0 7  * * 1-5 $DISP_USER /usr/bin/sudo /sbin/reboot >> $LOGS/autorun.log 2>&1
 " > /etc/cron.d/display_manager
 ```
 This will make the screen black after 6pm and reboot the pi at 7am.
