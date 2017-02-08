@@ -20,6 +20,21 @@ if [ $SQUID -eq 1 ] ; then
   /usr/sbin/squid3 -Nz
 fi
 
+# Kweb updates overwrites configuration
+if [ $(grep -c "^omxplayer_in_terminal_for_video = False" /usr/local/bin/kwebhelper_settings.py) -eq 0 ] ; then
+echo "
+omxplayer_in_terminal_for_video = False
+omxplayer_in_terminal_for_audio = False
+useAudioplayer = False
+useVideoplayer = False
+" >> /usr/local/bin/kwebhelper_settings.py
+fi
+
+# Squid updates may overwrite configuration
+if [ $(grep -c "/etc/squid3/squid.local.conf" /etc/squid3/squid.conf) -eq 0 ] ; then
+echo "include /etc/squid3/squid.local.conf" >> /etc/squid3/squid.conf
+fi
+
 sudo -u $DISP_USER wget https://raw.githubusercontent.com/jf-guillou/lcds/master/web/tools/autorun.sh -O /home/$DISP_USER/autorun.sh
 chmod u+x /home/$DISP_USER/autorun.sh
 

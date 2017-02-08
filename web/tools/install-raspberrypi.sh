@@ -99,12 +99,14 @@ echo "-JEKR+-zbhrqfpoklgtjneduwxyavcsmi#?!.," > /home/$DISP_USER/.kweb.conf
 chown $DISP_USER: /home/$DISP_USER/.kweb.conf
 
 echo "Configure media player"
+if [ $(grep -c "^omxplayer_in_terminal_for_video = False" /usr/local/bin/kwebhelper_settings.py) -eq 0 ] ; then
 echo "
 omxplayer_in_terminal_for_video = False
 omxplayer_in_terminal_for_audio = False
 useAudioplayer = False
 useVideoplayer = False
 " >> /usr/local/bin/kwebhelper_settings.py
+fi
 
 sudo -u $DISP_USER wget https://raw.githubusercontent.com/jf-guillou/lcds/master/web/tools/omxplayer -O /home/$DISP_USER/bin/omxplayer
 chmod u+x /home/$DISP_USER/bin/omxplayer
@@ -134,7 +136,9 @@ range_offset_limit none
 
 error_directory /usr/share/squid3/errors/force_reload
 " > /etc/squid3/squid.local.conf
+if [ $(grep -c "/etc/squid3/squid.local.conf" /etc/squid3/squid.conf) -eq 0 ] ; then
 echo "include /etc/squid3/squid.local.conf" >> /etc/squid3/squid.conf
+fi
 mkdir /usr/share/squid3/errors/force_reload
 echo "<html><head></head><body style=\"background-color: black; color: gray;\">
 %c - %U
