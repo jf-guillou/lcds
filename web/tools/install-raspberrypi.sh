@@ -131,8 +131,18 @@ request_timeout 30 minutes
 
 strip_query_terms off
 range_offset_limit none
+
+error_directory /usr/share/squid3/errors/force_reload
 " > /etc/squid3/squid.local.conf
 echo "include /etc/squid3/squid.local.conf" >> /etc/squid3/squid.conf
+mkdir /usr/share/squid3/errors/force_reload
+echo "<html><head></head><body style=\"background-color: black; color: gray;\">
+%c - %U
+<script type=\"text/javascript\">window.onload = function() {setTimeout(function() {window.location.reload();}, 10000);};</script>
+</body></html>
+" > /usr/share/squid3/errors/force_reload/generic
+ln -s /usr/share/squid3/errors/force_reload/generic /usr/share/squid3/errors/force_reload/ERR_CONNECT_FAIL
+ln -s /usr/share/squid3/errors/force_reload/generic /usr/share/squid3/errors/force_reload/ERR_DNS_FAIL
 fi
 
 echo "Configure prefetcher"
