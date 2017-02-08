@@ -24,8 +24,7 @@ def getScreenDimensions():
 
 def kill(pid):
   try:
-    #p.kill()
-    os.killpg(os.getpgid(pid), signal.SIGINT)
+    os.system('pkill -TERM -P {pid}'.format(pid=pid))
   except OSError:
     pass # ignore kill failure
 
