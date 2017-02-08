@@ -36,7 +36,7 @@ raspi-config nonint do_change_timezone
 raspi-config nonint do_overscan 1
 apt install -y keyboard-configuration console-data
 apt upgrade -y
-apt install -y rpi-update nano sudo lightdm spectrwm xserver-xorg xwit python python-tk lxterminal squid3 firmware-brcm80211 pi-bluetooth wpasupplicant
+apt install -y rpi-update nano sudo lightdm spectrwm xserver-xorg xwit python python-tk lxterminal
 
 echo "Create autorun user"
 useradd -m -s /bin/bash -G sudo -G video $DISP_USER
@@ -111,6 +111,7 @@ chmod u+x /home/$DISP_USER/bin/omxplayer
 
 if [ $SQUID -eq 1 ] ; then
 echo "Configure local proxy"
+apt install -y squid3
 echo "http_port 127.0.0.1:3128
 
 acl localhost src 127.0.0.1
@@ -140,7 +141,7 @@ chmod u+x /home/$DISP_USER/bin/httpPrefetch
 
 if [ $WIFI -eq 1 ] ; then
 echo "Configure WIFI"
-
+apt install -y firmware-brcm80211 pi-bluetooth wpasupplicant
 echo "ctrl_interface=/run/wpa_supplicant
 update_config=1
 
