@@ -137,7 +137,7 @@ class FrontendController extends BaseController
 
         return ['success' => true, 'data' => [
             'lastChanges' => $screen->last_changes,
-            'duration' => $nextScreen ? $screen->duration : 0,
+            'duration' => $screen->duration,
             'nextScreenUrl' => $nextScreen ? Url::to(['frontend/screen', 'id' => $nextScreen->id]) : null,
         ]];
     }

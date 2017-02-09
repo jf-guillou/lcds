@@ -11,6 +11,7 @@ function Screen(updateScreenUrl) {
   this.endAt = null;
   this.nextUrl = null;
   this.cache = new Preload(navigator.userAgent.toLowerCase().indexOf('kweb') == -1);
+  this.runOnce = false;
 }
 
 /**
@@ -29,10 +30,15 @@ Screen.prototype.checkUpdates = function() {
         return;
       }
 
-      if (j.data.duration > 0) {
+      if (j.data.nextScreenUrl != null) {
         // Setup next screen
         s.nextUrl = j.data.nextScreenUrl;
-        s.reloadIn(j.data.duration * 1000);
+        if (j.data.duration > 0) {
+          s.reloadIn(j.data.duration * 1000);
+        }
+      }
+      if (j.data.duration === 0) {
+        s.runOnce = true;
       }
     } else if (j.message == 'Unauthorized') {
       // Cookie/session gone bad, try to refresh with full screen reload
