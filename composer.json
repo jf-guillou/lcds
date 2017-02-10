@@ -22,7 +22,7 @@
         "kartik-v/yii2-widget-datetimepicker": "*",
         "norkunas/youtube-dl-php": "^0.3.0",
         "mhor/php-mediainfo": "^3.0",
-        "johngrogg/ics-parser": "dev-master",
+        "johngrogg/ics-parser": "^2.0",
         "bower-asset/weather-icons": "^2.0",
         "bower-asset/jquery-file-upload": "^9.13",
         "bower-asset/moment": "^2.15",
