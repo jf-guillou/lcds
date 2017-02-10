@@ -16,7 +16,7 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'description')->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'template')->radioList($templates, ['encode' => false]) ?>
+    <?= $form->field($model, 'template_id')->radioList($templates, ['encode' => false]) ?>
 
     <?= $form->field($model, 'duration')->textInput(['maxlength' => true]) ?>
 

@@ -54,8 +54,7 @@ class Screen extends \yii\db\ActiveRecord
             'id' => Yii::t('app', 'ID'),
             'name' => Yii::t('app', 'Name'),
             'description' => Yii::t('app', 'Description'),
-            'template_id' => Yii::t('app', 'Template ID'),
-            'template' => Yii::t('app', 'Template'),
+            'template_id' => Yii::t('app', 'Template'),
             'duration' => Yii::t('app', 'Duration'),
             'last_changes' => Yii::t('app', 'Last Changes'),
         ];
@@ -123,16 +122,6 @@ class Screen extends \yii\db\ActiveRecord
     public function getTemplate()
     {
         return $this->hasOne(ScreenTemplate::className(), ['id' => 'template_id']);
-    }
-
-    /**
-     * Update template_id field.
-     *
-     * @param string $templateId template ID
-     */
-    public function setTemplate($templateId)
-    {
-        $this->template_id = $templateId;
     }
 
     /**

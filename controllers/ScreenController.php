@@ -93,6 +93,7 @@ class ScreenController extends BaseController
     public function actionCreate()
     {
         $model = new Screen();
+        $model->loadDefaultValues();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);
