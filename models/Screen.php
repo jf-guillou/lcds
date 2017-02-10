@@ -55,6 +55,7 @@ class Screen extends \yii\db\ActiveRecord
             'name' => Yii::t('app', 'Name'),
             'description' => Yii::t('app', 'Description'),
             'template_id' => Yii::t('app', 'Template ID'),
+            'template' => Yii::t('app', 'Template'),
             'duration' => Yii::t('app', 'Duration'),
             'last_changes' => Yii::t('app', 'Last Changes'),
         ];
