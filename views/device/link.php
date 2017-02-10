@@ -15,7 +15,10 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="device-link">
 
     <h1><?= Html::encode($this->title) ?></h1>
-
+    
+    <p>
+        <?= Html::a(Yii::t('app', 'Create Screen'), ['screen/create', 'device_id' => $model->id], ['class' => 'btn btn-success']) ?>
+    </p>
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
         'columns' => [

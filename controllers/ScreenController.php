@@ -90,12 +90,16 @@ class ScreenController extends BaseController
      *
      * @return \yii\web\Response|string redirect or render
      */
-    public function actionCreate()
+    public function actionCreate($device_id = null)
     {
         $model = new Screen();
         $model->loadDefaultValues();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            if ($device_id !== null) {
+                return $this->redirect(['device/link', 'id' => $device_id]);
+            }
+
             return $this->redirect(['view', 'id' => $model->id]);
         } else {
             $templates = ScreenTemplate::find()->all();

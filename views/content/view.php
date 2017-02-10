@@ -42,6 +42,8 @@ $this->params['breadcrumbs'][] = $this->title;
             [
                 'label' => Yii::t('app', 'Flow'),
                 'attribute' => 'flow.name',
+                'format' => 'html',
+                'value' => Html::a($model->flow->name, ['flow/view', 'id' => $model->flow->id]),
             ],
         ],
     ]) ?>

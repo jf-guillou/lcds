@@ -22,6 +22,10 @@ $this->params['breadcrumbs'][] = $this->title;
             [
                 'label' => Yii::t('app', 'Flow'),
                 'attribute' => 'flow.name',
+                'format' => 'html',
+                'value' => function ($model) {
+                    return Html::a($model->flow->name, ['flow/view', 'id' => $model->flow->id]);
+                },
             ],
             [
                 'class' => 'yii\grid\ActionColumn',
