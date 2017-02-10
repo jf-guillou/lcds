@@ -20,6 +20,10 @@ $this->params['breadcrumbs'][] = $this->title;
             'description',
             'type.name',
             [
+                'label' => Yii::t('app', 'Flow'),
+                'attribute' => 'flow.name',
+            ],
+            [
                 'class' => 'yii\grid\ActionColumn',
                 'template' => '{view} {update} {delete} {toggle}',
                 'buttons' => [

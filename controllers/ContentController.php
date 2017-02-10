@@ -61,6 +61,11 @@ class ContentController extends BaseController
             'desc' => [ContentType::tableName().'.id' => SORT_DESC],
         ];
 
+        $dataProvider->sort->attributes['flow.name'] = [
+            'asc' => [Flow::tableName().'.id' => SORT_ASC],
+            'desc' => [Flow::tableName().'.id' => SORT_DESC],
+        ];
+
         return $this->render('index', [
             'dataProvider' => $dataProvider,
         ]);
