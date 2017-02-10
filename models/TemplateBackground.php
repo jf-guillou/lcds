@@ -4,6 +4,7 @@ namespace app\models;
 
 use Yii;
 use yii\helpers\Url;
+use app\models\types\Media;
 
 /**
  * This is the model class for table "template_background".
@@ -46,6 +47,17 @@ class TemplateBackground extends \yii\db\ActiveRecord
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function afterDelete()
+    {
+        if ($this->shouldDeleteFile()) {
+            unlink($this->getRealFilepath());
+        }
+        parent::afterDelete();
+    }
+
+    /**
      * @return \yii\db\ActiveQuery
      */
     public function getScreenTemplates()
@@ -73,5 +85,25 @@ class TemplateBackground extends \yii\db\ActiveRecord
         $parts = explode('/', $this->webpath);
 
         return $parts[count($parts) - 1];
+    }
+
+    /**
+     * Count templatesBackghround currently using this background to decide on file deletion.
+     *
+     * @return bool
+     */
+    public function shouldDeleteFile()
+    {
+        return self::find()->where(['webpath' => $this->webpath])->count() < 1;
+    }
+
+    /**
+     * Extract real filepath from background webpath.
+     *
+     * @return string file path
+     */
+    public function getRealFilepath()
+    {
+        return str_replace(Media::BASE_URI, '', $this->webpath);
     }
 }

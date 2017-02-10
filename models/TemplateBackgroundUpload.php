@@ -50,8 +50,7 @@ class TemplateBackgroundUpload extends \yii\base\Model
 
         $this->background = $fileInstance;
         $name = $this->background->baseName.'.'.$this->background->extension;
-        $path = Media::BASE_PATH.self::PATH;
-        $filepath = $path.$name;
+        $filepath = Media::BASE_PATH.self::PATH.$name;
         if ($this->validate() && $this->background->saveAs($filepath)) {
             $model = new TemplateBackground();
             $model->webpath = Media::BASE_URI.$filepath;
