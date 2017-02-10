@@ -12,9 +12,8 @@ Modal::begin([
 ]);
 
 $form = ActiveForm::begin([
-        'id' => 'screen-template-field-form',
-    ]);
-
+    'id' => 'screen-template-field-form',
+]);
 ?>
 
 <div class="row">
