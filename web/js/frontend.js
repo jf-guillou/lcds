@@ -35,10 +35,9 @@ Screen.prototype.checkUpdates = function() {
         s.nextUrl = j.data.nextScreenUrl;
         if (j.data.duration > 0) {
           s.reloadIn(j.data.duration * 1000);
+        } else {
+          s.runOnce = true;
         }
-      }
-      if (j.data.duration === 0) {
-        s.runOnce = true;
       }
     } else if (j.message == 'Unauthorized') {
       // Cookie/session gone bad, try to refresh with full screen reload
@@ -82,6 +81,12 @@ Screen.prototype.reloadIn = function(minDuration) {
  * @return {boolean} going to reload
  */
 Screen.prototype.reloadOnTimeout = function() {
+  if (screen.runOnce && screen.hasRanOnce() && !this.cache.hasPreloadingContent(true)) {
+    // Every content has been shown, reload
+    this.reloadNow();
+    return true;
+  }
+
   if (this.endAt != null && Date.now() >= this.endAt) {
     // No content to delay reload, do it now
     this.reloadNow();
@@ -100,6 +105,32 @@ Screen.prototype.reloadNow = function() {
   } else {
     window.location.reload();
   }
+}
+
+/**
+ * Check every field if contents have been all played at least once
+ * @return {Boolean} has every content been played
+ */
+Screen.prototype.hasRanOnce = function() {
+  for (var f in this.fields) {
+    if (!this.fields.hasOwnProperty(f)) {
+      continue;
+    }
+    f = this.fields[f];
+
+    for (var c in f.contents) {
+      if (!f.contents.hasOwnProperty(c)) {
+        continue;
+      }
+      c = f.contents[c];
+
+      if (f.playCount[c.id] < 1 && c.isPreloaded()) {
+        return false;
+      }
+    }
+  }
+
+  return true;
 }
 
 /**
@@ -522,6 +553,7 @@ function Field($f) {
   this.types = $f.attr('data-types').split(' ');
   this.canUpdate = this.url != null;
   this.contents = [];
+  this.playCount = {};
   this.previous = null;
   this.current = null;
   this.next = null;
@@ -542,6 +574,9 @@ Field.prototype.fetchContents = function() {
   $.get(this.url, function(j) {
     if (j.success) {
       f.contents = j.next.map(function(c) {
+        if (!f.playCount[c.id]) {
+          f.playCount[c.id] = 0;
+        }
         return new Content(c);
       });
       f.pickNextIfNecessary();
@@ -580,15 +615,17 @@ Field.prototype.pickNextIfNecessary = function() {
  * Loop through field contents to pick next displayable content
  */
 Field.prototype.pickNext = function() {
+  // Keep track of true previous content
+  if (this.current != null) {
+    this.previous = this.current;
+    this.playCount[this.current.id]++;
+  }
+
   if (screen.reloadOnTimeout()) {
     // Currently trying to reload, we're past threshold: reload now
     return;
   }
 
-  // Keep track of true previous content
-  if (this.current != null) {
-    this.previous = this.current;
-  }
   this.current = null;
   var previousData = this.previous && this.previous.data;
 
