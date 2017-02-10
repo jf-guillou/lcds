@@ -12,13 +12,23 @@ use kartik\datetime\DateTimePicker;
 
     <div class="col-lg-5">
         <?= $form->field($model, 'start_ts')->widget(DateTimePicker::className(), [
-            'pluginOptions' => ['format' => 'yyyy-mm-dd hh:mm:ss'],
+            'pluginOptions' => [
+                'minView' => 'day',
+                'startDate' => '-0d',
+                'format' => 'yyyy-mm-dd hh:ii:ss',
+                'todayBtn' => true,
+            ],
         ]) ?>
     </div>
 
     <div class="col-lg-5">
         <?= $form->field($model, 'end_ts')->widget(DateTimePicker::className(), [
-            'pluginOptions' => ['format' => 'yyyy-mm-dd hh:mm:ss'],
+            'pluginOptions' => [
+                'minView' => 'day',
+                'startDate' => '-0d',
+                'format' => 'yyyy-mm-dd hh:ii:ss',
+                'todayBtn' => true,
+            ],
         ]) ?>
     </div>
 </div>
