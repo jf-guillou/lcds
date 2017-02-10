@@ -55,6 +55,7 @@ foreach ($fields as $field) :
     class="field <?= implode(' ', $classes) ?>"
     data-id="<?= $field->id ?>"
     data-types="<?= implode(' ', $contentTypes) ?>"
+    data-random="<?= $field->random_order ?>"
     style="display: none;"
     <?= $isSelfUpdate ? '' : 'data-url="'.$nextUrl.$field->id.'"' ?>
 >

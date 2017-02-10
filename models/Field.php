@@ -35,10 +35,11 @@ class Field extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['template_id', 'x1', 'y1', 'x2', 'y2'], 'required'],
+            [['template_id', 'x1', 'y1', 'x2', 'y2', 'random_order'], 'required'],
             [['template_id'], 'integer'],
             [['x1', 'y1', 'x2', 'y2'], 'number'],
             [['css', 'js'], 'string'],
+            [['random_order'], 'boolean'],
             [['template_id'], 'exist', 'skipOnError' => true, 'targetClass' => ScreenTemplate::className(), 'targetAttribute' => ['template_id' => 'id']],
         ];
     }
@@ -57,6 +58,7 @@ class Field extends \yii\db\ActiveRecord
             'y2' => Yii::t('app', 'Y2'),
             'css' => Yii::t('app', 'CSS'),
             'js' => Yii::t('app', 'JS'),
+            'random_order' => Yii::t('app', 'Random order'),
             'contentTypes' => Yii::t('app', 'Content types'),
         ];
     }

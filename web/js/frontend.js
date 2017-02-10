@@ -551,6 +551,7 @@ function Field($f) {
   this.id = $f.attr('data-id');
   this.url = $f.attr('data-url');
   this.types = $f.attr('data-types').split(' ');
+  this.randomOrder = $f.attr('data-random') == '1';
   this.canUpdate = this.url != null;
   this.contents = [];
   this.playCount = {};
@@ -594,11 +595,33 @@ Field.prototype.setError = function(err) {
 }
 
 /**
- * Randomize order
+ * Sort contents
  */
-Field.prototype.randomizeSortContents = function() {
-  this.contents = this.contents.sort(function() {
-    return Math.random() - 0.5;
+Field.prototype.sortContents = function() {
+  this.contents = this.randomOrder ? this.sortContentsByPlayCountRandom() : this.sortContentsByPlayCountOrdered();
+}
+
+/**
+ * Sort by play count this by random
+ * @return {[]Content} sorted contents
+ */
+Field.prototype.sortContentsByPlayCountRandom = function() {
+  var f = this;
+  return this.contents.sort(function(a, b) {
+    var pC = f.playCount[a.id] - f.playCount[b.id];
+    return pC != 0 ? pC : Math.random() - 0.5;
+  });
+}
+
+/**
+ * Sort by play count this by content id
+ * @return {[]Content} sorted contents
+ */
+Field.prototype.sortContentsByPlayCountOrdered = function() {
+  var f = this;
+  return this.contents.sort(function(a, b) {
+    var pC = f.playCount[a.id] - f.playCount[b.id];
+    return pC != 0 ? pC : a.id - b.id;
   });
 }
 
@@ -629,7 +652,7 @@ Field.prototype.pickNext = function() {
   this.current = null;
   var previousData = this.previous && this.previous.data;
 
-  this.next = this.pickRandomContent(previousData) || this.pickRandomContent(previousData, true);
+  this.next = this.pickContent(previousData) || this.pickContent(previousData, true);
 
   if (this.next) {
     // Overwrite field with newly picked content
@@ -652,8 +675,9 @@ Field.prototype.pickNext = function() {
  * @param  {boolean} anyUsable    ignore constraints
  * @return {Content}              random usable content
  */
-Field.prototype.pickRandomContent = function(previousData, anyUsable) {
-  this.randomizeSortContents();
+Field.prototype.pickContent = function(previousData, anyUsable) {
+  this.sortContents();
+
   for (var i = 0; i < this.contents.length; i++) {
     var c = this.contents[i];
     // Skip too long, not preloaded or empty content

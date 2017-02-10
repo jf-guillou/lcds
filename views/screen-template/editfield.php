@@ -37,6 +37,9 @@ $form = ActiveForm::begin([
     </div>
 </div>
 
+<h4><?= Yii::t('app', 'Display order') ?></h4>
+<?= $form->field($field, 'random_order')->checkbox() ?>
+
 <?= $form->field($field, 'css')->textarea(['rows' => 5]) ?>
 
 <?= $form->field($field, 'js')->textarea(['rows' => 5]) ?>
