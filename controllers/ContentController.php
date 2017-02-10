@@ -32,9 +32,8 @@ class ContentController extends BaseController
             ],
             'access' => [
                 'class' => AccessControl::className(),
-                'only' => ['index', 'view', 'create', 'generate', 'upload', 'sideload', 'update', 'delete', 'toggle'],
+                'only' => ['index', 'view', 'generate', 'upload', 'sideload', 'update', 'delete', 'toggle'],
                 'rules' => [
-                    ['allow' => true, 'actions' => ['create'], 'roles' => ['setContent']],
                     ['allow' => true, 'actions' => ['index', 'view', 'generate', 'upload', 'sideload', 'update', 'delete', 'toggle'], 'roles' => ['@']],
                 ],
             ],
@@ -81,35 +80,6 @@ class ContentController extends BaseController
         return $this->render('view', [
             'model' => $model,
         ]);
-    }
-
-    /**
-     * Creates a new Content model.
-     * If creation is successful, the browser will be redirected to the 'view' page.
-     *
-     * @param int $flowId
-     *
-     * @return \yii\web\Response|string redirect or render
-     */
-    public function actionCreate($flowId)
-    {
-        $model = new Content();
-        $flow = Flow::findOne($flowId);
-        if ($flow === null) {
-            throw new NotFoundHttpException(Yii::t('app', 'The requested flow does not exist.'));
-        }
-        $model->flow_id = $flow->id;
-
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
-        } else {
-            $model->loadDefaultValues();
-
-            return $this->render('create', [
-                'model' => $model,
-                'contentTypes' => ContentType::getAllList(false),
-            ]);
-        }
     }
 
     /**

@@ -14,15 +14,15 @@ use kartik\datetime\DateTimePicker;
     <?php $form = ActiveForm::begin(); ?>
 
     <div class="row">
-        <div class="col-lg-8">
+        <div class="col-lg-4">
             <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
         </div>
-        <div class="col-lg-4">
-            <?= $form->field($model, 'type_id')->dropdownList($contentTypes) ?>
+        <div class="col-lg-8">
+            <?= $form->field($model, 'description')->textInput(['maxlength' => true]) ?>
         </div>
     </div>
 
-    <?= $form->field($model, 'description')->textInput(['maxlength' => true]) ?>
+    
 
     <?= $form->field($model, 'data')->textarea(['rows' => 6]) ?>
 
