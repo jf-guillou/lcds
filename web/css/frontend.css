@@ -16,6 +16,10 @@ body {
     line-height: 1.36;
 }
 
+.field {
+    overflow: hidden;
+}
+
 .weather {
     width: 100%;
     height: 100%;
