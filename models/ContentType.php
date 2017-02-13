@@ -191,17 +191,21 @@ class ContentType extends \yii\db\ActiveRecord
      */
     public static function downloadContent($url)
     {
-        if (\Yii::$app->params['proxy']) {
-            $ctx = [
-                'http' => [
-                    'proxy' => str_replace('http://', 'tcp://', \Yii::$app->params['proxy']),
-                    'request_fulluri' => true,
-                ],
-            ];
+        try {
+            if (\Yii::$app->params['proxy']) {
+                $ctx = [
+                    'http' => [
+                        'proxy' => str_replace('http://', 'tcp://', \Yii::$app->params['proxy']),
+                        'request_fulluri' => true,
+                    ],
+                ];
 
-            return file_get_contents($url, false, stream_context_create($ctx));
-        } else {
-            return file_get_contents($url);
+                return file_get_contents($url, false, stream_context_create($ctx));
+            } else {
+                return file_get_contents($url);
+            }
+        } catch (yii\base\ErrorException $e) {
+            return '';
         }
     }
 
