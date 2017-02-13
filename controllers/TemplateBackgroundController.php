@@ -87,7 +87,7 @@ class TemplateBackgroundController extends Controller
      *
      * @param int $id
      *
-     * @return \yii\web\Response
+     * @return \yii\web\Response|string
      */
     public function actionDelete($id)
     {
