@@ -33,7 +33,7 @@ class RSS extends ContentType
     {
         // Fetch content from cache if possible
         $content = self::fromCache($data);
-        if (!$content) {
+        if ($content === false) {
             $content = self::downloadContent($data);
             self::toCache($data, $content);
         }

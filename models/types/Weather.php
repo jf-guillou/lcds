@@ -85,7 +85,7 @@ class Weather extends ContentType
 
         // Fetch content from cache if possible
         $content = self::fromCache($url);
-        if (!$content) {
+        if ($content === false) {
             $content = self::downloadContent($url);
             self::toCache($url, $content);
         }

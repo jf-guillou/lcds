@@ -62,7 +62,7 @@ EO1;
     public function processData($data)
     {
         $content = self::fromCache($data);
-        if (!$content) {
+        if ($content === false) {
             if (!$data) {
                 return null;
             }
