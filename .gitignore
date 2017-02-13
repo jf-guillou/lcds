@@ -29,6 +29,3 @@ phpunit.phar
 # configuration files
 config/db.php
 config/params.php
-
-# User uploads
-/web/uploads
