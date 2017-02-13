@@ -441,6 +441,7 @@ Preload.prototype.preloadExternal = function(res) {
   $.ajax("http://127.0.0.1:8089/pf?res=" + res).done(function(j) {
     switch (j.state) {
       case Preload.state.OK:
+        // Empty line for Scrutinizer
       case Preload.state.NO_CONTENT:
         screen.cache.setState(res, j.state);
         screen.newContentTrigger();
