@@ -2,6 +2,10 @@
 
 use yii\db\Migration;
 
+/**
+ * Handles the update of foreign key 'screen_template-template_background1' from table `screen_template`.
+ */
+// @codingStandardsIgnoreLine
 class m170210_155249_update_screen_template_fk extends Migration
 {
     public function up()
