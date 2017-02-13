@@ -35,7 +35,4 @@ return [
         'apikey' => '',
         'withSummary' => false,
     ],
-
-    // Debug
-    'debugAllowedIPs' => [],
 ];
