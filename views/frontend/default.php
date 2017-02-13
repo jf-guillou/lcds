@@ -33,10 +33,10 @@ foreach ($fields as $field) :
     ];
     $css[] = '#field_'.$field->id.' { '.implode(' ', $properties).'}';
     if ($field->css) {
-        $css[] = str_replace('%field%', '.field_'.$field->id, $field->css);
+        $css[] = str_replace('%field%', '#field_'.$field->id, $field->css);
     }
     if ($field->js) {
-        $js[] = str_replace('%field%', '.field_'.$field->id, $field->js);
+        $js[] = str_replace('%field%', '#field_'.$field->id, $field->js);
     }
 
     $contentTypes = array_map(function ($ct) {
