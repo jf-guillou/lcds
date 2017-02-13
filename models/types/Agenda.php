@@ -61,13 +61,21 @@ EO1;
      */
     public function processData($data)
     {
-        $agenda = self::fromCache($data);
-        if (!$agenda) {
-            $agenda = $this->genAgenda($data);
-            if ($agenda !== null) {
-                self::toCache($data, $agenda);
+        $content = self::fromCache($data);
+        if (!$content) {
+            if (!$data) {
+                return null;
             }
+
+            $content = self::downloadContent($data);
+            self::toCache($data, $content);
         }
+
+        if (!$content) {
+            return null;
+        }
+
+        $agenda = $this->genAgenda($content);
 
         return $agenda;
     }
@@ -401,23 +409,14 @@ EO1;
     }
 
     /**
-     * Generate agenda HTML from .ical url.
+     * Generate agenda HTML from .ical raw data.
      *
-     * @param string $url ical url
+     * @param string $content ical raw data
      *
      * @return string|null HTML agenda
      */
-    public function genAgenda($url)
+    public function genAgenda($content)
     {
-        if (!$url) {
-            return null;
-        }
-
-        $content = self::downloadContent($url);
-        if (!$content) {
-            return null;
-        }
-
         $agenda = $this->parseIcal($content);
         if (!$agenda) {
             return null;
