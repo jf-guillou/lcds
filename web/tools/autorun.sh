@@ -24,6 +24,9 @@ fi
 if [ $PREFETCHER -eq 1 ]; then
   echo "$(date "+%F %T") : Starting prefetcher" >> $AR_LOG
   ./bin/httpPrefetch &> $PF_LOG &
+
+  # Wait for proper init
+  sleep 2
 fi
 
 # Move cursor out of the way
