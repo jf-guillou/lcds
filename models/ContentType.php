@@ -232,9 +232,8 @@ class ContentType extends \yii\db\ActiveRecord
     {
         $cache = \Yii::$app->cache;
         $cacheKey = $this->id.$key;
-        if ($cache->exists($cacheKey)) {
-            return $cache->get($cacheKey);
-        }
+
+        return $cache->get($cacheKey);
     }
 
     /**
