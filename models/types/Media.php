@@ -244,6 +244,8 @@ abstract class Media extends ContentType
             $parts = explode(DIRECTORY_SEPARATOR, $tmppath);
             array_pop($parts); // Remove filename
             if (implode(DIRECTORY_SEPARATOR, $parts) == sys_get_temp_dir() && strpos(DIRECTORY_SEPARATOR, $filename) === false && file_exists($tmppath)) {
+                ini_set('mbstring.substitute_character', 'none');
+                $filename = mb_convert_encoding($filename, 'ASCII');
                 $filename = static::getUniqFilename(static::getRealPath(), $filename);
                 $data = static::getWebPath().$filename;
                 $realFilepath = static::getRealPath().$filename;
