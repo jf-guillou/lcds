@@ -90,6 +90,9 @@ window.jqReady.push(function() {
                 setError(data.result.message);
             }
         },
+        fail: function (jq, textStatus) {
+            setError(textStatus.errorThrown);
+        },
         progressall: function (e, data) {
             var progress = parseInt(data.loaded / data.total * 100, 10);
             setProgress(progress);
