@@ -209,6 +209,29 @@ EO1;
             }
         }
 
+        // Second pass, fixing non-contiguous overlaps
+        for ($i = $from; $i <= $to; $i += $this->overlapScanOffset) {
+            // Find maximum overlap for a given line
+            $maxOverlaps = 0;
+            foreach ($events as $k => $e) {
+                if ($e['start'] < $i && $i < $e['end']) {
+                    if ($e['overlaps'] > $maxOverlaps) {
+                        $maxOverlaps = $e['overlaps'];
+                    }
+                }
+            }
+
+            // Apply it to all events on this line
+            foreach ($events as $k => $e) {
+                if ($e['start'] < $i && $i < $e['end']) {
+                    if ($e['overlaps'] < $maxOverlaps) {
+                        $e['overlaps'] = $maxOverlaps;
+                        $events[$k] = $e;
+                    }
+                }
+            }
+        }
+
         return $events;
     }
 
