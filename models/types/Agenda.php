@@ -384,18 +384,28 @@ EO1;
                 }, array_keys($style), $style));
 
                 $content = [];
+                $content[] = '<div class="agenda-event-header">';
                 if (count($e['desc']) && $e['desc'][0]) {
                     $content[] = '<span class="agenda-event-desc">'.$e['desc'][0].'</span>';
                 }
                 foreach ($e['locations'] as $l) {
                     $content[] = ' <span class="agenda-event-location">'.$l.'</span>';
                 }
+                $content[] = '</div>';
                 if ($e['name']) {
-                    $content[] = '<span class="agenda-event-name">'.$e['name'].'</span>';
+                    $content[] = '<div class="agenda-event-name">'.$e['name'].'</div>';
+                }
+                $content[] = '<div class="agenda-event-time">';
+                if ($e['startStr']) {
+                    $content[] = '<span class="agenda-event-time-start">'.$e['startStr'].'</span>';
                 }
                 if ($e['startStr'] && $e['endStr']) {
-                    $content[] = '<br />'.$e['startStr'].' - '.$e['endStr'];
+                    $content[] = ' - ';
                 }
+                if ($e['endStr']) {
+                    $content[] = '<span class="agenda-event-time-end">'.$e['endStr'].'</span>';
+                }
+                $content[] = '</div>';
 
                 $h .= '<div class="agenda-event" style="'.$styleStr.'">'.implode('', $content).'</div>';
             }

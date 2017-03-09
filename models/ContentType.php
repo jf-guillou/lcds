@@ -143,7 +143,7 @@ class ContentType extends \yii\db\ActiveRecord
         $types = self::find()->all();
 
         return array_filter($types, function ($t) use ($selfUpdate, $usableOnly) {
-            return ($selfUpdate === null || $t->selfUpdate == $selfUpdate) && (!$usableOnly || $t->usable);
+            return ($selfUpdate === null || $t->selfUpdate == $selfUpdate) && (!$usableOnly || ($t->usable && $t->enabled));
         });
     }
 

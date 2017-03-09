@@ -4,7 +4,7 @@
 
 There are already dozens of digital signage managers. But no easy to use open-source CMS based projects.
 
-Now there's this one. **Early beta** though. Expect a lot of updates on master branch, there is no STABLE release yet.
+Now there's this one, still in **beta**.
 
 Based on the [Yii2 framework](http://www.yiiframework.com/).
 See [https://github.com/jf-guillou/lcds/blob/master/composer.json](composer.json) for the complete list of extensions used in this project.
@@ -56,7 +56,7 @@ sudo chmod a+rx /usr/local/bin/youtube-dl
 composer self-update
 composer global require "fxp/composer-asset-plugin:^1.2.0"
 cd /path/to/install
-git clone https://github.com/jf-guillou/lcds.git
+git clone -b production https://github.com/jf-guillou/lcds.git
 cd lcds
 composer install --no-dev
 ```
