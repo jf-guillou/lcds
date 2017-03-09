@@ -56,7 +56,7 @@ sudo chmod a+rx /usr/local/bin/youtube-dl
 composer self-update
 composer global require "fxp/composer-asset-plugin:^1.2.0"
 cd /path/to/install
-git clone https://github.com/jf-guillou/lcds.git
+git clone -b production https://github.com/jf-guillou/lcds.git
 cd lcds
 composer install --no-dev
 ```
