@@ -396,15 +396,9 @@ EO1;
                     $content[] = '<div class="agenda-event-name">'.$e['name'].'</div>';
                 }
                 $content[] = '<div class="agenda-event-time">';
-                if ($e['startStr']) {
-                    $content[] = '<span class="agenda-event-time-start">'.$e['startStr'].'</span>';
-                }
-                if ($e['startStr'] && $e['endStr']) {
-                    $content[] = ' - ';
-                }
-                if ($e['endStr']) {
-                    $content[] = '<span class="agenda-event-time-end">'.$e['endStr'].'</span>';
-                }
+                $content[] = '<span class="agenda-event-time-start">'.$e['startStr'].'</span>';
+                $content[] = ' - ';
+                $content[] = '<span class="agenda-event-time-end">'.$e['endStr'].'</span>';
                 $content[] = '</div>';
 
                 $h .= '<div class="agenda-event" style="'.$styleStr.'">'.implode('', $content).'</div>';

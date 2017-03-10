@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "ea2e07352264d9d7e928c575add36a57",
+    "content-hash": "70f8433461808964b25d38d6713f9852",
     "packages": [
         {
             "name": "adldap2/adldap2",
@@ -1011,16 +1011,16 @@
         },
         {
             "name": "norkunas/youtube-dl-php",
-            "version": "v0.3.2",
+            "version": "v0.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/norkunas/youtube-dl-php.git",
-                "reference": "78bb1d82c790668a80790d3b7bfc606793479f51"
+                "reference": "b86b29c9f54536311036aed666b6993d68b10cc2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/norkunas/youtube-dl-php/zipball/78bb1d82c790668a80790d3b7bfc606793479f51",
-                "reference": "78bb1d82c790668a80790d3b7bfc606793479f51",
+                "url": "https://api.github.com/repos/norkunas/youtube-dl-php/zipball/b86b29c9f54536311036aed666b6993d68b10cc2",
+                "reference": "b86b29c9f54536311036aed666b6993d68b10cc2",
                 "shasum": ""
             },
             "require": {
@@ -1052,7 +1052,7 @@
                 "youtube",
                 "youtube-dl"
             ],
-            "time": "2017-02-27T05:40:59+00:00"
+            "time": "2016-09-08T08:05:55+00:00"
         },
         {
             "name": "swiftmailer/swiftmailer",

@@ -147,6 +147,9 @@ echo "<html><head></head><body style=\"background-color: black; color: gray;\">
 " > /usr/share/squid3/errors/force_reload/generic
 ln -s /usr/share/squid3/errors/force_reload/generic /usr/share/squid3/errors/force_reload/ERR_CONNECT_FAIL
 ln -s /usr/share/squid3/errors/force_reload/generic /usr/share/squid3/errors/force_reload/ERR_DNS_FAIL
+ln -s /usr/share/squid3/errors/force_reload/generic /usr/share/squid3/errors/force_reload/ERR_READ_ERROR
+ln -s /usr/share/squid3/errors/force_reload/generic /usr/share/squid3/errors/force_reload/ERR_READ_TIMEOUT
+ln -s /usr/share/squid3/errors/force_reload/generic /usr/share/squid3/errors/force_reload/ERR_SOCKET_FAILURE
 fi
 
 echo "Configure prefetcher"
