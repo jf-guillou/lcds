@@ -18,7 +18,7 @@
         "yiisoft/yii2-swiftmailer": "*",
         "yiisoft/yii2-jui": "^2.0",
         "kartik-v/yii2-widget-datetimepicker": "*",
-        "norkunas/youtube-dl-php": "^0.3.0",
+        "norkunas/youtube-dl-php": "=0.3.0",
         "mhor/php-mediainfo": "^3.0",
         "johngrogg/ics-parser": "^2.0",
         "bower-asset/weather-icons": "^2.0",
