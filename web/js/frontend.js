@@ -455,8 +455,10 @@ Preload.prototype.preloadExternal = function(res) {
         return;
     }
     screen.cache.preloadNext();
-  }).fail(function() {
-    screen.cache.preload = screen.cache.preloadAjax;
+  }).fail(function(jqHXR) {
+    if (!jqHXR.status) {
+      screen.cache.preload = screen.cache.preloadAjax;
+    }
     screen.cache.preload(res);
   });
 }
