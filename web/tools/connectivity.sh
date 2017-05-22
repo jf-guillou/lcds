@@ -23,7 +23,7 @@ if [ $# -gt 0 ] ; then
     do
       sleep 10
       ((fails++))
-      if [[ $fails -gt 60 ]] ; then
+      if [[ $fails -gt 12 ]] ; then
         /usr/bin/sudo reboot
       fi
     done
@@ -37,18 +37,18 @@ if [ $# -gt 0 ] ; then
     do
       sleep 10
       ((fails++))
-      if [[ $fails -gt 60 ]] ; then
+      if [[ $fails -gt 12 ]] ; then
         /usr/bin/sudo reboot
       fi
     done
 
     echo "$(date "+%F %T") [$INT] : Wait for curl success on web frontend"
     fails=0
-    while ! curl -s $LCDS > /dev/null
+    while ! curl -s $LCDS --connect-timeout 3 > /dev/null
     do
       sleep 10
       ((fails++))
-      if [[ $fails -gt 60 ]] ; then
+      if [[ $fails -gt 12 ]] ; then
         /usr/bin/sudo reboot
       fi
     done
@@ -61,18 +61,18 @@ if [ $# -gt 0 ] ; then
     do
       sleep 10
       ((fails++))
-      if [[ $fails -gt 60 ]] ; then
+      if [[ $fails -gt 12 ]] ; then
         /usr/bin/sudo reboot
       fi
     done
 
     echo "$(date "+%F %T") [$INT] : Wait for curl success on web frontend"
     fails=0
-    while ! curl -s $LCDS > /dev/null
+    while ! curl -s $LCDS --connect-timeout 3 > /dev/null
     do
       sleep 10
       ((fails++))
-      if [[ $fails -gt 60 ]] ; then
+      if [[ $fails -gt 12 ]] ; then
         /usr/bin/sudo reboot
       fi
     done
@@ -86,11 +86,11 @@ else
   do
 
     fails=0
-    while ! curl -s $LCDS > /dev/null
+    while ! curl -s $LCDS --connect-timeout 3 > /dev/null
     do
       sleep 10
       ((fails++))
-      if [[ $fails -gt 60 ]] ; then
+      if [[ $fails -gt 12 ]] ; then
         /usr/bin/sudo reboot
       fi
     done
