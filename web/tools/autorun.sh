@@ -11,15 +11,16 @@ TURNMEOFF=/tmp/turnoff_display
 echo "$(date "+%F %T") : Start" > $AR_LOG
 
 export PATH="/home/pi/bin:$PATH"
-if [ $SQUID -eq 1 ]; then
-  export http_proxy="http://localhost:3128"
-fi
 
 # Init network and wait for connectivity
 ./bin/connectivity.sh INIT &> $AR_LOG
 
 # Continuous slow HTTP checks
 ./bin/connectivity.sh &
+
+if [ $SQUID -eq 1 ]; then
+  export http_proxy="http://localhost:3128"
+fi
 
 if [ $PREFETCHER -eq 1 ]; then
   echo "$(date "+%F %T") : Starting prefetcher" >> $AR_LOG
