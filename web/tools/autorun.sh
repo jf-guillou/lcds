@@ -8,6 +8,11 @@ AR_LOG=$LOGS/autorun.log
 PF_LOG=$LOGS/prefetch.log
 TURNMEOFF=/tmp/turnoff_display
 
+if [ -f $AR_LOG ]
+then
+  mv $AR_LOG $AR_LOG.1
+fi
+
 echo "$(date "+%F %T") : Start" > $AR_LOG
 
 export PATH="/home/pi/bin:$PATH"
