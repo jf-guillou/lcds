@@ -8,6 +8,11 @@ AR_LOG=$LOGS/autorun.log
 PF_LOG=$LOGS/prefetch.log
 TURNMEOFF=/tmp/turnoff_display
 
+if [ -f $AR_LOG ]
+then
+  mv $AR_LOG $AR_LOG.1
+fi
+
 echo "$(date "+%F %T") : Start" > $AR_LOG
 
 export PATH="/home/pi/bin:$PATH"
@@ -36,7 +41,13 @@ xwit -root -warp $( cat /sys/module/*fb*/parameters/fbwidth ) $( cat /sys/module
 # Disable DPMS / Screen blanking
 xset s off
 
-rm $TURNMEOFF
+if [ -f $TURNMEOFF ]
+then
+  xset dpms force off # Disable X
+  tvservice -o # Turn off screen
+fi
+
+# rm $TURNMEOFF
 
 while true; do
   if [ -f $TURNMEOFF ]
