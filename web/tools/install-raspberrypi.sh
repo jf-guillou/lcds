@@ -176,7 +176,7 @@ sed -i s/iface\ eth0\ inet\ dhcp/iface\ eth0\ inet\ manual/ /etc/network/interfa
 
 echo "Configure auto-shutdown"
 echo "0 18 * * 1-5 $DISP_USER touch /tmp/turnoff_display >> $LOGS/autorun.log 2>&1
-0 7  * * 1-5 $DISP_USER /usr/bin/sudo /sbin/reboot >> $LOGS/autorun.log 2>&1
+0 7  * * 1-5 $DISP_USER rm /tmp/turnoff_display && /usr/bin/sudo /sbin/reboot >> $LOGS/autorun.log 2>&1
 " > /etc/cron.d/display_manager
 
 echo "Firmware update. This will reboot the raspberry pi!"

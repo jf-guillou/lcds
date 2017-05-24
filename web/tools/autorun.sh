@@ -41,7 +41,13 @@ xwit -root -warp $( cat /sys/module/*fb*/parameters/fbwidth ) $( cat /sys/module
 # Disable DPMS / Screen blanking
 xset s off
 
-rm $TURNMEOFF
+if [ -f $TURNMEOFF ]
+then
+  xset dpms force off # Disable X
+  tvservice -o # Turn off screen
+fi
+
+# rm $TURNMEOFF
 
 while true; do
   if [ -f $TURNMEOFF ]
