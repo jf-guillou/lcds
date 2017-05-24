@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "82e91a22b1dbd97fd8a4941a960f3259",
+    "content-hash": "10d7decf195583c64249239c944cae62",
     "packages": [
         {
             "name": "adldap2/adldap2",
@@ -1656,16 +1656,16 @@
         },
         {
             "name": "codeception/base",
-            "version": "2.2.11",
+            "version": "2.3.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Codeception/base.git",
-                "reference": "eea7d29115390772363a4f7744396927b33bf4f3"
+                "reference": "c3beb9ff7fe829e4d9b66c1fdfcc99e85cad485f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Codeception/base/zipball/eea7d29115390772363a4f7744396927b33bf4f3",
-                "reference": "eea7d29115390772363a4f7744396927b33bf4f3",
+                "url": "https://api.github.com/repos/Codeception/base/zipball/c3beb9ff7fe829e4d9b66c1fdfcc99e85cad485f",
+                "reference": "c3beb9ff7fe829e4d9b66c1fdfcc99e85cad485f",
                 "shasum": ""
             },
             "require": {
@@ -1675,7 +1675,7 @@
                 "guzzlehttp/psr7": "~1.0",
                 "php": ">=5.4.0 <8.0",
                 "phpunit/php-code-coverage": ">=2.2.4 <6.0",
-                "phpunit/phpunit": ">4.8.20 <6.0",
+                "phpunit/phpunit": ">4.8.20 <7.0",
                 "phpunit/phpunit-mock-objects": ">2.3 <5.0",
                 "sebastian/comparator": ">1.1 <3.0",
                 "sebastian/diff": "^1.4",
@@ -1744,7 +1744,7 @@
                 "functional testing",
                 "unit testing"
             ],
-            "time": "2017-05-11T21:58:39+00:00"
+            "time": "2017-05-24T01:15:53+00:00"
         },
         {
             "name": "codeception/specify",
