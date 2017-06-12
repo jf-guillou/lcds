@@ -6,7 +6,7 @@ cd "$(dirname "$0")"
 
 AR_LOG=$LOGS/autorun.log
 PF_LOG=$LOGS/prefetch.log
-TURNMEOFF=/tmp/turnoff_display
+TURNMEOFF=~/turnoff_display.tmp
 
 if [ -f $AR_LOG ]
 then
