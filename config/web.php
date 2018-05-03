@@ -1,7 +1,7 @@
 <?php
 
-$params = require __DIR__.'/params.php';
-$db = require __DIR__.'/db.php';
+$params = require __DIR__ . '/params.php';
+$db = require __DIR__ . '/db.php';
 
 $config = [
     'id' => 'lcds',
@@ -54,10 +54,10 @@ $config = [
                 ],
             ],
         ],
-        'ldap' => [
+        'ldap' => ($params['useLdap'] ? [
             'class' => 'Edvlerblog\Ldap',
             'options' => $params['ldapOptions'],
-        ],
+        ] : null),
         'authManager' => [
             'class' => 'yii\rbac\DbManager',
         ],

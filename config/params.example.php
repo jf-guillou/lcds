@@ -12,6 +12,7 @@ return [
     // Authentication
     'useKerberos' => false,
     'kerberosPrincipalVar' => 'REDIRECT_REMOTE_USER',
+    // LDAP -- requires edvlerblog/yii2-adldap-module
     'useLdap' => false,
     'ldapOptions' => [
         'port' => 389,
