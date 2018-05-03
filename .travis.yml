@@ -12,7 +12,6 @@ before_install:
   - cp config/db.test.php config/db.example.php
 
 install:
-  - composer global require "fxp/composer-asset-plugin:^1.2.0"
   - composer install
   - ./yii migrate --interactive=0
 
