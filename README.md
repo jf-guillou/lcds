@@ -33,18 +33,19 @@ See [https://github.com/jf-guillou/lcds/blob/master/composer.json](composer.json
 ## REQUIREMENTS
 
 - PHP >= 5.6
-- php5-ldap / php7-ldap
 - MySQL >= 5.5 OR MariaDB >= 10.0
-- [Composer](https://getcomposer.org/)
-> Lower PHP versions are unsupported but should work
-
-### Optional
-
+- mediainfo
 - youtube-dl : Used by HostedVideo sideloader -- Make sure to keep updated
 ```bash
 sudo wget https://yt-dl.org/downloads/latest/youtube-dl -O /usr/local/bin/youtube-dl
 sudo chmod a+rx /usr/local/bin/youtube-dl
 ```
+- [Composer](https://getcomposer.org/)
+> Lower PHP versions are unsupported but should work
+
+### Optional
+
+- php5-ldap / php7-ldap
 
 ## INSTALLATION
 
@@ -53,9 +54,6 @@ sudo chmod a+rx /usr/local/bin/youtube-dl
 ### Install app
 
 ```bash
-composer self-update
-composer global require "fxp/composer-asset-plugin:^1.2.0"
-cd /path/to/install
 git clone -b production https://github.com/jf-guillou/lcds.git
 cd lcds
 composer install --no-dev
@@ -140,8 +138,6 @@ Do not hesitate to report bugs by posting an [issue at Github](https://github.co
 ## UPGRADE
 
 ```bash
-composer self-update
-composer global update
 cd /path/to/install/lcds
 git pull
 composer install --no-dev
