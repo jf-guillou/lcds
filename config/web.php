@@ -7,6 +7,10 @@ $config = [
     'id' => 'lcds',
     'basePath' => dirname(__DIR__),
     'bootstrap' => ['log'],
+    'aliases' => [
+        '@bower' => '@vendor/bower-asset',
+        '@npm'   => '@vendor/npm-asset',
+    ],
     'defaultRoute' => 'main/index',
     'sourceLanguage' => 'en-US',
     'language' => $params['language'],
