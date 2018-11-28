@@ -25,14 +25,12 @@
         "norkunas/youtube-dl-php": "^0.3.5",
         "mhor/php-mediainfo": "^4.1.2",
         "johngrogg/ics-parser": "^2.1.7",
+        "edvlerblog/yii2-adldap-module": "^4.0",
         "bower-asset/weather-icons": "^2.0",
         "bower-asset/jquery-file-upload": "^9.28",
         "bower-asset/moment": "^2.22",
         "bower-asset/jquery-textfill": "^0.6.0",
         "bower-asset/raphael": "^2.2"
-    },
-    "suggest": {
-        "edvlerblog/yii2-adldap-module": "^4.0"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.0.0",

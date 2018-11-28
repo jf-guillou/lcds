@@ -30,14 +30,23 @@ See [https://github.com/jf-guillou/lcds/blob/master/composer.json](composer.json
 
 - PHP >= 5.6
     - php-mbstring
-    - php-ldap (optional)
-- Any php-pdo supported driver
-    - MariaDB >= 10.0 preferably
+    - php-ldap
+- Any php-pdo supported driver and associated database
+    - php-mysql with mariadb-server >= 10.0 preferably
 - mediainfo -- extract media content-type and duration
 - youtube-dl -- download media from video hosting sites
 - [Composer](https://getcomposer.org/)
 
 ## INSTALLATION
+
+### Requirements
+
+```bash
+apt-get install -y git php php-mbstring php-ldap php-mysql composer mariadb-server mediainfo
+
+sudo wget https://yt-dl.org/downloads/latest/youtube-dl -O /usr/local/bin/youtube-dl
+sudo chmod a+rx /usr/local/bin/youtube-dl
+```
 
 ### Install app
 
@@ -46,13 +55,6 @@ cd /var/www
 git clone -b production https://github.com/jf-guillou/lcds.git
 cd lcds
 composer install --no-dev
-```
-
-### youtube-dl
-
-```bash
-sudo wget https://yt-dl.org/downloads/latest/youtube-dl -O /usr/local/bin/youtube-dl
-sudo chmod a+rx /usr/local/bin/youtube-dl
 ```
 
 ### Database
