@@ -24,13 +24,13 @@ class ScreenController extends BaseController
     {
         return [
             'verbs' => [
-                'class' => VerbFilter::className(),
+                'class' => VerbFilter::class,
                 'actions' => [
                     'delete' => ['POST'],
                 ],
             ],
             'access' => [
-                'class' => AccessControl::className(),
+                'class' => AccessControl::class,
                 'only' => ['index', 'view', 'create', 'update', 'delete', 'link', 'unlink'],
                 'rules' => [
                     ['allow' => true, 'actions' => ['index', 'view', 'create', 'update', 'delete', 'link', 'unlink'], 'roles' => ['setScreens']],
@@ -51,8 +51,8 @@ class ScreenController extends BaseController
         ]);
 
         $dataProvider->sort->attributes['template'] = [
-            'asc' => [ScreenTemplate::tableName().'.name' => SORT_ASC],
-            'desc' => [ScreenTemplate::tableName().'.name' => SORT_DESC],
+            'asc' => [ScreenTemplate::tableName() . '.name' => SORT_ASC],
+            'desc' => [ScreenTemplate::tableName() . '.name' => SORT_DESC],
         ];
 
         return $this->render('index', [
@@ -69,7 +69,7 @@ class ScreenController extends BaseController
      */
     public function actionView($id)
     {
-        $model = Screen::find()->where([Screen::tableName().'.id' => $id])->joinWith('template')->one();
+        $model = Screen::find()->where([Screen::tableName() . '.id' => $id])->joinWith('template')->one();
         if ($model === null) {
             throw new NotFoundHttpException(Yii::t('app', 'The requested screen does not exist.'));
         }

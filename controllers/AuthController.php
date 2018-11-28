@@ -19,7 +19,7 @@ class AuthController extends BaseController
     {
         return [
             'access' => [
-                'class' => AccessControl::className(),
+                'class' => AccessControl::class,
                 'only' => ['login', 'logout'],
                 'rules' => [
                     ['allow' => true, 'actions' => ['login'], 'roles' => ['?']],

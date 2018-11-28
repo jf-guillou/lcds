@@ -236,7 +236,7 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
      */
     public function getUserHasFlows()
     {
-        return $this->hasMany(UserHasFlow::className(), ['user_username' => 'username']);
+        return $this->hasMany(UserHasFlow::class, ['user_username' => 'username']);
     }
 
     /**
@@ -244,7 +244,7 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
      */
     public function getFlows()
     {
-        return $this->hasMany(Flow::className(), ['id' => 'flow_id'])->viaTable('user_has_flow', ['user_username' => 'username']);
+        return $this->hasMany(Flow::class, ['id' => 'flow_id'])->viaTable('user_has_flow', ['user_username' => 'username']);
     }
 
     /**

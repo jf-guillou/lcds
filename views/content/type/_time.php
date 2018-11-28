@@ -11,7 +11,7 @@ use kartik\datetime\DateTimePicker;
     </div>
 
     <div class="col-lg-5">
-        <?= $form->field($model, 'start_ts')->widget(DateTimePicker::className(), [
+        <?= $form->field($model, 'start_ts')->widget(DateTimePicker::class, [
             'pluginOptions' => [
                 'minView' => 'day',
                 'startDate' => '-0d',
@@ -22,7 +22,7 @@ use kartik\datetime\DateTimePicker;
     </div>
 
     <div class="col-lg-5">
-        <?= $form->field($model, 'end_ts')->widget(DateTimePicker::className(), [
+        <?= $form->field($model, 'end_ts')->widget(DateTimePicker::class, [
             'pluginOptions' => [
                 'minView' => 'day',
                 'startDate' => '-0d',

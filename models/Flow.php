@@ -40,7 +40,7 @@ class Flow extends \yii\db\ActiveRecord
             [['name'], 'string', 'max' => 64],
             [['description'], 'string', 'max' => 1024],
             [['parent'], 'safe'],
-            [['parent_id'], 'exist', 'skipOnError' => true, 'targetClass' => self::className(), 'targetAttribute' => ['parent_id' => 'id']],
+            [['parent_id'], 'exist', 'skipOnError' => true, 'targetClass' => self::class, 'targetAttribute' => ['parent_id' => 'id']],
         ];
     }
 
@@ -63,7 +63,7 @@ class Flow extends \yii\db\ActiveRecord
      */
     public function getContents()
     {
-        return $this->hasMany(Content::className(), ['flow_id' => 'id']);
+        return $this->hasMany(Content::class, ['flow_id' => 'id']);
     }
 
     /**
@@ -71,7 +71,7 @@ class Flow extends \yii\db\ActiveRecord
      */
     public function getParent()
     {
-        return $this->hasOne(self::className(), ['id' => 'parent_id']);
+        return $this->hasOne(self::class, ['id' => 'parent_id']);
     }
 
     /**
@@ -89,7 +89,7 @@ class Flow extends \yii\db\ActiveRecord
      */
     public function getChildren()
     {
-        return $this->hasMany(self::className(), ['parent_id' => 'id']);
+        return $this->hasMany(self::class, ['parent_id' => 'id']);
     }
 
     /**
@@ -97,7 +97,7 @@ class Flow extends \yii\db\ActiveRecord
      */
     public function getScreenHasFlows()
     {
-        return $this->hasMany(ScreenHasFlow::className(), ['flow_id' => 'id']);
+        return $this->hasMany(ScreenHasFlow::class, ['flow_id' => 'id']);
     }
 
     /**
@@ -105,7 +105,7 @@ class Flow extends \yii\db\ActiveRecord
      */
     public function getScreens()
     {
-        return $this->hasMany(Screen::className(), ['id' => 'screen_id'])->viaTable('screen_has_flow', ['flow_id' => 'id']);
+        return $this->hasMany(Screen::class, ['id' => 'screen_id'])->viaTable('screen_has_flow', ['flow_id' => 'id']);
     }
 
     /**
@@ -113,7 +113,7 @@ class Flow extends \yii\db\ActiveRecord
      */
     public function getUserHasFlows()
     {
-        return $this->hasMany(UserHasFlow::className(), ['flow_id' => 'id']);
+        return $this->hasMany(UserHasFlow::class, ['flow_id' => 'id']);
     }
 
     /**
@@ -121,7 +121,7 @@ class Flow extends \yii\db\ActiveRecord
      */
     public function getUsers()
     {
-        return $this->hasMany(User::className(), ['username' => 'user_username'])->viaTable('user_has_flow', ['flow_id' => 'id']);
+        return $this->hasMany(User::class, ['username' => 'user_username'])->viaTable('user_has_flow', ['flow_id' => 'id']);
     }
 
     /**

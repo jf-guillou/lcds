@@ -25,13 +25,13 @@ class ScreenTemplateController extends BaseController
     {
         return [
             'verbs' => [
-                'class' => VerbFilter::className(),
+                'class' => VerbFilter::class,
                 'actions' => [
                     'delete' => ['POST'],
                 ],
             ],
             'access' => [
-                'class' => AccessControl::className(),
+                'class' => AccessControl::class,
                 'only' => ['index', 'view', 'add-field', 'get-field', 'edit-field', 'set-field-pos', 'delete-field', 'create', 'update', 'delete'],
                 'rules' => [
                     ['allow' => true, 'actions' => ['index', 'view', 'add-field', 'get-field', 'edit-field', 'set-field-pos', 'delete-field', 'create', 'update', 'delete'], 'roles' => ['setTemplates']],
@@ -72,8 +72,8 @@ class ScreenTemplateController extends BaseController
             'background' => $screenTemplate->background ? $screenTemplate->background->uri : null,
             'fields' => $screenTemplate->getFields()->with('contentTypes')->asArray()->all(),
             'contentTypes' => ContentType::getAllList(),
-            'setFieldPosUrl' => Url::to([Yii::$app->controller->id.'/set-field-pos', 'id' => '']),
-            'editFieldUrl' => Url::to([Yii::$app->controller->id.'/edit-field', 'id' => '']),
+            'setFieldPosUrl' => Url::to([Yii::$app->controller->id . '/set-field-pos', 'id' => '']),
+            'editFieldUrl' => Url::to([Yii::$app->controller->id . '/edit-field', 'id' => '']),
         ]);
     }
 

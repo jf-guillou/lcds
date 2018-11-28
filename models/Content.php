@@ -45,8 +45,8 @@ class Content extends \yii\db\ActiveRecord
             [['name'], 'string', 'max' => 64],
             [['type_id'], 'string', 'max' => 45],
             [['description'], 'string', 'max' => 1024],
-            [['flow_id'], 'exist', 'skipOnError' => true, 'targetClass' => Flow::className(), 'targetAttribute' => ['flow_id' => 'id']],
-            [['type_id'], 'exist', 'skipOnError' => true, 'targetClass' => ContentType::className(), 'targetAttribute' => ['type_id' => 'id']],
+            [['flow_id'], 'exist', 'skipOnError' => true, 'targetClass' => Flow::class, 'targetAttribute' => ['flow_id' => 'id']],
+            [['type_id'], 'exist', 'skipOnError' => true, 'targetClass' => ContentType::class, 'targetAttribute' => ['type_id' => 'id']],
         ], $this->type ? $this->type->contentRules() : []);
     }
 
@@ -75,7 +75,7 @@ class Content extends \yii\db\ActiveRecord
      */
     public function getFlow()
     {
-        return $this->hasOne(Flow::className(), ['id' => 'flow_id']);
+        return $this->hasOne(Flow::class, ['id' => 'flow_id']);
     }
 
     /**
@@ -83,7 +83,7 @@ class Content extends \yii\db\ActiveRecord
      */
     public function getType()
     {
-        return $this->hasOne(ContentType::className(), ['id' => 'type_id']);
+        return $this->hasOne(ContentType::class, ['id' => 'type_id']);
     }
 
     /**
@@ -143,7 +143,7 @@ class Content extends \yii\db\ActiveRecord
     {
         $data = $this->data;
         if ($this->type->appendParams) {
-            $data .= (strpos($data, '#') === false ? '#' : ';').$this->type->appendParams;
+            $data .= (strpos($data, '#') === false ? '#' : ';') . $this->type->appendParams;
         }
 
         $data = $this->processData($data);
@@ -200,7 +200,7 @@ class Content extends \yii\db\ActiveRecord
         if ($this->type->input == ContentType::KINDS['FILE']) {
             return self::find()
                 ->joinWith(['type'])
-                ->where([ContentType::tableName().'.id' => ContentType::getAllFileTypeIds()])
+                ->where([ContentType::tableName() . '.id' => ContentType::getAllFileTypeIds()])
                 ->andWhere(['data' => $this->data])
                 ->count() == 0;
         }
@@ -237,6 +237,6 @@ class Content extends \yii\db\ActiveRecord
      */
     public function getRealFilepath()
     {
-        return \Yii::getAlias('@app/').'web/'.$this->getFilepath();
+        return \Yii::getAlias('@app/') . 'web/' . $this->getFilepath();
     }
 }

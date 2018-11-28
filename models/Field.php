@@ -40,7 +40,7 @@ class Field extends \yii\db\ActiveRecord
             [['x1', 'y1', 'x2', 'y2'], 'number'],
             [['css', 'js'], 'string'],
             [['random_order'], 'boolean'],
-            [['template_id'], 'exist', 'skipOnError' => true, 'targetClass' => ScreenTemplate::className(), 'targetAttribute' => ['template_id' => 'id']],
+            [['template_id'], 'exist', 'skipOnError' => true, 'targetClass' => ScreenTemplate::class, 'targetAttribute' => ['template_id' => 'id']],
         ];
     }
 
@@ -83,7 +83,7 @@ class Field extends \yii\db\ActiveRecord
      */
     public function getTemplate()
     {
-        return $this->hasOne(ScreenTemplate::className(), ['id' => 'template_id']);
+        return $this->hasOne(ScreenTemplate::class, ['id' => 'template_id']);
     }
 
     /**
@@ -91,7 +91,7 @@ class Field extends \yii\db\ActiveRecord
      */
     public function getFieldHasContentTypes()
     {
-        return $this->hasMany(FieldHasContentType::className(), ['field_id' => 'id']);
+        return $this->hasMany(FieldHasContentType::class, ['field_id' => 'id']);
     }
 
     /**
@@ -99,7 +99,7 @@ class Field extends \yii\db\ActiveRecord
      */
     public function getContentTypes()
     {
-        return $this->hasMany(ContentType::className(), ['id' => 'content_type_id'])->viaTable('field_has_content_type', ['field_id' => 'id']);
+        return $this->hasMany(ContentType::class, ['id' => 'content_type_id'])->viaTable('field_has_content_type', ['field_id' => 'id']);
     }
 
     /**

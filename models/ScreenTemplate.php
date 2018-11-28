@@ -36,7 +36,7 @@ class ScreenTemplate extends \yii\db\ActiveRecord
             [['css'], 'string'],
             [['name'], 'string', 'max' => 64],
             [['background'], 'safe'],
-            [['background_id'], 'exist', 'skipOnError' => true, 'targetClass' => TemplateBackground::className(), 'targetAttribute' => ['background_id' => 'id']],
+            [['background_id'], 'exist', 'skipOnError' => true, 'targetClass' => TemplateBackground::class, 'targetAttribute' => ['background_id' => 'id']],
         ];
     }
 
@@ -74,7 +74,7 @@ class ScreenTemplate extends \yii\db\ActiveRecord
      */
     public function getFields()
     {
-        return $this->hasMany(Field::className(), ['template_id' => 'id']);
+        return $this->hasMany(Field::class, ['template_id' => 'id']);
     }
 
     /**
@@ -82,7 +82,7 @@ class ScreenTemplate extends \yii\db\ActiveRecord
      */
     public function getScreens()
     {
-        return $this->hasMany(Screen::className(), ['template_id' => 'id']);
+        return $this->hasMany(Screen::class, ['template_id' => 'id']);
     }
 
     /**
@@ -90,7 +90,7 @@ class ScreenTemplate extends \yii\db\ActiveRecord
      */
     public function getBackground()
     {
-        return $this->hasOne(TemplateBackground::className(), ['id' => 'background_id']);
+        return $this->hasOne(TemplateBackground::class, ['id' => 'background_id']);
     }
 
     public function setBackground($backgroundId)

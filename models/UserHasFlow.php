@@ -31,8 +31,8 @@ class UserHasFlow extends \yii\db\ActiveRecord
             [['user_username', 'flow_id'], 'required'],
             [['flow_id'], 'integer'],
             [['user_username'], 'string', 'max' => 64],
-            [['user_username'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['user_username' => 'username']],
-            [['flow_id'], 'exist', 'skipOnError' => true, 'targetClass' => Flow::className(), 'targetAttribute' => ['flow_id' => 'id']],
+            [['user_username'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['user_username' => 'username']],
+            [['flow_id'], 'exist', 'skipOnError' => true, 'targetClass' => Flow::class, 'targetAttribute' => ['flow_id' => 'id']],
         ];
     }
 
@@ -52,7 +52,7 @@ class UserHasFlow extends \yii\db\ActiveRecord
      */
     public function getUser()
     {
-        return $this->hasOne(User::className(), ['username' => 'user_username']);
+        return $this->hasOne(User::class, ['username' => 'user_username']);
     }
 
     /**
@@ -60,6 +60,6 @@ class UserHasFlow extends \yii\db\ActiveRecord
      */
     public function getFlow()
     {
-        return $this->hasOne(Flow::className(), ['id' => 'flow_id']);
+        return $this->hasOne(Flow::class, ['id' => 'flow_id']);
     }
 }
