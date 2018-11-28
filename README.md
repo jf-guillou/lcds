@@ -2,9 +2,7 @@
 
 # Light Centralized Digital Signage
 
-There are already dozens of digital signage managers. But no easy to use open-source CMS based projects.
-
-Now there's this one, still in **beta**.
+This PHP web app is a simple digital signage manager, used to display content on any kind of browser.
 
 Based on the [Yii2 framework](http://www.yiiframework.com/).
 See [https://github.com/jf-guillou/lcds/blob/master/composer.json](composer.json) for the complete list of extensions used in this project.
@@ -28,35 +26,33 @@ See [https://github.com/jf-guillou/lcds/blob/master/composer.json](composer.json
   - [Auto-Configuration](#auto-configuration)
   - [Manual configuration](#manual-configuration)
 
-
-
 ## REQUIREMENTS
 
 - PHP >= 5.6
-- MySQL >= 5.5 OR MariaDB >= 10.0
-- mediainfo
-- youtube-dl : Used by HostedVideo sideloader -- Make sure to keep updated
-```bash
-sudo wget https://yt-dl.org/downloads/latest/youtube-dl -O /usr/local/bin/youtube-dl
-sudo chmod a+rx /usr/local/bin/youtube-dl
-```
+    - php-mbstring
+    - php-ldap (optional)
+- Any php-pdo supported driver
+    - MariaDB >= 10.0 preferably
+- mediainfo -- extract media content-type and duration
+- youtube-dl -- download media from video hosting sites
 - [Composer](https://getcomposer.org/)
-> Lower PHP versions are unsupported but should work
-
-### Optional
-
-- php5-ldap / php7-ldap
 
 ## INSTALLATION
-
-**Do not forget to change /path/to/install in the following guide to your liking.**
 
 ### Install app
 
 ```bash
+cd /var/www
 git clone -b production https://github.com/jf-guillou/lcds.git
 cd lcds
 composer install --no-dev
+```
+
+### youtube-dl
+
+```bash
+sudo wget https://yt-dl.org/downloads/latest/youtube-dl -O /usr/local/bin/youtube-dl
+sudo chmod a+rx /usr/local/bin/youtube-dl
 ```
 
 ### Database
@@ -90,20 +86,19 @@ Edit the app configuration file `config/params.php` :
   - `apikey` - API key used to fetch weather status
   - `withSummary` - Display text summary alongside icon
 
-
 ### Web Server configuration
 
 The [Yii2 framework](http://www.yiiframework.com/) document root is in the /web folder
 
 #### Apache
 ```
-DocumentRoot "/path/to/install/lcds/web"
+DocumentRoot "/var/www/lcds/web"
 ```
 
 ##### Enable pretty urls
 Add to Apache configuration
 ```
-<Directory "/path/to/install/lcds/web">
+<Directory "/var/www/lcds/web">
     # use mod_rewrite for pretty URL support
     RewriteEngine on
     # If a directory or a file exists, use the request directly
@@ -117,7 +112,7 @@ Add to Apache configuration
 
 #### Nginx
 ```
-root /path/to/install/lcds/web;
+root /var/www/lcds/web;
 ```
 
 ##### Enable pretty urls
@@ -132,13 +127,16 @@ location / {
 ### Ready
 
 The app should be ready to use.
+
+Default credentials are `admin`/`admin`
+
 Do not hesitate to report bugs by posting an [issue at Github](https://github.com/jf-guillou/lcds/issues)
 
 
 ## UPGRADE
 
 ```bash
-cd /path/to/install/lcds
+cd /var/www/lcds
 git pull
 composer install --no-dev
 ./yii migrate --interactive=0
