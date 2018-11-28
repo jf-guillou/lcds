@@ -72,7 +72,7 @@ AppAsset::register($this);
     <div class="container">
         <p class="pull-left">&copy; <a href="https://github.com/jf-guillou/">jf-guillou</a> <?= date('Y') ?> - <?= Yii::t('app', 'Developed for the {iut}', ['iut' => '<a href="https://iut-stbrieuc.univ-rennes1.fr/">IUT Saint-Brieuc</a>'])?></p>
 
-        <p class="pull-right"><?= Yii::powered() ?> <a href="https://github.com/jf-guillou/lcds/">Github</a></p>
+        <p class="pull-right"><a href="http://www.yiiframework.com/" rel="external">Yii Framework</a> - <a href="https://github.com/jf-guillou/lcds/">Github</a></p>
     </div>
 </footer>
 
