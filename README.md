@@ -152,6 +152,6 @@ Basically, just set the homepage of the browser to your web server address with 
 
 `https://lcds-server/frontend`
 
-## Raspberry Pi Client
+### Raspberry Pi Client
 
-If you want to use a Raspberry Pi, you probably need (some setup)[https://github.com/jf-guillou/lcds-rpi-client].
+If you want to use a Raspberry Pi, here is [the setup we use](https://github.com/jf-guillou/lcds-rpi-client).
