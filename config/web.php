@@ -59,8 +59,14 @@ $config = [
             ],
         ],
         'ldap' => ($params['useLdap'] ? [
-            'class' => 'Edvlerblog\Ldap',
-            'options' => $params['ldapOptions'],
+            'class' => 'Edvlerblog\Adldap2\Adldap2Wrapper',
+            'schema' => $params['activeDirectorySchema'] ? \Adldap\Schemas\ActiveDirectory::class : \Adldap\Schemas\OpenLDAP::class,
+            'providers' => [
+                'default' => [
+                    'autoconnect' => true,
+                    'config' => $params['ldapOptions']
+                ]
+            ]
         ] : null),
         'authManager' => [
             'class' => 'yii\rbac\DbManager',

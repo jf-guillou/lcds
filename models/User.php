@@ -125,7 +125,7 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
     public function authenticate($password)
     {
         $this->password = $password;
-        if (Yii::$app->params['useLdap'] && Yii::$app->ldap->authenticate($this->getId(), $password)) {
+        if (Yii::$app->params['useLdap'] && Yii::$app->ldap->auth()->attempt($this->getId(), $password)) {
             $this->fromLdap = true;
 
             return true;
@@ -144,7 +144,7 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
     public static function findInLdap($id)
     {
         if (Yii::$app->params['useLdap']) {
-            $ldapUser = Yii::$app->ldap->users()->find($id);
+            $ldapUser = Yii::$app->ldap->search()->users()->find($id);
             if ($ldapUser) {
                 $user = new self();
                 $user->username = $id;

@@ -12,8 +12,10 @@ return [
     // Authentication
     'useKerberos' => false,
     'kerberosPrincipalVar' => 'REDIRECT_REMOTE_USER',
-    // LDAP -- requires edvlerblog/yii2-adldap-module
+    // LDAP
     'useLdap' => false,
+    // ActiveDirectory schema (will use OpenLDAP if false)
+    'activeDirectorySchema' => true,
     'ldapOptions' => [
         'port' => 389,
         'domain_controllers' => ['controller.domain.local'],
