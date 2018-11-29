@@ -60,10 +60,10 @@ $config = [
         ],
         'ldap' => ($params['useLdap'] ? [
             'class' => 'Edvlerblog\Adldap2\Adldap2Wrapper',
-            'schema' => $params['activeDirectorySchema'] ? \Adldap\Schemas\ActiveDirectory::class : \Adldap\Schemas\OpenLDAP::class,
             'providers' => [
                 'default' => [
                     'autoconnect' => true,
+                    'schema' => $params['activeDirectorySchema'] ? \Adldap\Schemas\ActiveDirectory::class : \Adldap\Schemas\OpenLDAP::class,
                     'config' => $params['ldapOptions']
                 ]
             ]
