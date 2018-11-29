@@ -63,7 +63,7 @@ $config = [
             'providers' => [
                 'default' => [
                     'autoconnect' => true,
-                    'schema' => $params['activeDirectorySchema'] ? \Adldap\Schemas\ActiveDirectory::class : \Adldap\Schemas\OpenLDAP::class,
+                    'schema' => $params['activeDirectorySchema'] ? new \Adldap\Schemas\ActiveDirectory() : new \Adldap\Schemas\OpenLDAP(),
                     'config' => $params['ldapOptions']
                 ]
             ]

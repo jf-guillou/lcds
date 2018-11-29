@@ -144,7 +144,7 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
     public static function findInLdap($id)
     {
         if (Yii::$app->params['useLdap']) {
-            $ldapUser = Yii::$app->ldap->search()->users()->find($id);
+            $ldapUser = Yii::$app->ldap->search()->users()->findBy(Yii::$app->params['activeDirectorySchema'] ? 'samAccountName' : 'uid', $id);
             if ($ldapUser) {
                 $user = new self();
                 $user->username = $id;
