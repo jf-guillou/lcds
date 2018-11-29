@@ -35,7 +35,7 @@ class Field extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['template_id', 'x1', 'y1', 'x2', 'y2', 'random_order'], 'required'],
+            [['template_id', 'x1', 'y1', 'x2', 'y2'], 'required'],
             [['template_id'], 'integer'],
             [['x1', 'y1', 'x2', 'y2'], 'number'],
             [['css', 'js'], 'string'],
