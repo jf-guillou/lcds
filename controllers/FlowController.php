@@ -24,13 +24,13 @@ class FlowController extends BaseController
     {
         return [
             'verbs' => [
-                'class' => VerbFilter::className(),
+                'class' => VerbFilter::class,
                 'actions' => [
                     'delete' => ['POST'],
                 ],
             ],
             'access' => [
-                'class' => AccessControl::className(),
+                'class' => AccessControl::class,
                 'only' => ['index', 'view', 'create', 'update', 'delete'],
                 'rules' => [
                     ['allow' => true, 'actions' => ['index', 'view'], 'roles' => ['@']],
@@ -76,12 +76,12 @@ class FlowController extends BaseController
         }
 
         $dataProvider = new ActiveDataProvider([
-            'query' => Content::find()->joinWith(['type', 'flow'])->where([Flow::tableName().'.id' => $id]),
+            'query' => Content::find()->joinWith(['type', 'flow'])->where([Flow::tableName() . '.id' => $id]),
         ]);
 
         $dataProvider->sort->attributes['type.name'] = [
-            'asc' => [ContentType::tableName().'.id' => SORT_ASC],
-            'desc' => [ContentType::tableName().'.id' => SORT_DESC],
+            'asc' => [ContentType::tableName() . '.id' => SORT_ASC],
+            'desc' => [ContentType::tableName() . '.id' => SORT_DESC],
         ];
 
         return $this->render('view', [

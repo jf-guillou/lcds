@@ -31,8 +31,8 @@ class FieldHasContentType extends \yii\db\ActiveRecord
             [['field_id', 'content_type_id'], 'required'],
             [['field_id'], 'integer'],
             [['content_type_id'], 'string', 'max' => 45],
-            [['field_id'], 'exist', 'skipOnError' => true, 'targetClass' => Field::className(), 'targetAttribute' => ['field_id' => 'id']],
-            [['content_type_id'], 'exist', 'skipOnError' => true, 'targetClass' => ContentType::className(), 'targetAttribute' => ['content_type_id' => 'id']],
+            [['field_id'], 'exist', 'skipOnError' => true, 'targetClass' => Field::class, 'targetAttribute' => ['field_id' => 'id']],
+            [['content_type_id'], 'exist', 'skipOnError' => true, 'targetClass' => ContentType::class, 'targetAttribute' => ['content_type_id' => 'id']],
         ];
     }
 
@@ -52,7 +52,7 @@ class FieldHasContentType extends \yii\db\ActiveRecord
      */
     public function getField()
     {
-        return $this->hasOne(Field::className(), ['id' => 'field_id']);
+        return $this->hasOne(Field::class, ['id' => 'field_id']);
     }
 
     /**
@@ -60,6 +60,6 @@ class FieldHasContentType extends \yii\db\ActiveRecord
      */
     public function getContentType()
     {
-        return $this->hasOne(ContentType::className(), ['id' => 'content_type_id']);
+        return $this->hasOne(ContentType::class, ['id' => 'content_type_id']);
     }
 }

@@ -6,6 +6,10 @@ $db = require __DIR__.'/db.test.php';
 $config = [
     'id' => 'lcds',
     'basePath' => dirname(__DIR__),
+    'aliases' => [
+        '@bower' => '@vendor/bower-asset',
+        '@npm'   => '@vendor/npm-asset',
+    ],
     'defaultRoute' => 'main/index',
     'sourceLanguage' => 'en-US',
     'language' => 'en-US',

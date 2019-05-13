@@ -62,7 +62,7 @@ class TemplateBackground extends \yii\db\ActiveRecord
      */
     public function getScreenTemplates()
     {
-        return $this->hasMany(ScreenTemplate::className(), ['background_id' => 'id']);
+        return $this->hasMany(ScreenTemplate::class, ['background_id' => 'id']);
     }
 
     /**

@@ -125,7 +125,7 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
     public function authenticate($password)
     {
         $this->password = $password;
-        if (Yii::$app->params['useLdap'] && Yii::$app->ldap->authenticate($this->getId(), $password)) {
+        if (Yii::$app->params['useLdap'] && Yii::$app->ldap->auth()->attempt($this->getId(), $password)) {
             $this->fromLdap = true;
 
             return true;
@@ -144,7 +144,7 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
     public static function findInLdap($id)
     {
         if (Yii::$app->params['useLdap']) {
-            $ldapUser = Yii::$app->ldap->users()->find($id);
+            $ldapUser = Yii::$app->ldap->search()->users()->findBy(Yii::$app->params['activeDirectorySchema'] ? 'samAccountName' : 'uid', $id);
             if ($ldapUser) {
                 $user = new self();
                 $user->username = $id;
@@ -236,7 +236,7 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
      */
     public function getUserHasFlows()
     {
-        return $this->hasMany(UserHasFlow::className(), ['user_username' => 'username']);
+        return $this->hasMany(UserHasFlow::class, ['user_username' => 'username']);
     }
 
     /**
@@ -244,7 +244,7 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
      */
     public function getFlows()
     {
-        return $this->hasMany(Flow::className(), ['id' => 'flow_id'])->viaTable('user_has_flow', ['user_username' => 'username']);
+        return $this->hasMany(Flow::class, ['id' => 'flow_id'])->viaTable('user_has_flow', ['user_username' => 'username']);
     }
 
     /**

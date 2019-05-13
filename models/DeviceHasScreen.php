@@ -30,8 +30,8 @@ class DeviceHasScreen extends \yii\db\ActiveRecord
         return [
             [['device_id', 'screen_id'], 'required'],
             [['device_id', 'screen_id'], 'integer'],
-            [['device_id'], 'exist', 'skipOnError' => true, 'targetClass' => Device::className(), 'targetAttribute' => ['device_id' => 'id']],
-            [['screen_id'], 'exist', 'skipOnError' => true, 'targetClass' => Screen::className(), 'targetAttribute' => ['screen_id' => 'id']],
+            [['device_id'], 'exist', 'skipOnError' => true, 'targetClass' => Device::class, 'targetAttribute' => ['device_id' => 'id']],
+            [['screen_id'], 'exist', 'skipOnError' => true, 'targetClass' => Screen::class, 'targetAttribute' => ['screen_id' => 'id']],
         ];
     }
 
@@ -51,7 +51,7 @@ class DeviceHasScreen extends \yii\db\ActiveRecord
      */
     public function getDevice()
     {
-        return $this->hasOne(Device::className(), ['id' => 'device_id']);
+        return $this->hasOne(Device::class, ['id' => 'device_id']);
     }
 
     /**
@@ -59,6 +59,6 @@ class DeviceHasScreen extends \yii\db\ActiveRecord
      */
     public function getScreen()
     {
-        return $this->hasOne(Screen::className(), ['id' => 'screen_id']);
+        return $this->hasOne(Screen::class, ['id' => 'screen_id']);
     }
 }

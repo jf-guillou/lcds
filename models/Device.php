@@ -79,7 +79,7 @@ class Device extends \yii\db\ActiveRecord
      */
     public function getDeviceHasScreens()
     {
-        return $this->hasMany(DeviceHasScreen::className(), ['device_id' => 'id']);
+        return $this->hasMany(DeviceHasScreen::class, ['device_id' => 'id']);
     }
 
     /**
@@ -87,7 +87,7 @@ class Device extends \yii\db\ActiveRecord
      */
     public function getScreens()
     {
-        return $this->hasMany(Screen::className(), ['id' => 'screen_id'])->viaTable('device_has_screen', ['device_id' => 'id']);
+        return $this->hasMany(Screen::class, ['id' => 'screen_id'])->viaTable('device_has_screen', ['device_id' => 'id']);
     }
 
     /**

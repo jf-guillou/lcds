@@ -96,7 +96,7 @@ class ContentType extends \yii\db\ActiveRecord
      */
     public static function fromType($typeId)
     {
-        $className = self::SUB_PATH.$typeId;
+        $className = self::SUB_PATH . $typeId;
         if (!class_exists($className)) {
             throw new ServerErrorHttpException(Yii::t('app', 'The requested content type has no class.'));
         }
@@ -218,7 +218,7 @@ class ContentType extends \yii\db\ActiveRecord
      */
     public function hasCache($key)
     {
-        return \Yii::$app->cache->exists($this->id.$key);
+        return \Yii::$app->cache->exists($this->id . $key);
     }
 
     /**
@@ -231,7 +231,7 @@ class ContentType extends \yii\db\ActiveRecord
     public function fromCache($key)
     {
         $cache = \Yii::$app->cache;
-        $cacheKey = $this->id.$key;
+        $cacheKey = $this->id . $key;
 
         return $cache->get($cacheKey);
     }
@@ -245,7 +245,7 @@ class ContentType extends \yii\db\ActiveRecord
     public function toCache($key, $content)
     {
         $cache = \Yii::$app->cache;
-        $cacheKey = $this->id.$key;
+        $cacheKey = $this->id . $key;
         $cache->set($cacheKey, $content, static::BASE_CACHE_TIME);
     }
 
@@ -254,7 +254,7 @@ class ContentType extends \yii\db\ActiveRecord
      */
     public function getContents()
     {
-        return $this->hasMany(Content::className(), ['type_id' => 'id']);
+        return $this->hasMany(Content::class, ['type_id' => 'id']);
     }
 
     /**
@@ -262,7 +262,7 @@ class ContentType extends \yii\db\ActiveRecord
      */
     public function getFieldHasContentTypes()
     {
-        return $this->hasMany(FieldHasContentType::className(), ['content_type_id' => 'id']);
+        return $this->hasMany(FieldHasContentType::class, ['content_type_id' => 'id']);
     }
 
     /**
@@ -270,7 +270,7 @@ class ContentType extends \yii\db\ActiveRecord
      */
     public function getFields()
     {
-        return $this->hasMany(Field::className(), ['id' => 'field_id'])->viaTable('field_has_content_type', ['content_type_id' => 'id']);
+        return $this->hasMany(Field::class, ['id' => 'field_id'])->viaTable('field_has_content_type', ['content_type_id' => 'id']);
     }
 
     /**

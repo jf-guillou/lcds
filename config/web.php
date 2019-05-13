@@ -1,12 +1,16 @@
 <?php
 
-$params = require __DIR__.'/params.php';
-$db = require __DIR__.'/db.php';
+$params = require __DIR__ . '/params.php';
+$db = require __DIR__ . '/db.php';
 
 $config = [
     'id' => 'lcds',
     'basePath' => dirname(__DIR__),
     'bootstrap' => ['log'],
+    'aliases' => [
+        '@bower' => '@vendor/bower-asset',
+        '@npm'   => '@vendor/npm-asset',
+    ],
     'defaultRoute' => 'main/index',
     'sourceLanguage' => 'en-US',
     'language' => $params['language'],
@@ -54,10 +58,16 @@ $config = [
                 ],
             ],
         ],
-        'ldap' => [
-            'class' => 'Edvlerblog\Ldap',
-            'options' => $params['ldapOptions'],
-        ],
+        'ldap' => ($params['useLdap'] ? [
+            'class' => 'Edvlerblog\Adldap2\Adldap2Wrapper',
+            'providers' => [
+                'default' => [
+                    'autoconnect' => true,
+                    'schema' => $params['activeDirectorySchema'] ? new \Adldap\Schemas\ActiveDirectory() : new \Adldap\Schemas\OpenLDAP(),
+                    'config' => $params['ldapOptions']
+                ]
+            ]
+        ] : null),
         'authManager' => [
             'class' => 'yii\rbac\DbManager',
         ],

@@ -12,17 +12,24 @@ return [
     // Authentication
     'useKerberos' => false,
     'kerberosPrincipalVar' => 'REDIRECT_REMOTE_USER',
+    // LDAP
     'useLdap' => false,
+    // ActiveDirectory schema (will use OpenLDAP if false)
+    'activeDirectorySchema' => false,
     'ldapOptions' => [
+        // 636 for ldaps
         'port' => 389,
+        // AD domain controllers or LDAP servers
         'domain_controllers' => ['controller.domain.local'],
+        // 'uid=' for OpenLDAP
+        'account_prefix' => '',
+        // ',ou=users,dc=local' for OpenLDAP
         'account_suffix' => '@local',
         'base_dn' => 'dc=local',
         'admin_username' => 'admin',
         'admin_password' => 'password',
         'use_ssl' => true,
         'use_tls' => true,
-        'use_sso' => true,
     ],
     // Cookie duration in seconds
     'cookieDuration' => 60 * 60 * 24 * 7,

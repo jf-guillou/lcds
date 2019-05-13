@@ -31,8 +31,8 @@ class ScreenHasFlow extends \yii\db\ActiveRecord
         return [
             [['screen_id', 'flow_id'], 'required'],
             [['screen_id', 'flow_id'], 'integer'],
-            [['screen_id'], 'exist', 'skipOnError' => true, 'targetClass' => Screen::className(), 'targetAttribute' => ['screen_id' => 'id']],
-            [['flow_id'], 'exist', 'skipOnError' => true, 'targetClass' => Flow::className(), 'targetAttribute' => ['flow_id' => 'id']],
+            [['screen_id'], 'exist', 'skipOnError' => true, 'targetClass' => Screen::class, 'targetAttribute' => ['screen_id' => 'id']],
+            [['flow_id'], 'exist', 'skipOnError' => true, 'targetClass' => Flow::class, 'targetAttribute' => ['flow_id' => 'id']],
         ];
     }
 
@@ -52,7 +52,7 @@ class ScreenHasFlow extends \yii\db\ActiveRecord
      */
     public function getScreen()
     {
-        return $this->hasOne(Screen::className(), ['id' => 'screen_id']);
+        return $this->hasOne(Screen::class, ['id' => 'screen_id']);
     }
 
     /**
@@ -60,6 +60,6 @@ class ScreenHasFlow extends \yii\db\ActiveRecord
      */
     public function getFlow()
     {
-        return $this->hasOne(Flow::className(), ['id' => 'flow_id']);
+        return $this->hasOne(Flow::class, ['id' => 'flow_id']);
     }
 }

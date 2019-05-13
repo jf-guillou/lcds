@@ -25,13 +25,13 @@ class UserController extends Controller
     {
         return [
             'verbs' => [
-                'class' => VerbFilter::className(),
+                'class' => VerbFilter::class,
                 'actions' => [
                     'delete' => ['POST'],
                 ],
             ],
             'access' => [
-                'class' => AccessControl::className(),
+                'class' => AccessControl::class,
                 'only' => ['index', 'view', 'create', 'import', 'delete', 'set-roles'],
                 'rules' => [
                     ['allow' => true, 'actions' => ['index', 'view', 'create', 'delete', 'set-roles'], 'roles' => ['admin']],

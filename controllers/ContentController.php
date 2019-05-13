@@ -25,13 +25,13 @@ class ContentController extends BaseController
     {
         return [
             'verbs' => [
-                'class' => VerbFilter::className(),
+                'class' => VerbFilter::class,
                 'actions' => [
                     'delete' => ['POST'],
                 ],
             ],
             'access' => [
-                'class' => AccessControl::className(),
+                'class' => AccessControl::class,
                 'only' => ['index', 'view', 'generate', 'upload', 'sideload', 'update', 'delete', 'toggle'],
                 'rules' => [
                     ['allow' => true, 'actions' => ['index', 'view', 'generate', 'upload', 'sideload', 'update', 'delete', 'toggle'], 'roles' => ['@']],
@@ -57,13 +57,13 @@ class ContentController extends BaseController
         ]);
 
         $dataProvider->sort->attributes['type.name'] = [
-            'asc' => [ContentType::tableName().'.id' => SORT_ASC],
-            'desc' => [ContentType::tableName().'.id' => SORT_DESC],
+            'asc' => [ContentType::tableName() . '.id' => SORT_ASC],
+            'desc' => [ContentType::tableName() . '.id' => SORT_DESC],
         ];
 
         $dataProvider->sort->attributes['flow.name'] = [
-            'asc' => [Flow::tableName().'.id' => SORT_ASC],
-            'desc' => [Flow::tableName().'.id' => SORT_DESC],
+            'asc' => [Flow::tableName() . '.id' => SORT_ASC],
+            'desc' => [Flow::tableName() . '.id' => SORT_DESC],
         ];
 
         return $this->render('index', [
@@ -134,12 +134,12 @@ class ContentController extends BaseController
                     // Latitude & longitude
                 case ContentType::KINDS['TEXT']:
                     // Same as URL, text doesn't require processing
-                    return $this->render('type/'.$contentType->input, [
-                            'type' => $contentType,
-                            'model' => $model,
-                            'uploadUrl' => Url::to(['content/upload', 'type' => $type]),
-                            'sideloadUrl' => Url::to(['content/sideload', 'type' => $type]),
-                        ]);
+                    return $this->render('type/' . $contentType->input, [
+                        'type' => $contentType,
+                        'model' => $model,
+                        'uploadUrl' => Url::to(['content/upload', 'type' => $type]),
+                        'sideloadUrl' => Url::to(['content/sideload', 'type' => $type]),
+                    ]);
                 case ContentType::KINDS['NONE']:
                 case ContentType::KINDS['RAW']:
                     // RAW ContentType doesn't support Content
@@ -252,9 +252,9 @@ class ContentController extends BaseController
         $model = $this->findViewableModel($id, Yii::$app->user);
 
         return $this->renderPartial('preview', [
-                'type' => $model->type,
-                'data' => $model->getData(),
-            ]);
+            'type' => $model->type,
+            'data' => $model->getData(),
+        ]);
     }
 
     /**

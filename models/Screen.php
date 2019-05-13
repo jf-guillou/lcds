@@ -41,7 +41,7 @@ class Screen extends \yii\db\ActiveRecord
             [['last_changes', 'template'], 'safe'],
             [['name'], 'string', 'max' => 64],
             [['description'], 'string', 'max' => 1024],
-            [['template_id'], 'exist', 'skipOnError' => true, 'targetClass' => ScreenTemplate::className(), 'targetAttribute' => ['template_id' => 'id']],
+            [['template_id'], 'exist', 'skipOnError' => true, 'targetClass' => ScreenTemplate::class, 'targetAttribute' => ['template_id' => 'id']],
         ];
     }
 
@@ -105,7 +105,7 @@ class Screen extends \yii\db\ActiveRecord
      */
     public function getDeviceHasScreens()
     {
-        return $this->hasMany(DeviceHasScreen::className(), ['screen_id' => 'id']);
+        return $this->hasMany(DeviceHasScreen::class, ['screen_id' => 'id']);
     }
 
     /**
@@ -113,7 +113,7 @@ class Screen extends \yii\db\ActiveRecord
      */
     public function getDevices()
     {
-        return $this->hasMany(Device::className(), ['id' => 'device_id'])->viaTable('device_has_screen', ['screen_id' => 'id']);
+        return $this->hasMany(Device::class, ['id' => 'device_id'])->viaTable('device_has_screen', ['screen_id' => 'id']);
     }
 
     /**
@@ -121,7 +121,7 @@ class Screen extends \yii\db\ActiveRecord
      */
     public function getTemplate()
     {
-        return $this->hasOne(ScreenTemplate::className(), ['id' => 'template_id']);
+        return $this->hasOne(ScreenTemplate::class, ['id' => 'template_id']);
     }
 
     /**
@@ -129,7 +129,7 @@ class Screen extends \yii\db\ActiveRecord
      */
     public function getScreenHasFlows()
     {
-        return $this->hasMany(ScreenHasFlow::className(), ['screen_id' => 'id']);
+        return $this->hasMany(ScreenHasFlow::class, ['screen_id' => 'id']);
     }
 
     /**
@@ -137,6 +137,6 @@ class Screen extends \yii\db\ActiveRecord
      */
     public function getFlows()
     {
-        return $this->hasMany(Flow::className(), ['id' => 'flow_id'])->viaTable('screen_has_flow', ['screen_id' => 'id']);
+        return $this->hasMany(Flow::class, ['id' => 'flow_id'])->viaTable('screen_has_flow', ['screen_id' => 'id']);
     }
 }
