@@ -28,7 +28,9 @@ See [https://github.com/jf-guillou/lcds/blob/master/composer.json](composer.json
 
 ## REQUIREMENTS
 
-- PHP >= 5.6
+- PHP >= 7.0
+    - php-curl
+    - php-xml
     - php-mbstring
     - php-ldap
 - Any php-pdo supported driver and associated database
@@ -42,7 +44,7 @@ See [https://github.com/jf-guillou/lcds/blob/master/composer.json](composer.json
 ### Requirements
 
 ```bash
-apt-get install -y git php php-mbstring php-ldap php-mysql composer mariadb-server mediainfo
+apt-get install -y git php php-mbstring php-ldap php-mysql php-curl php-xml composer mariadb-server mediainfo
 
 sudo wget https://yt-dl.org/downloads/latest/youtube-dl -O /usr/local/bin/youtube-dl
 sudo chmod a+rx /usr/local/bin/youtube-dl
