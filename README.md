@@ -82,6 +82,7 @@ Edit the app configuration file `config/params.php` :
 - `useSSO` - If the web server is SSO enabled (CAS/Kerberos)
 - `ssoEnvUsername` - The HTTP environment variable containing the username from SSO
 - `useLdap` - Use LDAP for authentication backend
+- `activeDirectorySchema` - ActiveDirectory or OpenLDAP schema
 - `ldapOptions` - Common options for LDAP, default values should help you understand their meaning
 - `cookieDuration` - Cookie duration in seconds, 0 will disable cookies
 - `weather` - Weather renderer configuration / See https://darksky.net/dev for more details

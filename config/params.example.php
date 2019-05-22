@@ -20,14 +20,14 @@ return [
         // 636 for ldaps
         'port' => 389,
         // AD domain controllers or LDAP servers
-        'domain_controllers' => ['controller.domain.local'],
+        'hosts' => ['controller.domain.local'],
         // 'uid=' for OpenLDAP
         'account_prefix' => '',
         // ',ou=users,dc=local' for OpenLDAP
         'account_suffix' => '@local',
         'base_dn' => 'dc=local',
-        'admin_username' => 'admin',
-        'admin_password' => 'password',
+        'username' => 'admin',
+        'password' => 'password',
         'use_ssl' => true,
         'use_tls' => true,
     ],
