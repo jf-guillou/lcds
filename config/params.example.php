@@ -10,8 +10,8 @@ return [
     // Outgoing proxy
     'proxy' => false,
     // Authentication
-    'useKerberos' => false,
-    'kerberosPrincipalVar' => 'REDIRECT_REMOTE_USER',
+    'useSSO' => false,
+    'ssoEnvUsername' => 'REDIRECT_REMOTE_USER',
     // LDAP
     'useLdap' => false,
     // ActiveDirectory schema (will use OpenLDAP if false)

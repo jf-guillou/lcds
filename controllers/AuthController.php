@@ -51,7 +51,7 @@ class AuthController extends BaseController
     }
 
     /**
-     * Login an user based on kerberos auth if available, else use login form
+     * Login an user based on SSO auth if available, else use login form
      * with LDAP backend if available or DB.
      *
      * @return \yii\web\Response|string redirect or render
@@ -62,8 +62,8 @@ class AuthController extends BaseController
             return $this->goBack();
         }
 
-        // Kerberos auth
-        $identity = $this->getFromKerberos();
+        // SSO auth
+        $identity = $this->getFromSSO();
         if ($identity) {
             // Login auto saves in DB
             Yii::$app->user->login($identity, Yii::$app->params['cookieDuration']);
@@ -93,15 +93,15 @@ class AuthController extends BaseController
     }
 
     /**
-     * Check for kerberos configuration and try to authenticate user.
+     * Check for SSO configuration and try to authenticate user.
      *
      * @return \app\models\User|null found user
      */
-    private function getFromKerberos()
+    private function getFromSSO()
     {
-        // Kerberos auth
-        if (Yii::$app->params['useKerberos'] && isset($_SERVER[Yii::$app->params['kerberosPrincipalVar']])) {
-            $username = $_SERVER[Yii::$app->params['kerberosPrincipalVar']];
+        // SSO auth
+        if (Yii::$app->params['useSSO'] && isset($_SERVER[Yii::$app->params['ssoEnvUsername']])) {
+            $username = $_SERVER[Yii::$app->params['ssoEnvUsername']];
 
             // Find in DB/LDAP
             return User::findIdentity($username);
