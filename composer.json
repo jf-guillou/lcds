@@ -17,9 +17,9 @@
     "minimum-stability": "stable",
     "require": {
         "php": ">=7.0.0",
-        "yiisoft/yii2": "~2.0.18",
+        "yiisoft/yii2": "~2.0.19",
         "yiisoft/yii2-bootstrap": "~2.0.0",
-        "yiisoft/yii2-swiftmailer": "~2.0.0",
+        "yiisoft/yii2-swiftmailer": "~2.1.0",
         "yiisoft/yii2-jui": "~2.0.0",
         "kartik-v/yii2-widget-datetimepicker": "^1.4.8",
         "norkunas/youtube-dl-php": "^1.2.0",
@@ -33,12 +33,13 @@
         "bower-asset/raphael": "^2.2"
     },
     "require-dev": {
-        "yiisoft/yii2-debug": "~2.0.0",
-        "yiisoft/yii2-gii": "~2.0.0",
+        "yiisoft/yii2-debug": "~2.1.0",
+        "yiisoft/yii2-gii": "~2.1.0",
         "yiisoft/yii2-faker": "~2.0.0",
-        "codeception/base": "^2.2.3",
-        "codeception/verify": "~0.3.1",
-        "codeception/specify": "~0.4.3"
+        "codeception/base": "^2.3.0",
+        "codeception/verify": "~0.4.0",
+        "codeception/specify": "~0.4.6",
+        "symfony/browser-kit": ">=2.7 <=4.2.4"
     },
     "config": {
         "process-timeout": 1800
