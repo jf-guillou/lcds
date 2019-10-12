@@ -29,17 +29,8 @@ class Image extends Media
         $this->description = Yii::t('app', 'Direct link to an image on an internet website. Hosted image is usually more appropriate.');
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function validateFile($realFilepath)
+    public function transformDataBeforeSave($insert, $data)
     {
-        $mediainfo = self::getMediaInfo($realFilepath);
-
-        if (count($mediainfo->getImages())) {
-            return true;
-        }
-
-        return false;
+        return $data;
     }
 }
